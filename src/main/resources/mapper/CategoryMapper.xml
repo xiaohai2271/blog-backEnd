@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.celess.blog.mapper.CategoryMapper">
+    <resultMap id="categoryResultMap" type="cn.celess.blog.entity.Category">
+        <id column="c_id" property="id"/>
+        <result column="c_name" property="name"/>
+    </resultMap>
+
+    <insert id="insert">
+        insert into category (c_name, articles)
+        values (#{name}, #{articles});
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <update id="update">
+        update category
+        set c_name=#{name},
+            articles=#{articles}
+        where c_id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete
+        from category
+        where c_id = #{id}
+    </delete>
+
+    <select id="findCategoryByName" resultMap="categoryResultMap">
+        select *
+        from category
+        where c_name = #{name}
+    </select>
+
+    <select id="findCategoryById" resultMap="categoryResultMap">
+        select *
+        from category
+        where c_id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="categoryResultMap">
+        select *
+        from category
+    </select>
+
+    <select id="getAllName" resultType="java.lang.String">
+        select c_name
+        from category
+    </select>
+
+    <select id="getNameById" resultType="java.lang.String">
+        select c_name
+        from category
+        where c_id = #{id}
+    </select>
+
+    <select id="getIDByName" resultType="java.lang.Long">
+        select c_id
+        from category
+        where c_name = #{name}
+    </select>
+
+    <select id="existsByName" resultType="java.lang.Boolean">
+        SELECT EXISTS(SELECT * FROM category WHERE c_name = #{name})
+    </select>
+
+    <select id="existsById" resultType="java.lang.Boolean">
+        SELECT EXISTS(SELECT * FROM category WHERE c_id = #{id})
+    </select>
+
+    <select id="getLastestCategory" resultMap="categoryResultMap">
+        select *
+        from category
+        order by c_id desc
+        limit 1;
+    </select>
+
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from category;
+    </select>
+
+</mapper>

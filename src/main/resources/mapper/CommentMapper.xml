@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.celess.blog.mapper.CommentMapper">
+    <resultMap id="commentResultMap" type="cn.celess.blog.entity.Comment">
+        <id column="co_id" property="id"/>
+        <result column="co_article_id" property="articleID"/>
+        <result column="is_comment" property="type"/>
+        <result column="author_id" property="authorID"/>
+        <result column="co_content" property="content"/>
+        <result column="co_date" property="date"/>
+        <result column="co_pid" property="pid"/>
+        <result column="co_response_id" property="responseId"/>
+    </resultMap>
+
+    <insert id="insert">
+        insert into comment (co_article_id, is_comment, author_id, co_content, co_date, co_pid)
+        VALUES (#{articleID}, #{type}, #{authorID}, #{content}, #{date}, #{pid})
+        <selectKey resultType="java.lang.Long" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <update id="updateContent">
+        update comment
+        set co_content=#{content}
+        where co_id = #{id}
+    </update>
+
+    <update id="updateResponder">
+        update comment
+        set co_response_id =#{responder}
+        where co_id = #{id}
+    </update>
+    <delete id="delete">
+        delete
+        from comment
+        where co_id = #{id}
+    </delete>
+    <delete id="deleteByArticleId">
+        delete
+        from comment
+        where co_article_id = #{articleId}
+    </delete>
+    <select id="existsById" resultType="java.lang.Boolean">
+        SELECT EXISTS(SELECT * FROM comment WHERE co_id = #{id})
+    </select>
+    <select id="findCommentById" resultMap="commentResultMap">
+        select *
+        from comment
+        where co_id = #{id}
+    </select>
+    <select id="findAllByAuthorIDAndType" resultMap="commentResultMap">
+        select *
+        from comment
+        where author_id = #{id}
+          and is_comment = #{isComment}
+    </select>
+    <select id="findAllByPId" resultMap="commentResultMap">
+        select *
+        from comment
+        where co_pid = #{pid}
+    </select>
+    <select id="findAllByArticleID" resultMap="commentResultMap">
+        select *
+        from comment
+        where co_article_id = #{articleId}
+    </select>
+    <select id="findAllByArticleIDAndPId" resultMap="commentResultMap">
+        select *
+        from comment
+        where co_article_id = #{articleID}
+          and co_pid = #{pid}
+    </select>
+    <select id="findCommentsByTypeAndPId" resultMap="commentResultMap">
+        select *
+        from comment
+        where is_comment = #{isComment}
+          and co_pid = #{pid}
+    </select>
+    <select id="findAllByType" resultMap="commentResultMap">
+        select *
+        from comment
+        where is_comment = #{isComment}
+    </select>
+    <select id="countByType" resultType="java.lang.Long">
+        select count(*)
+        from comment
+        where is_comment = #{isComment}
+    </select>
+    <select id="getLastestComment" resultMap="commentResultMap">
+        select *
+        from comment
+        order by co_id desc
+        limit 1
+    </select>
+
+
+</mapper>
