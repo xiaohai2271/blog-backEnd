@@ -10,9 +10,7 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -23,31 +21,29 @@ import java.io.InputStream;
  */
 @Service
 public class QiniuServiceImpl implements QiniuService {
-    private Configuration cfg = new Configuration(Zone.zone2());
-    private UploadManager uploadManager;
-    private BucketManager bucketManager;
-    private Auth auth;
+    private static Configuration cfg = new Configuration(Zone.zone2());
+    private static UploadManager uploadManager;
+    private static BucketManager bucketManager;
+    private static Auth auth;
 
-    private static String bucket;
+    @Value("${qiniu.accessKey}")
+    private String accessKey;
+    @Value("${qiniu.secretKey}")
+    private String secretKey;
+    @Value("${qiniu.bucket}")
+    private String bucket;
 
-
-    {
-        /* ***** 必填 ******
-         *    七牛的配置    *
-         * ***** 必填 ******
-         */
-        // accessKeyString,secretKeyString,bucketString：请替换为自己的值
-        String accessKey = "accessKeyString";
-        String secretKey = "secretKeyString";
-        bucket = "bucketString";
-
-        auth = Auth.create(accessKey, secretKey);
-        uploadManager = new UploadManager(cfg);
-        bucketManager = new BucketManager(auth, cfg);
+    private void init() {
+        if (auth == null || uploadManager == null || bucketManager == null) {
+            auth = Auth.create(accessKey, secretKey);
+            uploadManager = new UploadManager(cfg);
+            bucketManager = new BucketManager(auth, cfg);
+        }
     }
 
     @Override
     public QiniuResponse uploadFile(InputStream is, String fileName) {
+        init();
         //文件存在则删除文件
         if (continueFile(fileName)) {
             try {
@@ -69,6 +65,7 @@ public class QiniuServiceImpl implements QiniuService {
 
     @Override
     public FileInfo[] getFileList() {
+        init();
         BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(bucket, "", 1000, "");
         FileInfo[] items = null;
         while (fileListIterator.hasNext()) {

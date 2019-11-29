@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -33,8 +34,8 @@ public class JwtUtil {
     /**
      * JWT 秘钥需自行设置不可泄露
      */
-    private static final String SECRET = "xxx";
-
+    @Value("${jwt.secret}")
+    private String SECRET;
 
     public String generateToken(User user, boolean isRemember) {
         Map<String, Object> claims = new HashMap<>(16);
