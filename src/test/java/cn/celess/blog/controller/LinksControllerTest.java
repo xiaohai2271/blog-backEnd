@@ -161,7 +161,8 @@ public class LinksControllerTest extends BaseTest {
         });
     }
 
-    @Test
+    // 手动测试
+    // @Test
     public void apply() throws Exception {
         long l = System.currentTimeMillis();
         String url = "https://www.example.com";

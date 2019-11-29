@@ -63,7 +63,8 @@ public class VisitorControllerTest extends BaseTest {
         );
     }
 
-    @Test
+    // 手动测试
+    // @Test
     public void ipLocation() throws Exception {
         String ip = "127.0.0.1";
         mockMvc.perform(get("/ip/" + ip)).andDo(MockMvcResultHandlers.print()).andDo(result -> {
