@@ -43,6 +43,9 @@ public class SitemapGenerateUtil {
     @Async
     public void createSitemap() {
         initList();
+        if ("".equals(path) || "classpath".equals(path)) {
+            path = System.getProperty("user.dir")+"/sitemap.xml";
+        }
         File file = new File(path);
         try {
             if (file.exists()) {
