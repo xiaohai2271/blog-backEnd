@@ -1,0 +1,21 @@
+image: maven:3.3.9-jdk-8
+
+cache:
+  paths:
+    - .m2/repository
+
+stages:
+  - test
+  - build
+
+
+test:
+  stage: test
+  script:
+    - cp "$APP_TEST" ./src/main/resources/application-test.properties
+    - mvn test
+build:
+  stage: build
+  script:
+    - cp "$APP_PROD" ./src/main/resources/application-prod.properties
+    - mvn package -DskipTests
