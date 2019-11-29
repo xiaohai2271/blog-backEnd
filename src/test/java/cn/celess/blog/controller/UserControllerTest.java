@@ -14,10 +14,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -93,8 +92,12 @@ public class UserControllerTest extends BaseTest {
 
     @Test
     public void upload() throws Exception {
-        File logoFile = new File("C:\\Users\\zh564\\Pictures\\logo.png");
-        MockMultipartFile file = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE, new FileInputStream(logoFile));
+        URL url = new URL("https://56462271.oss-cn-beijing.aliyuncs.com/web/logo.png");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        InputStream inputStream = connection.getInputStream();
+        assertNotNull(inputStream);
+        MockMultipartFile file = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE, inputStream);
         mockMvc.perform(multipart("/user/imgUpload").file(file)).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)));
         mockMvc.perform(multipart("/user/imgUpload").file(file).header("Authorization", userLogin())).andDo(result -> {
             JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
