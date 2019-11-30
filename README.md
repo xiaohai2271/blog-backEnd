@@ -1,5 +1,5 @@
  # 小海博客后端管理系统
-
+![CI](https://gitlab.com/xiaohai2271/blog-backEnd/badges/master/pipeline.svg)
   
 
   ## 基于Springboot的后端博客管理系统
