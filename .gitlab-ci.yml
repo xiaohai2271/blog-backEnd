@@ -6,7 +6,7 @@ cache:
 
 stages:
   - test
-  - build
+  - deploy
 
 
 test:
@@ -14,8 +14,17 @@ test:
   script:
     - cp "$APP_TEST" ./src/main/resources/application-test.properties
     - mvn test
-build:
-  stage: build
+
+deploy:
+  stage: deploy
   script:
     - cp "$APP_PROD" ./src/main/resources/application-prod.properties
     - mvn package -DskipTests
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 --decode)
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan celess.cn >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - scp target/blog-0.0.1-SNAPSHOT.jar root@celess.cn:/www/wwwroot/api.celess.cn
+    - ssh root@celess.cn "cd /www/wwwroot/api.celess.cn && bash build.sh"
