@@ -41,12 +41,16 @@ public class AuthenticationFilter implements HandlerInterceptor {
         path = path.replaceAll("/+", "/");
         int indexOf = path.indexOf("/", 1);
         String rootPath = indexOf == -1 ? path : path.substring(0, indexOf);
+        String jwtStr = request.getHeader("Authorization");
+        if (jwtStr != null && !jwtStr.isEmpty() && !jwtUtil.isTokenExpired(jwtStr)) {
+            // 已登录 记录当前email
+            request.getSession().setAttribute("email", jwtUtil.getUsernameFromToken(jwtStr));
+        }
         // 不需要鉴权的路径
         if (!USER_PREFIX.equals(rootPath.toLowerCase()) && !ADMIN_PREFIX.equals(rootPath.toLowerCase())) {
             return true;
         }
 
-        String jwtStr = request.getHeader("Authorization");
         if (jwtStr == null || jwtStr.isEmpty()) {
             return writeResponse(ResponseEnum.HAVE_NOT_LOG_IN, response, request);
         }

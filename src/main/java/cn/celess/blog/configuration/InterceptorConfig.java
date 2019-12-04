@@ -19,11 +19,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new MultipleSubmitFilter()).addPathPatterns("/*");
+        registry.addInterceptor(new MultipleSubmitFilter()).addPathPatterns("/**");
+        registry.addInterceptor(new VisitorRecord()).addPathPatterns("/**");
         registry.addInterceptor(authenticationFilter()).addPathPatterns("/**");
-
-        // visitor 输出信息杂乱 暂时放弃使用
-//        registry.addInterceptor(new VisitorRecord()).addPathPatterns("/*");
     }
 
     @Bean
@@ -31,11 +29,11 @@ public class InterceptorConfig implements WebMvcConfigurer {
         return new AuthenticationFilter();
     }
 
-//    // session listener register bean
-//    @Bean
-//    public ServletListenerRegistrationBean<SessionListener> servletListenerRegistrationBean() {
-//        ServletListenerRegistrationBean<SessionListener> slrBean = new ServletListenerRegistrationBean<SessionListener>();
-//        slrBean.setListener(new SessionListener());
-//        return slrBean;
-//    }
+    @Bean
+    public ServletListenerRegistrationBean<SessionListener> servletListenerRegistrationBean() {
+        // session listener register bean
+        ServletListenerRegistrationBean<SessionListener> slrBean = new ServletListenerRegistrationBean<SessionListener>();
+        slrBean.setListener(new SessionListener());
+        return slrBean;
+    }
 }
