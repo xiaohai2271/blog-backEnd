@@ -13,7 +13,7 @@ test:
   stage: test
   script:
     - cp "$APP_TEST" ./src/main/resources/application-test.properties
-    - mvn test
+    - mvn clean test && cat target/site/jacoco/index.html
 
 deploy:
   stage: deploy
