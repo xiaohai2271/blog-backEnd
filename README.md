@@ -1,7 +1,5 @@
  # 小海博客后端管理系统
-![CI](https://gitlab.com/xiaohai2271/blog-backEnd/badges/master/pipeline.svg)
-  
-
+![Gitlab pipeline status](https://img.shields.io/gitlab/pipeline/xiaohai2271/blog-backEnd) ![coverage report](https://gitlab.com/xiaohai2271/blog-backEnd/badges/master/coverage.svg) ![GitHub](https://img.shields.io/github/license/xiaohai2271/blog-backEnd) [![Website](https://img.shields.io/website?up_message=%E5%B0%8F%E6%B5%B7%E5%8D%9A%E5%AE%A2&url=https%3A%2F%2Fwww.celess.cn)](https://www.celess.cn)
   ## 基于Springboot的后端博客管理系统
 
 
