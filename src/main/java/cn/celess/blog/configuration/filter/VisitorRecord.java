@@ -21,14 +21,18 @@ public class VisitorRecord implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HttpSession session = request.getSession();
+
         HashMap<String, Integer> visitDetail = (HashMap<String, Integer>) session.getAttribute("visitDetail");
+        if (visitDetail == null) {
+            return true;
+        }
         // 获取访问次数
         Integer count = visitDetail.get(RequestUtil.getCompleteUrlAndMethod(request));
         // 自增
         count = count == null ? 1 : ++count;
         // 更新
         visitDetail.put(RequestUtil.getCompleteUrlAndMethod(request), count);
-        session.setAttribute("ip",request.getRemoteAddr());
+        session.setAttribute("ip", request.getRemoteAddr());
         return true;
     }
 }
