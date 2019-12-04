@@ -45,4 +45,11 @@ public class RedisUserUtil {
                 redisUtil.getExpire(user.getEmail() + "-login"), TimeUnit.MILLISECONDS);
         return user;
     }
+
+    public User set(User user, boolean isRemember) {
+        redisUtil.setEx(user.getEmail() + "-login", JSONObject.fromObject(user).toString(),
+                isRemember ? JwtUtil.EXPIRATION_LONG_TIME : JwtUtil.EXPIRATION_SHORT_TIME, TimeUnit.MILLISECONDS);
+        request.getSession().setAttribute("email", user.getEmail());
+        return user;
+    }
 }

@@ -119,8 +119,7 @@ public class UserServiceImpl implements UserService {
             userMapper.updateLoginTime(loginReq.getEmail(), new Date());
             redisUtil.delete(loginReq.getEmail() + "-passwordWrongTime");
             // redis 标记
-            redisUtil.setEx(loginReq.getEmail() + "-login", JSONObject.fromObject(user).toString(),
-                    (loginReq.getIsRememberMe() ? JwtUtil.EXPIRATION_LONG_TIME : JwtUtil.EXPIRATION_SHORT_TIME), TimeUnit.MILLISECONDS);
+            redisUserUtil.set(user, loginReq.getIsRememberMe());
             token = jwtUtil.generateToken(user, loginReq.getIsRememberMe());
         } else {
             logger.info("====> {}  进行权限认证  状态：登录失败 <====", loginReq.getEmail());
