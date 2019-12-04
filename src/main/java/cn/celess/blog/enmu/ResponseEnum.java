@@ -31,6 +31,11 @@ public enum ResponseEnum {
     PWD_SAME(360, "新密码与原密码相同"),
     LOGIN_EXPIRED(370, "登陆过期"),
 
+    JWT_EXPIRED(381, "Token过期"),
+    JWT_MALFORMED(382, "Token格式不对"),
+    JWT_SIGNATURE(383, "Token签名错误"),
+    JWT_NOT_SUPPORT(384, "不支持的Token"),
+
     //标签
     TAG_NOT_EXIST(401, "标签不存在"),
     TAG_HAS_EXIST(402, "标签已存在"),
