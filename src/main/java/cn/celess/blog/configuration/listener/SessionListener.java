@@ -39,7 +39,7 @@ public class SessionListener implements HttpSessionListener {
         HashMap<String, Integer> visitDetail = (HashMap<String, Integer>) se.getSession().getAttribute("visitDetail");
         StringBuilder sb = new StringBuilder();
         sb.append("ip => ").append(se.getSession().getAttribute("ip"));
-        User user = redisUserUtil.get(request);
+        User user = redisUserUtil.get();
         sb.append("\t登录情况 => ");
         sb.append(user == null ? "游客访问" : user.getEmail());
         visitDetail.forEach((s, integer) -> {

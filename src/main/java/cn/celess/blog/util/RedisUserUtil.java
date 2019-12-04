@@ -20,16 +20,18 @@ public class RedisUserUtil {
     RedisUtil redisUtil;
     @Autowired
     JwtUtil jwtUtil;
+    @Autowired
+    HttpServletRequest request;
 
-    public User get(HttpServletRequest request) {
-        User user = getWithOutExc(request);
+    public User get() {
+        User user = getWithOutExc();
         if (user == null) {
             throw new MyException(ResponseEnum.HAVE_NOT_LOG_IN);
         }
         return user;
     }
 
-    public User getWithOutExc(HttpServletRequest request) {
+    public User getWithOutExc() {
         String token = request.getHeader("Authorization");
         if (token == null || token.isEmpty()) {
             return null;

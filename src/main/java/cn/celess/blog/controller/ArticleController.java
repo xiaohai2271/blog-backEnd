@@ -83,7 +83,7 @@ public class ArticleController {
         ArticleModel article = articleService.retrieveOneByID(articleId, is4update);
         if (article.getOpen()) {
             return ResponseUtil.success(article);
-        } else if (article.getAuthorId().equals(redisUserUtil.get(request).getId())) {
+        } else if (article.getAuthorId().equals(redisUserUtil.get().getId())) {
             return ResponseUtil.success(article);
         }
         return ResponseUtil.response(ResponseEnum.PERMISSION_ERROR, null);

@@ -44,7 +44,7 @@ public class CommentServiceImpl implements CommentService {
         if (reqBody == null) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
-        long authorID = redisUserUtil.get(request).getId();
+        long authorID = redisUserUtil.get().getId();
         Comment pComment = null;
         if (reqBody.getPid() != null && reqBody.getPid() != -1) {
             pComment = commentMapper.findCommentById(reqBody.getPid());
@@ -147,7 +147,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public PageInfo<CommentModel> retrievePageByAuthor(Boolean isComment, int page, int count) {
         PageHelper.startPage(page, count);
-        List<Comment> commentList = commentMapper.findAllByAuthorIDAndType(redisUserUtil.get(request).getId(), isComment);
+        List<Comment> commentList = commentMapper.findAllByAuthorIDAndType(redisUserUtil.get().getId(), isComment);
         PageInfo pageInfo = new PageInfo(commentList);
         pageInfo.setList(list2List(commentList));
         return pageInfo;

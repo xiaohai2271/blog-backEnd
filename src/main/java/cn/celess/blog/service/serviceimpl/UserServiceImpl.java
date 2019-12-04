@@ -159,7 +159,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserModel update(String desc, String displayName) {
-        User user = redisUserUtil.get(request);
+        User user = redisUserUtil.get();
         user.setDesc(desc);
         user.setDisplayName(displayName);
 
@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Object updateUserAavatarImg(InputStream is, String mime) {
-        User user = redisUserUtil.get(request);
+        User user = redisUserUtil.get();
         QiniuResponse upload = qiniuService.uploadFile(is, user.getEmail() + "_" + user.getId() + mime.toLowerCase());
         user.setAvatarImgUrl(upload.key);
         userMapper.updateAvatarImgUrl(upload.key, user.getId());
@@ -203,7 +203,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserModel getUserInfoBySession() {
-        User user = redisUserUtil.get(request);
+        User user = redisUserUtil.get();
         return trans(user);
     }
 
@@ -422,7 +422,7 @@ public class UserServiceImpl implements UserService {
         if (updateResult == 0) {
             throw new MyException(ResponseEnum.FAILURE);
         }
-        if (redisUserUtil.get(request).getId().equals(userReq.getId())) {
+        if (redisUserUtil.get().getId().equals(userReq.getId())) {
             redisUserUtil.set(user);
         }
         logger.info("修改了用户 [id={}] 的用户的资料", userReq.getId());
