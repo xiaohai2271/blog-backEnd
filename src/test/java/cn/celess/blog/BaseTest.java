@@ -8,10 +8,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -19,6 +21,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.Cookie;
+
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -39,10 +43,12 @@ public class BaseTest {
 
     @Autowired
     private WebApplicationContext wac;
+    protected MockHttpSession session;
 
     @Before
     public void before() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+        session = new MockHttpSession();
         System.out.println("==========> 开始测试 <=========");
     }
 
@@ -60,7 +66,7 @@ public class BaseTest {
             req.setIsRememberMe(false);
             JSONObject loginReq = JSONObject.fromObject(req);
             String str = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(loginReq.toString()).contentType("application/json"))
-//                    .andDo(MockMvcResultHandlers.print())
+                    //                    .andDo(MockMvcResultHandlers.print())
                     .andReturn().getResponse().getContentAsString();
             String token = JSONObject.fromObject(str).getJSONObject(Result).getString("token");
             assertNotNull(token);
@@ -79,7 +85,7 @@ public class BaseTest {
             req.setIsRememberMe(false);
             JSONObject loginReq = JSONObject.fromObject(req);
             String str = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(loginReq.toString()).contentType("application/json"))
-//                    .andDo(MockMvcResultHandlers.print())
+                    //                    .andDo(MockMvcResultHandlers.print())
                     .andReturn().getResponse().getContentAsString();
             String token = JSONObject.fromObject(str).getJSONObject(Result).getString("token");
             assertNotNull(token);
@@ -93,5 +99,9 @@ public class BaseTest {
     @Test
     public void test() {
 
+    }
+
+    protected String randomStr(int len) {
+        return UUID.randomUUID().toString().replaceAll("-", "").substring(0, len);
     }
 }

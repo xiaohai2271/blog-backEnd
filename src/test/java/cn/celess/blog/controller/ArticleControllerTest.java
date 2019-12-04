@@ -13,8 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -139,32 +138,17 @@ public class ArticleControllerTest extends BaseTest {
         articleReq.setCategory("test");
         articleReq.setMdContent("test-" + article.getMdContent());
         articleReq.setOpen(!article.getOpen());
-        articleReq.setTags("tag");
+        String tag1 = randomStr(4);
+        String tag2 = randomStr(4);
+        String tag = "test," + tag1 + "," + tag2;
+        articleReq.setTags(tag);
         articleReq.setTitle("test-" + article.getTitle());
         try {
-            mockMvc.perform(put("/admin/article/update")
-                    .content(JSONObject.fromObject(articleReq).toString())
-                    .contentType("application/json"))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        assertEquals(HAVE_NOT_LOG_IN.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code));
-                    });
-            // User 权限
-            String token = userLogin();
-            mockMvc.perform(put("/admin/article/update")
-                    .content(JSONObject.fromObject(articleReq).toString())
-                    .contentType("application/json")
-                    .header("Authorization", token))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        assertEquals(PERMISSION_ERROR.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code));
-                    });
             // Admin 权限
-            token = adminLogin();
             mockMvc.perform(put("/admin/article/update")
                     .content(JSONObject.fromObject(articleReq).toString())
                     .contentType("application/json")
-                    .header("Authorization", token))
+                    .header("Authorization", adminLogin()))
                     .andExpect(status().isOk())
                     .andDo(result -> {
                         JSONObject jsonObject = JSONObject.fromObject(result.getResponse().getContentAsString());
@@ -175,8 +159,11 @@ public class ArticleControllerTest extends BaseTest {
                         assertEquals(articleReq.getMdContent(), a.getMdContent());
                         assertEquals(articleReq.getTitle(), a.getTitle());
                         assertEquals(articleReq.getType(), a.getOriginal());
-                        // Tag 暂时不支持更新
-//                        assertEquals(articleReq.getTags(), Arrays.toString(a.getTags()).replaceAll(" ", "".replace("[", "".replace("]", ""))));
+                        // Tag
+                        List<String> asList = Arrays.asList(a.getTags());
+                        assertTrue(asList.contains("test"));
+                        assertTrue(asList.contains(tag1));
+                        assertTrue(asList.contains(tag2));
                         assertEquals(articleReq.getOpen(), a.getOpen());
                         assertEquals(articleReq.getId(), a.getId());
                     });

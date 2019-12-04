@@ -277,10 +277,10 @@ public class ArticleServiceImpl implements ArticleService {
         if (reqBody.getCategory() == null || reqBody.getCategory().replaceAll(" ", "").isEmpty()) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
-//        暂时不更新tags
-//        if (reqBody.getTags() == null || reqBody.getTags().replaceAll(" ", "").isEmpty()) {
-//            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
-//        }
+        // 暂时不更新tags
+        if (reqBody.getTags() == null || reqBody.getTags().replaceAll(" ", "").isEmpty()) {
+            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+        }
 
         //写入数据库的数据
         Article article = new Article();
@@ -317,26 +317,44 @@ public class ArticleServiceImpl implements ArticleService {
             article.setCategoryId(oldArticle.getCategoryId());
         }
 
-
-//        String[] newTags = reqBody.getTags().replaceAll(" ", "").split(",");
-
-//        //防止出现 ‘null2’这种情况
-//        article.setTagsId("");
-//        for (String t : newTags) {
-//            Tag tag = tagMapper.findTagByName(t);
-//            if (tag == null) {
-//                tag = new Tag();
-//                tag.setName(t);
-//                tag.setArticles(oldArticle.getId() + ",");
-//                tag = tagMapper.save(tag);
-//                article.setTagsId(article.getTagsId() + tag.getId() + ",");
-//                continue;
-//            }
-//            article.setTagsId(article.getTagsId() + tag.getId() + ",");
-//        }
-
-        // TODO:::: tag的更新
-        article.setTagsId(oldArticle.getTagsId());
+        String[] newTags = reqBody.getTags().split(",");
+        String[] tagIds = oldArticle.getTagsId().split(",");
+        //防止出现 ‘null2’这种情况
+        article.setTagsId("");
+        for (String t : newTags) {
+            Tag tag = tagMapper.findTagByName(t);
+            if (tag == null) {
+                tag = new Tag();
+                tag.setName(t);
+                tag.setArticles(oldArticle.getId() + ",");
+                int status = tagMapper.insert(tag);
+                if (status == 0) {
+                    // 插入失败
+                    throw new MyException(ResponseEnum.FAILURE);
+                }
+                article.setTagsId(article.getTagsId() + tag.getId() + ",");
+                continue;
+            }
+            article.setTagsId(article.getTagsId() + tag.getId() + ",");
+        }
+        for (String tagId : tagIds) {
+            Tag tagById = tagMapper.findTagById(Long.parseLong(tagId));
+            // 在新更新的tag中是否有原有的tag
+            boolean isOldTag = false;
+            for (String s : newTags) {
+                if (s.equals(tagById.getName())) {
+                    isOldTag = true;
+                    break;
+                }
+            }
+            if (!isOldTag) {
+                tagById.setArticles(tagById.getArticles().replace(oldArticle.getId() + ",", ""));
+            }
+            tagMapper.update(tagById);
+        }
+//
+//        // TODO:::: tag的更新
+//        article.setTagsId(oldArticle.getTagsId());
 
 
         article.setUpdateDate(new Date());
