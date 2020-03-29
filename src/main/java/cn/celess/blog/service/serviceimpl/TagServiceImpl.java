@@ -62,8 +62,7 @@ public class TagServiceImpl implements TagService {
         }
         String[] articleArray = tag.getArticles().split(",");
         for (int i = 0; i < articleArray.length; i++) {
-            // FIXME :: bug
-            if (articleArray[i] == null || "".equals(articleArray)) {
+            if (articleArray[i] == null || "".equals(articleArray[i])) {
                 continue;
             }
             long articleID = Long.parseLong(articleArray[i]);
