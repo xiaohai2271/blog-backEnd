@@ -2,6 +2,7 @@ package cn.celess.blog.controller;
 
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.Tag;
+import cn.celess.blog.entity.model.TagModel;
 import cn.celess.blog.mapper.TagMapper;
 import com.github.pagehelper.PageInfo;
 import net.sf.json.JSONArray;
@@ -29,7 +30,7 @@ public class TagControllerTest extends BaseTest {
             JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
             assertEquals(SUCCESS.getCode(), object.getInt(Code));
             JSONObject resJson = object.getJSONObject(Result);
-            Tag tag = (Tag) JSONObject.toBean(resJson, Tag.class);
+            TagModel tag = (TagModel) JSONObject.toBean(resJson, TagModel.class);
             assertNotNull(tag.getId());
             assertEquals(name, tag.getName());
         });
@@ -63,9 +64,11 @@ public class TagControllerTest extends BaseTest {
             JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
             assertEquals(SUCCESS.getCode(), object.getInt(Code));
             assertNotNull(object.getJSONObject(Result));
-            Tag t = (Tag) JSONObject.toBean(object.getJSONObject(Result), Tag.class);
+            TagModel t = (TagModel) JSONObject.toBean(object.getJSONObject(Result), TagModel.class);
             assertEquals(name, t.getName());
-            assertEquals(tag.getArticles(), t.getArticles());
+            StringBuilder s = new StringBuilder();
+            t.getArticles().forEach(e -> s.append(e).append(","));
+            assertEquals(tag.getArticles(), s.toString());
             assertEquals(tag.getId(), t.getId());
         });
 
@@ -79,7 +82,7 @@ public class TagControllerTest extends BaseTest {
             JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
             assertEquals(SUCCESS.getCode(), object.getInt(Code));
             assertNotNull(object.getJSONObject(Result));
-            Tag t = (Tag) JSONObject.toBean(object.getJSONObject(Result), Tag.class);
+            TagModel t = (TagModel) JSONObject.toBean(object.getJSONObject(Result), TagModel.class);
             assertEquals(tag.getId(), t.getId());
             assertNotNull(t.getName());
         });
@@ -93,7 +96,7 @@ public class TagControllerTest extends BaseTest {
             JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
             assertEquals(SUCCESS.getCode(), object.getInt(Code));
             assertNotNull(object.getJSONObject(Result));
-            Tag t = (Tag) JSONObject.toBean(object.getJSONObject(Result), Tag.class);
+            TagModel t = (TagModel) JSONObject.toBean(object.getJSONObject(Result), TagModel.class);
             assertEquals(tag.getName(), t.getName());
             assertNotNull(t.getId());
         });
@@ -119,7 +122,7 @@ public class TagControllerTest extends BaseTest {
                     assertEquals(5, pageInfo.getPageSize());
                     // 内容完整
                     for (Object tag : pageInfo.getList()) {
-                        Tag t = (Tag) JSONObject.toBean(JSONObject.fromObject(tag), Tag.class);
+                        TagModel t = (TagModel) JSONObject.toBean(JSONObject.fromObject(tag), TagModel.class);
                         assertNotNull(t.getId());
                         assertNotNull(t.getName());
                     }

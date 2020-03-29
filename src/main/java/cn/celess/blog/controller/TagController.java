@@ -2,6 +2,7 @@ package cn.celess.blog.controller;
 
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.Tag;
+import cn.celess.blog.entity.model.TagModel;
 import cn.celess.blog.service.TagService;
 import cn.celess.blog.util.ResponseUtil;
 import net.sf.json.JSONObject;
@@ -56,12 +57,11 @@ public class TagController {
     @GetMapping("/tags/nac")
     public Response getTagNameAndCount() {
         List<JSONObject> nameAndCount = new ArrayList<>();
-        List<Tag> all = tagService.findAll();
-        for (Tag t : all) {
+        List<TagModel> all = tagService.findAll();
+        for (TagModel t : all) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", t.getName());
-            String articles = t.getArticles();
-            jsonObject.put("size", articles == null ? 0 : articles.split(",").length);
+            jsonObject.put("size", t.getArticles() == null ? 0 : t.getArticles().size());
             nameAndCount.add(jsonObject);
         }
         return ResponseUtil.success(nameAndCount);

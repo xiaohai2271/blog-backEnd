@@ -3,6 +3,7 @@ package cn.celess.blog.service.serviceimpl;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Tag;
+import cn.celess.blog.entity.model.TagModel;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.ArticleMapper;
 import cn.celess.blog.mapper.TagMapper;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +31,7 @@ public class TagServiceImpl implements TagService {
     ArticleMapper articleMapper;
 
     @Override
-    public Tag create(String name) {
+    public TagModel create(String name) {
         boolean b = tagMapper.existsByName(name);
         if (b) {
             throw new MyException(ResponseEnum.TAG_HAS_EXIST);
@@ -37,16 +39,16 @@ public class TagServiceImpl implements TagService {
         Tag tag = new Tag();
         tag.setName(name);
         tagMapper.insert(tag);
-        return tag;
+        return new TagModel(tag);
     }
 
     @Override
-    public Tag create(Tag tag) {
+    public TagModel create(Tag tag) {
         if (tag == null) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
         tagMapper.insert(tag);
-        return tag;
+        return new TagModel(tag);
     }
 
     @Override
@@ -55,11 +57,12 @@ public class TagServiceImpl implements TagService {
         if (tag == null) {
             throw new MyException(ResponseEnum.TAG_NOT_EXIST);
         }
-        if (tag.getArticles()==null){
+        if (tag.getArticles() == null) {
             return tagMapper.delete(tagId) == 1;
         }
         String[] articleArray = tag.getArticles().split(",");
         for (int i = 0; i < articleArray.length; i++) {
+            // FIXME :: bug
             if (articleArray[i] == null || "".equals(articleArray)) {
                 continue;
             }
@@ -76,7 +79,7 @@ public class TagServiceImpl implements TagService {
 
 
     @Override
-    public Tag update(Long id,String name) {
+    public TagModel update(Long id, String name) {
         if (id == null) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR.getCode(), "缺少ID");
         }
@@ -84,37 +87,43 @@ public class TagServiceImpl implements TagService {
         tagFromDB.setName(name);
 
         tagMapper.update(tagFromDB);
-        return tagFromDB;
+        return new TagModel(tagFromDB);
 
     }
 
     @Override
-    public Tag retrieveOneById(long tagId) {
+    public TagModel retrieveOneById(long tagId) {
         Tag tag = tagMapper.findTagById(tagId);
         if (tag == null) {
             throw new MyException(ResponseEnum.TAG_NOT_EXIST);
         }
-        return tag;
+        return new TagModel(tag);
     }
 
     @Override
-    public Tag retrieveOneByName(String name) {
+    public TagModel retrieveOneByName(String name) {
         Tag tag = tagMapper.findTagByName(name);
         if (tag == null) {
             throw new MyException(ResponseEnum.TAG_NOT_EXIST);
         }
-        return tag;
+        return new TagModel(tag);
     }
 
     @Override
-    public PageInfo<Tag> retrievePage(int page, int count) {
+    public PageInfo<TagModel> retrievePage(int page, int count) {
         PageHelper.startPage(page, count);
-        PageInfo pageInfo = new PageInfo(tagMapper.findAll());
+        List<Tag> tagList = tagMapper.findAll();
+        PageInfo pageInfo = new PageInfo(tagList);
+        List<TagModel> list = new ArrayList<>();
+        tagList.forEach(e -> list.add(new TagModel(e)));
+        pageInfo.setList(list);
         return pageInfo;
     }
 
     @Override
-    public List<Tag> findAll() {
-        return tagMapper.findAll();
+    public List<TagModel> findAll() {
+        List<TagModel> list = new ArrayList<>();
+        tagMapper.findAll().forEach(e -> list.add(new TagModel(e)));
+        return list;
     }
 }

@@ -1,6 +1,7 @@
 package cn.celess.blog.service;
 
 import cn.celess.blog.entity.Tag;
+import cn.celess.blog.entity.model.TagModel;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public interface TagService {
      * @param name 标签名
      * @return 新增后的数据
      */
-    Tag create(String name);
+    TagModel create(String name);
 
     /**
      * 新增数据
@@ -27,7 +28,7 @@ public interface TagService {
      * @return 新增后的数据
      */
 
-    Tag create(Tag tag);
+    TagModel create(Tag tag);
 
     /**
      * 删除数据
@@ -44,7 +45,7 @@ public interface TagService {
      * @param name 改名的name值
      * @return 更新后的数据
      */
-    Tag update(Long id, String name);
+    TagModel update(Long id, String name);
 
     /**
      * 查询单个标签信息
@@ -52,7 +53,7 @@ public interface TagService {
      * @param tagId id
      * @return 标签的数据
      */
-    Tag retrieveOneById(long tagId);
+    TagModel retrieveOneById(long tagId);
 
     /**
      * 通过name查询标签的信息
@@ -60,7 +61,7 @@ public interface TagService {
      * @param name tag的名称
      * @return 标签数据
      */
-    Tag retrieveOneByName(String name);
+    TagModel retrieveOneByName(String name);
 
 
     /**
@@ -70,13 +71,13 @@ public interface TagService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageInfo<Tag> retrievePage(int page, int count);
+    PageInfo<TagModel> retrievePage(int page, int count);
 
     /**
      * 获取全部标签数据
      *
      * @return 标签数据列表
      */
-    List<Tag> findAll();
+    List<TagModel> findAll();
 
 }
