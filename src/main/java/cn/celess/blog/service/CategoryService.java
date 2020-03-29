@@ -1,6 +1,7 @@
 package cn.celess.blog.service;
 
 import cn.celess.blog.entity.Category;
+import cn.celess.blog.entity.model.CategoryModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface CategoryService {
      * @param name 分类名
      * @return 所增加的分类数据
      */
-    Category create(String name);
+    CategoryModel create(String name);
 
     /**
      * 增加一个分类
@@ -25,7 +26,7 @@ public interface CategoryService {
      * @param category 分类对象
      * @return 所增加的分类数据
      */
-    Category create(Category category);
+    CategoryModel create(Category category);
 
     /**
      * 通过id删除分类
@@ -42,13 +43,13 @@ public interface CategoryService {
      * @param name 分类名字
      * @return 更新后的分类的数据
      */
-    Category update(Long id, String name);
+    CategoryModel update(Long id, String name);
 
     /**
      * 获取全部的分类数据
      *
      * @return 全部的分类数据
      */
-    List<Category> retrievePage();
+    List<CategoryModel> retrievePage();
 
 }

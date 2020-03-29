@@ -2,6 +2,7 @@ package cn.celess.blog.controller;
 
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.Category;
+import cn.celess.blog.entity.model.CategoryModel;
 import cn.celess.blog.mapper.CategoryMapper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -45,10 +46,10 @@ public class CategoryControllerTest extends BaseTest {
                 .andDo(result -> {
                     JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
                     assertEquals(SUCCESS.getCode(), object.getInt(Code));
-                    Category category = (Category) JSONObject.toBean(object.getJSONObject(Result), Category.class);
+                    CategoryModel category = (CategoryModel) JSONObject.toBean(object.getJSONObject(Result), CategoryModel.class);
                     assertEquals(categoryName, category.getName());
                     assertNotNull(category.getId());
-                    assertNotNull(category.getArticles());
+                    assertNotEquals(0, category.getArticles());
                 });
     }
 
@@ -105,9 +106,9 @@ public class CategoryControllerTest extends BaseTest {
                 .andDo(result -> {
                     JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
                     assertEquals(SUCCESS.getCode(), object.getInt(Code));
-                    Category c = (Category) JSONObject.toBean(object.getJSONObject(Result), Category.class);
+                    CategoryModel c = (CategoryModel) JSONObject.toBean(object.getJSONObject(Result), CategoryModel.class);
                     assertEquals(name, c.getName());
-                    assertNotNull(c.getArticles());
+                    assertNotEquals(0, c.getArticles());
                     assertNotNull(c.getId());
                 });
     }
@@ -121,10 +122,10 @@ public class CategoryControllerTest extends BaseTest {
                     JSONArray jsonArray = object.getJSONArray(Result);
                     assertNotNull(jsonArray);
                     jsonArray.forEach(o -> {
-                        Category c = (Category) JSONObject.toBean(JSONObject.fromObject(o), Category.class);
+                        CategoryModel c = (CategoryModel) JSONObject.toBean(JSONObject.fromObject(o), CategoryModel.class);
                         assertNotNull(c.getName());
                         assertNotNull(c.getId());
-                        assertNotNull(c.getArticles());
+                        assertNotEquals(0, c.getArticles());
                     });
                 });
 

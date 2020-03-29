@@ -3,6 +3,7 @@ package cn.celess.blog.service.serviceimpl;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Category;
+import cn.celess.blog.entity.model.CategoryModel;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.ArticleMapper;
 import cn.celess.blog.mapper.CategoryMapper;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     ArticleMapper articleMapper;
 
     @Override
-    public Category create(String name) {
+    public CategoryModel create(String name) {
         if (categoryMapper.existsByName(name)) {
             throw new MyException(ResponseEnum.CATEGORY_HAS_EXIST);
         }
@@ -35,16 +37,16 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(name);
         category.setArticles("");
         categoryMapper.insert(category);
-        return category;
+        return new CategoryModel(category);
     }
 
     @Override
-    public Category create(Category category) {
+    public CategoryModel create(Category category) {
         if (category == null) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
         categoryMapper.insert(category);
-        return category;
+        return new CategoryModel(category);
     }
 
     @Override
@@ -74,18 +76,20 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public Category update(Long id, String name) {
+    public CategoryModel update(Long id, String name) {
         if (id == null) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR.getCode(), "id不可为空");
         }
         Category category = categoryMapper.findCategoryById(id);
         category.setName(name);
         categoryMapper.update(category);
-        return category;
+        return new CategoryModel(category);
     }
 
     @Override
-    public List<Category> retrievePage() {
-        return categoryMapper.findAll();
+    public List<CategoryModel> retrievePage() {
+        List<CategoryModel> list = new ArrayList<>();
+        categoryMapper.findAll().forEach(e -> list.add(new CategoryModel(e)));
+        return list;
     }
 }
