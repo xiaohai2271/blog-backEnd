@@ -9,6 +9,7 @@ import cn.celess.blog.service.QiniuService;
 import cn.celess.blog.util.RedisUtil;
 import cn.celess.blog.util.ResponseUtil;
 import cn.celess.blog.util.VeriCodeUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,10 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -168,5 +171,46 @@ public class Other {
         jsonObject.put("success", 0);
         jsonObject.put("message", "上传失败，请上传图片文件");
         response.getWriter().println(jsonObject.toString());
+    }
+
+    @GetMapping("/bingPic")
+    public Response bingPic() {
+        StringBuffer sb = new StringBuffer();
+        try {
+            //建立URL
+            URL url = new URL("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN");
+
+            //打开http
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            //获得输入
+            InputStream inputStream = urlConnection.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            //将bufferReader的值给放到buffer里
+            String str = null;
+            while ((str = bufferedReader.readLine()) != null) {
+                sb.append(str);
+            }
+            //关闭bufferReader和输入流
+            bufferedReader.close();
+            inputStreamReader.close();
+            inputStream.close();
+            //断开连接
+            urlConnection.disconnect();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseUtil.failure(null);
+        }
+
+        JSONObject imageObj = JSONObject.fromObject(sb.toString());
+        JSONArray jsonArray = imageObj.getJSONArray("images");
+        String imageName = jsonArray.getJSONObject(0).getString("url");
+        return ResponseUtil.success("https://cn.bing.com" + imageName);
     }
 }
