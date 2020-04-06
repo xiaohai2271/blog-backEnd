@@ -41,8 +41,9 @@ public class RedisUserUtil {
     }
 
     public User set(User user) {
+        Long expire = redisUtil.getExpire(user.getEmail() + "-login");
         redisUtil.setEx(user.getEmail() + "-login", JSONObject.fromObject(user).toString(),
-                redisUtil.getExpire(user.getEmail() + "-login"), TimeUnit.MILLISECONDS);
+                expire > 0 ? expire : JwtUtil.EXPIRATION_SHORT_TIME, TimeUnit.MILLISECONDS);
         return user;
     }
 
