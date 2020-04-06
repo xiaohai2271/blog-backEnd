@@ -5,6 +5,8 @@ import cn.celess.blog.entity.request.CommentReq;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author : xiaohai
  * @date : 2019/03/29 16:58
@@ -49,11 +51,9 @@ public interface CommentService {
      * 通过pid获取数据
      *
      * @param pid   父id
-     * @param count 单页数据量
-     * @param page  数据页
      * @return 分页数据
      */
-    PageInfo<CommentModel> retrievePageByPid(long pid, int page, int count);
+    List<CommentModel> retrievePageByPid(long pid);
 
 
     /**

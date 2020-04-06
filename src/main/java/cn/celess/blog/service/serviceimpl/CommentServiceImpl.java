@@ -11,6 +11,7 @@ import cn.celess.blog.service.CommentService;
 import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.DateFormatUtil;
 import cn.celess.blog.util.RedisUserUtil;
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,45 +113,36 @@ public class CommentServiceImpl implements CommentService {
     public PageInfo<CommentModel> retrievePage(Boolean isComment, int page, int count) {
         PageHelper.startPage(page, count);
         List<Comment> commentList = commentMapper.findAllByType(isComment);
-        PageInfo pageInfo = new PageInfo(commentList);
-        pageInfo.setList(list2List(commentList));
-        return pageInfo;
+        return pageTrans(commentList);
     }
 
     @Override
-    public PageInfo<CommentModel> retrievePageByPid(long pid, int page, int count) {
-        PageHelper.startPage(page, count);
+    public List<CommentModel> retrievePageByPid(long pid) {
         List<Comment> commentList = commentMapper.findAllByPId(pid);
-        PageInfo pageInfo = new PageInfo(commentList);
-        pageInfo.setList(list2List(commentList));
-        return pageInfo;
+        List<CommentModel> modelList = new ArrayList<>();
+        commentList.forEach(m -> modelList.add(trans(m)));
+        return modelList;
     }
 
     @Override
     public PageInfo<CommentModel> retrievePageByArticle(long articleID, long pid, int page, int count) {
         PageHelper.startPage(page, count);
         List<Comment> commentList = commentMapper.findAllByArticleIDAndPId(articleID, pid);
-        PageInfo pageInfo = new PageInfo(commentList);
-        pageInfo.setList(list2List(commentList));
-        return pageInfo;
+        return pageTrans(commentList);
     }
 
     @Override
     public PageInfo<CommentModel> retrievePageByTypeAndPid(Boolean isComment, int pid, int page, int count) {
         PageHelper.startPage(page, count);
         List<Comment> commentList = commentMapper.findCommentsByTypeAndPId(isComment, pid);
-        PageInfo pageInfo = new PageInfo(commentList);
-        pageInfo.setList(list2List(commentList));
-        return pageInfo;
+        return pageTrans(commentList);
     }
 
     @Override
     public PageInfo<CommentModel> retrievePageByAuthor(Boolean isComment, int page, int count) {
         PageHelper.startPage(page, count);
         List<Comment> commentList = commentMapper.findAllByAuthorIDAndType(redisUserUtil.get().getId(), isComment);
-        PageInfo pageInfo = new PageInfo(commentList);
-        pageInfo.setList(list2List(commentList));
-        return pageInfo;
+        return pageTrans(commentList);
     }
 
 
@@ -158,17 +150,7 @@ public class CommentServiceImpl implements CommentService {
     public PageInfo<CommentModel> retrievePageByType(Boolean isComment, int page, int count) {
         PageHelper.startPage(page, count);
         List<Comment> commentList = commentMapper.findAllByType(isComment);
-        PageInfo pageInfo = new PageInfo(commentList);
-        pageInfo.setList(list2List(commentList));
-        return pageInfo;
-    }
-
-    private List<CommentModel> list2List(List<Comment> commentList) {
-        List<CommentModel> content = new ArrayList<>();
-        for (Comment c : commentList) {
-            content.add(trans(c));
-        }
-        return content;
+        return pageTrans(commentList);
     }
 
     private CommentModel trans(Comment comment) {
@@ -189,4 +171,16 @@ public class CommentServiceImpl implements CommentService {
         return commentModel;
     }
 
+    private PageInfo<CommentModel> pageTrans(List<Comment> commentList) {
+        PageInfo p = new PageInfo(commentList);
+        List<CommentModel> modelList = new ArrayList<>();
+
+        commentList.forEach(l -> {
+            CommentModel model = trans(l);
+            model.setRespComment(this.retrievePageByPid(model.getId()));
+            modelList.add(model);
+        });
+        p.setList(modelList);
+        return p;
+    }
 }

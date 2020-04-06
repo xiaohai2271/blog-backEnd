@@ -9,6 +9,7 @@ import cn.celess.blog.mapper.ArticleMapper;
 import cn.celess.blog.mapper.CommentMapper;
 import cn.celess.blog.mapper.UserMapper;
 import com.github.pagehelper.PageInfo;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,22 +199,17 @@ public class CommentControllerTest extends BaseTest {
 
     @Test
     public void retrievePage() throws Exception {
-        long pid = 17;
-        mockMvc.perform(get("/comment/pid/" + pid + "?articleId=3&page=1&count=10")).andDo(result -> {
+        long pid = -1;
+        mockMvc.perform(get("/comment/pid/" + pid)).andDo(result -> {
             JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
             assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            PageInfo pageInfo = (PageInfo) JSONObject.toBean(object.getJSONObject(Result), PageInfo.class);
-            assertNotEquals(0, pageInfo.getStartRow());
-            assertNotEquals(0, pageInfo.getEndRow());
-            assertEquals(1, pageInfo.getPageNum());
-            assertEquals(10, pageInfo.getPageSize());
-            pageInfo.getList().forEach(o -> {
+            JSONArray jsonArray = object.getJSONArray(Result);
+            assertNotEquals(0, jsonArray.size());
+            jsonArray.forEach(o -> {
                 CommentModel model = (CommentModel) JSONObject.toBean(JSONObject.fromObject(o), CommentModel.class);
-                assertEquals(3, model.getArticleID());
                 assertNotNull(model.getDate());
                 assertNotNull(model.getAuthorName());
                 assertNotNull(model.getAuthorAvatarImgUrl());
-                assertNotNull(model.getArticleTitle());
                 assertNotNull(model.getContent());
                 assertNotNull(model.getResponseId());
             });

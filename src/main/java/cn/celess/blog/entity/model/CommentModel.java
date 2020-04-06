@@ -3,7 +3,7 @@ package cn.celess.blog.entity.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * @author : xiaohai
@@ -52,6 +52,8 @@ public class CommentModel {
      * 评论的父ID
      */
     private long pid = -1;
+
+    private List<CommentModel> respComment;
 
 
 }

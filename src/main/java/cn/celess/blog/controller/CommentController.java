@@ -58,15 +58,11 @@ public class CommentController {
      * 通过pid获取数据
      *
      * @param pid
-     * @param count
-     * @param page
      * @return
      */
     @GetMapping("/comment/pid/{pid}")
-    public Response retrievePage(@PathVariable("pid") long pid,
-                                 @RequestParam(value = "count", required = false, defaultValue = "10") int count,
-                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByPid(pid, page, count));
+    public Response retrievePage(@PathVariable("pid") long pid) {
+        return ResponseUtil.success(commentService.retrievePageByPid(pid));
     }
 
     /**
