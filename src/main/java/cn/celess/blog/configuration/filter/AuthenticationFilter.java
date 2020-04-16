@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,6 +64,11 @@ public class AuthenticationFilter implements HandlerInterceptor {
             return writeResponse(ResponseEnum.LOGIN_EXPIRED, response, request);
         }
         String role = userService.getUserRoleByEmail(email);
+        if (role.equals(ROLE_USER) || role.equals(ROLE_ADMIN)) {
+            // 更新token
+            String token = jwtUtil.updateTokenDate(jwtStr);
+            response.setHeader("Authorization",token);
+        }
         if (role.equals(ROLE_ADMIN)) {
             // admin
             return true;

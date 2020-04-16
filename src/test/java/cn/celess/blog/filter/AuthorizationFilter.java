@@ -61,4 +61,16 @@ public class AuthorizationFilter extends BaseTest {
             assertEquals(HAVE_NOT_LOG_IN.getCode(), object.getInt(Code));
         });
     }
+
+    @Test
+    public void authorizationTest() throws Exception {
+        // 测试response中有无Authorization字段
+        String s = userLogin();
+        mockMvc.perform(get("/user/userInfo").header("Authorization", s)).andDo(result -> {
+            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
+            assertEquals(SUCCESS.getCode(), object.getInt(Code));
+            assertNotNull(result.getResponse().getHeader("Authorization"));
+            assertNotEquals(s, result.getResponse().getHeader("Authorization"));
+        });
+    }
 }
