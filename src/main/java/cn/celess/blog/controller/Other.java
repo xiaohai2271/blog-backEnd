@@ -73,7 +73,8 @@ public class Other {
         Map<String, Object> map = new HashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
         String str = null;
-        while ((str = headerNames.nextElement()) != null) {
+        while (headerNames.hasMoreElements()) {
+            str = headerNames.nextElement();
             map.put(str, request.getHeader(str));
         }
         map.put("sessionID", request.getSession().getId());
