@@ -13,6 +13,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
+      APPLICATION_PROPERTIES_TEST: ${{ secrets.APPLICATION_PROPERTIES_TEST }}
       APPLICATION_PROPERTIES_PROD: ${{ secrets.APPLICATION_PROPERTIES_PROD }}
 
     steps:
