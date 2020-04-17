@@ -13,20 +13,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      QINIU_ACCESSKEY: ${{ secrets.QINIU_ACCESSKEY }}
-      QINIU_SECRETKEY: ${{ secrets.QINIU_SECRETKEY }}
-      JWT_SECRETKEY: ${{ secrets.JWT_SECRETKEY }}
-      MYSQL_URL_PROD: ${{ secrets.MYSQL_URL_PROD }}
-      MYSQL_USERNAME_PROD: ${{ secrets.MYSQL_USERNAME_PROD }}
-      MYSQL_PASSWORD_PROD: ${{ secrets.MYSQL_PASSWORD_PROD }}
-      MAIL_HOST_PROD: ${{ secrets.MAIL_HOST_PROD }}
-      MAIL_USERNAME_PROD: ${{ secrets.MAIL_USERNAME_PROD }}
-      MAIL_PWD_PROD: ${{ secrets.MAIL_PWD_PROD }}
-      REDIS_PROD: ${{ secrets.REDIS_PROD }}
-      MYSQL_URL_TEST: ${{ secrets.MYSQL_URL_TEST }}
-      MYSQL_USERNAME_TEST: ${{ secrets.MYSQL_USERNAME_TEST }}
-      MYSQL_PASSWORD_TEST: ${{ secrets.MYSQL_PASSWORD_TEST }}
-      JWT_SECRETKEY_TEST: ${{ secrets.JWT_SECRETKEY_TEST }}
+      APPLICATION_PROPERTIES_PROD: ${{ secrets.APPLICATION_PROPERTIES_PROD }}
 
     steps:
     - uses: actions/checkout@v2
@@ -36,7 +23,7 @@ jobs:
         java-version: 1.8
 
     - name: Build jar file
-      run: mvn -B package --file pom.xml
+      run: echo $APPLICATION_PROPERTIES_TEST|base64 -d > src/main/resources/application-test.properties && echo $APPLICATION_PROPERTIES_PROD|base64 -d> src/main/resources/application-prod.properties && mvn -B package --file pom.xml
         
     - name: SCP
       uses: appleboy/scp-action@master
