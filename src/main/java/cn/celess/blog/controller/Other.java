@@ -162,7 +162,7 @@ public class Other {
         if (".png".equals(mime.toLowerCase()) || ".jpg".equals(mime.toLowerCase()) ||
                 ".jpeg".equals(mime.toLowerCase()) || ".bmp".equals(mime.toLowerCase())) {
             QiniuResponse qiniuResponse = qiniuService.uploadFile(file.getInputStream(), "img_" + System.currentTimeMillis() + mime);
-            jsonObject.put("success", 0);
+            jsonObject.put("success", 1);
             jsonObject.put("message", "上传成功");
             jsonObject.put("url", "http://cdn.celess.cn/" + qiniuResponse.key);
             response.getWriter().println(jsonObject.toString());
