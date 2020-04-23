@@ -10,6 +10,7 @@ import cn.celess.blog.util.DateFormatUtil;
 import cn.celess.blog.util.HttpUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.util.List;
  * @date : 2019/05/12 11:43
  */
 @Service
+@Slf4j
 public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
     @Autowired
     WebUpdateInfoMapper webUpdateInfoMapper;
@@ -99,8 +101,9 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
             SimpleDateFormat sdf = new SimpleDateFormat();
             Instant parse = Instant.parse(commit.getJSONObject("committer").getString("date"));
             jsonObject.put("committerDate", DateFormatUtil.get(Date.from(parse)));
+            jsonObject.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/"+object.getString("sha"));
         } catch (IOException e) {
-            jsonObject.put("lastCommit", null);
+            log.info("网络请求失败{}", e.getMessage());
         }
         return jsonObject;
     }
