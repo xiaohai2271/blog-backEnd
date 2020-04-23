@@ -27,5 +27,5 @@ public interface WebUpdateInfoMapper {
 
     List<WebUpdate> findAll();
 
-    Date getLastestOne();
+    WebUpdate getLastestOne();
 }

@@ -39,8 +39,8 @@
         select *
         from web_update
     </select>
-    <select id="getLastestOne" resultType="date">
-        select update_time
+    <select id="getLastestOne" resultMap="webUpdateResultMap">
+        select *
         from web_update
         order by update_id desc
         limit 1

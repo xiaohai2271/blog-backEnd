@@ -39,7 +39,7 @@ public class WebUpdateInfoController {
     public Response page(@RequestParam("page") int page, @RequestParam("count") int count) {
         return ResponseUtil.success(webUpdateInfoService.pages(count, page));
     }
-    @GetMapping("/lastestUpdateTime")
+    @GetMapping("/lastestUpdate")
     public Response lastestUpdateTime() {
         return ResponseUtil.success(webUpdateInfoService.getLastestUpdateTime());
     }

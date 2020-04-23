@@ -7,11 +7,17 @@ import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.WebUpdateInfoMapper;
 import cn.celess.blog.service.WebUpdateInfoService;
 import cn.celess.blog.util.DateFormatUtil;
+import cn.celess.blog.util.HttpUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -80,8 +86,23 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
     }
 
     @Override
-    public String getLastestUpdateTime() {
-        return DateFormatUtil.get(webUpdateInfoMapper.getLastestOne());
+    public JSONObject getLastestUpdateTime() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("lastUpdateTime", DateFormatUtil.get(webUpdateInfoMapper.getLastestOne().getUpdateTime()));
+        jsonObject.put("lastUpdateInfo", webUpdateInfoMapper.getLastestOne().getUpdateInfo());
+        try {
+            JSONArray array = JSONArray.fromObject(HttpUtil.get("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1"));
+            JSONObject object = array.getJSONObject(0);
+            JSONObject commit = object.getJSONObject("commit");
+            jsonObject.put("lastCommit", commit.getString("message"));
+            jsonObject.put("committerAuthor", commit.getJSONObject("committer").getString("name"));
+            SimpleDateFormat sdf = new SimpleDateFormat();
+            Instant parse = Instant.parse(commit.getJSONObject("committer").getString("date"));
+            jsonObject.put("committerDate", DateFormatUtil.get(Date.from(parse)));
+        } catch (IOException e) {
+            jsonObject.put("lastCommit", null);
+        }
+        return jsonObject;
     }
 
     private List<WebUpdateModel> list2List(List<WebUpdate> webUpdates) {

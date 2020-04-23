@@ -2,6 +2,7 @@ package cn.celess.blog.service;
 
 import cn.celess.blog.entity.model.WebUpdateModel;
 import com.github.pagehelper.PageInfo;
+import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,5 +59,5 @@ public interface WebUpdateInfoService {
      *
      * @return
      */
-    String getLastestUpdateTime();
+    JSONObject getLastestUpdateTime();
 }
