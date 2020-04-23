@@ -6,6 +6,7 @@ import cn.celess.blog.entity.model.QiniuResponse;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.service.CountService;
 import cn.celess.blog.service.QiniuService;
+import cn.celess.blog.util.HttpUtil;
 import cn.celess.blog.util.RedisUtil;
 import cn.celess.blog.util.ResponseUtil;
 import cn.celess.blog.util.VeriCodeUtil;
@@ -176,40 +177,13 @@ public class Other {
 
     @GetMapping("/bingPic")
     public Response bingPic() {
-        StringBuffer sb = new StringBuffer();
+
+        JSONObject imageObj;
         try {
-            //建立URL
-            URL url = new URL("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN");
-
-            //打开http
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setDoInput(true);
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            //获得输入
-            InputStream inputStream = urlConnection.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            //将bufferReader的值给放到buffer里
-            String str = null;
-            while ((str = bufferedReader.readLine()) != null) {
-                sb.append(str);
-            }
-            //关闭bufferReader和输入流
-            bufferedReader.close();
-            inputStreamReader.close();
-            inputStream.close();
-            //断开连接
-            urlConnection.disconnect();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            imageObj = JSONObject.fromObject(HttpUtil.get("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"));
+        } catch (IOException e) {
             return ResponseUtil.failure(null);
         }
-
-        JSONObject imageObj = JSONObject.fromObject(sb.toString());
         JSONArray jsonArray = imageObj.getJSONArray("images");
         String imageName = jsonArray.getJSONObject(0).getString("url");
         return ResponseUtil.success("https://cn.bing.com" + imageName);
