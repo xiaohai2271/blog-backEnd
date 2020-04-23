@@ -120,6 +120,7 @@ public class WebUpdateInfoControllerTest extends BaseTest {
 
     @Test
     public void lastestUpdateTime() throws Exception {
-        mockMvc.perform(get("/lastestUpdateTime")).andDo(result -> assertEquals(SUCCESS.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)));
+        mockMvc.perform(get("/lastestUpdate")).andDo(result ->
+                assertEquals(SUCCESS.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)));
     }
 }
