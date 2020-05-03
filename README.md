@@ -24,12 +24,3 @@
 
    项目采用swagger2，接口文档自动生成，具体为 http://ip:端口/swagger-ui.html
 
-  ###  📝TODO
-
-  - [x] 密码重置
-  - [x] 信息修改
-  - [ ] 接入qq登录
-
-  ### 📌FIXME
-
-  - [ ] `/write` 图片上传的跨域问题
