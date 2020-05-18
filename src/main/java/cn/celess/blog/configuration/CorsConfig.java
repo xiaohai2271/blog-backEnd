@@ -1,5 +1,6 @@
 package cn.celess.blog.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -13,6 +14,9 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 public class CorsConfig {
+    @Value("${spring.profiles.active}")
+    private String activeModel;
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -22,14 +26,17 @@ public class CorsConfig {
         config.addAllowedOrigin("https://celess.cn");
         config.addAllowedOrigin("https://www.celess.cn");
         // 本地调试时的跨域
-        config.addAllowedOrigin("http://localhost:4200");
-        config.addAllowedOrigin("http://127.0.0.1:4200");
+        if ("dev".equals(activeModel)) {
+            config.addAllowedOrigin("http://localhost:4200");
+            config.addAllowedOrigin("http://127.0.0.1:4200");
+        }
         config.addAllowedHeader("*");
         config.addAllowedMethod("OPTIONS");
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");
         config.addAllowedMethod("DELETE");
+        config.addExposedHeader("Authorization");
         config.setAllowCredentials(true);
         config.setMaxAge(10800L);
         source.registerCorsConfiguration("/**", config);
