@@ -93,6 +93,14 @@ public class UserController {
         return ResponseUtil.success(userService.reSetPwd(verifyId, email, pwd));
     }
 
+    @PostMapping("/user/setPwd")
+    public Response setPwd(@RequestParam("pwd") String pwd,
+                             @RequestParam("newPwd") String newPwd,
+                             @RequestParam("confirmPwd") String confirmPwd) {
+        return ResponseUtil.success(userService.setPwd(pwd,newPwd,confirmPwd));
+    }
+
+
     @DeleteMapping("/admin/user/delete")
     public Response multipleDelete(@RequestBody Integer[] ids) {
         return ResponseUtil.success(userService.deleteUser(ids));

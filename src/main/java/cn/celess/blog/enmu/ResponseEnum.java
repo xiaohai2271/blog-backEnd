@@ -28,8 +28,10 @@ public enum ResponseEnum {
     USEREMAIL_NULL(3310, "未设置邮箱"),
     USEREMAIL_NOT_VERIFY(3320, "邮箱未验证"),
     LOGIN_LATER(3500, "错误次数已达5次，请稍后再试"),
-    PWD_SAME(3600, "新密码与原密码相同"),
+    PWD_SAME(3601, "新密码与原密码相同"),
+    PWD_NOT_SAME(3602, "新密码与原密码不相同"),
     LOGIN_EXPIRED(3700, "登陆过期"),
+    PWD_WRONG(3800, "密码不正确"),
 
     JWT_EXPIRED(3810, "Token过期"),
     JWT_MALFORMED(3820, "Token格式不对"),

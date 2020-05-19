@@ -174,4 +174,13 @@ public interface UserService {
      * @return true:存在  false：不存在
      */
     boolean getStatusOfEmail(String email);
+
+    /**
+     * 设置密码
+     * @param pwd
+     * @param newPwd
+     * @param confirmPwd
+     * @return
+     */
+    UserModel setPwd(String pwd, String newPwd, String confirmPwd);
 }

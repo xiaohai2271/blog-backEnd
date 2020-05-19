@@ -433,6 +433,20 @@ public class UserServiceImpl implements UserService {
         return userMapper.existsByEmail(email);
     }
 
+    @Override
+    public UserModel setPwd(String pwd, String newPwd, String confirmPwd) {
+        User user = redisUserUtil.get();
+        String pwd1 = userMapper.getPwd(user.getEmail());
+        if (!MD5Util.getMD5(pwd).equals(pwd1)) {
+            throw new MyException(ResponseEnum.PWD_WRONG);
+        }
+        if (!newPwd.equals(confirmPwd)) {
+            throw new MyException(ResponseEnum.PWD_NOT_SAME);
+        }
+        userMapper.updatePwd(user.getEmail(), MD5Util.getMD5(newPwd));
+        return trans(userMapper.findByEmail(user.getEmail()));
+    }
+
     private UserModel trans(User u) {
         UserModel user = new UserModel();
         user.setId(u.getId());

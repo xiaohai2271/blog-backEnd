@@ -14,6 +14,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -245,6 +248,30 @@ public class UserControllerTest extends BaseTest {
             String content = result.getResponse().getContentAsString();
             assertEquals(SUCCESS.getCode(), JSONObject.fromObject(content).getInt(Code));
             assertTrue(JSONObject.fromObject(content).getBoolean(Result));
+        });
+    }
+
+    @Test
+    public void setPwd() throws Exception {
+        String email = UUID.randomUUID().toString().substring(0, 4) + "@celess.cn";
+        assertEquals(1, userMapper.addUser(email, MD5Util.getMD5("1234567890")));
+        LoginReq req = new LoginReq();
+        req.setEmail(email);
+        req.setPassword("1234567890");
+        req.setIsRememberMe(false);
+        JSONObject loginReq = JSONObject.fromObject(req);
+        String contentAsString = mockMvc.perform(post("/login").content(loginReq.toString()).contentType("application/json")).andReturn().getResponse().getContentAsString();
+        assertNotNull(contentAsString);
+        String token = JSONObject.fromObject(contentAsString).getJSONObject(Result).getString("token");
+        assertNotNull(token);
+        MultiValueMap<String, String> param = new LinkedMultiValueMap<String, String>();
+        param.add("pwd", "1234567890");
+        param.add("newPwd", "aaabbbccc");
+        param.add("confirmPwd", "aaabbbccc");
+        mockMvc.perform(post("/user/setPwd").header("Authorization", token).params(param)).andDo(result -> {
+            String content = result.getResponse().getContentAsString();
+            assertEquals(SUCCESS.getCode(), JSONObject.fromObject(content).getInt(Code));
+            assertEquals(MD5Util.getMD5("aaabbbccc"), userMapper.getPwd(email));
         });
     }
 }
