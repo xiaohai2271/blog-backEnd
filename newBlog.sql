@@ -24,9 +24,10 @@ CREATE TABLE `article`
 
 CREATE TABLE `article_tag`
 (
-    `at_id` bigint(20) primary key auto_increment,
-    `a_id`  bigint(20) not null comment '文章id',
-    `t_id`  bigint     not null comment 'tag/category 的id'
+    `at_id`     bigint(20) primary key auto_increment,
+    `a_id`      bigint(20) not null comment '文章id',
+    `t_id`      bigint     not null comment 'tag/category 的id',
+    `is_delete` boolean    not null default false comment '该数据是否被删除'
 ) comment '文章标签表';
 
 CREATE TABLE `tag_category`

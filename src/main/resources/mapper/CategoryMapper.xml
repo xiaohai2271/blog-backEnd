@@ -1,84 +1,91 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.celess.blog.mapper.CategoryMapper">
-    <resultMap id="categoryResultMap" type="cn.celess.blog.entity.Category">
+    <resultMap id="categoryResultMap" type="cn.celess.blog.entity.TagCategory">
         <id column="t_id" property="id"/>
         <result column="t_name" property="name"/>
+        <result column="is_category" property="category"/>
+        <result column="is_delete" property="deleted"/>
     </resultMap>
 
-    <insert id="insert">
-        insert into category (c_name, articles)
-        values (#{name}, #{articles});
-        <selectKey resultType="java.lang.Long" keyProperty="id">
-            SELECT LAST_INSERT_ID() AS id
-        </selectKey>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into tag_category (t_name, is_category)
+        values (#{name}, true);
     </insert>
 
     <update id="update">
-        update category
-        set c_name=#{name},
-            articles=#{articles}
-        where c_id = #{id}
+        update tag_category
+        set t_name=#{name}
+        where t_id = #{id}
+          and is_category = true;
     </update>
 
-    <delete id="delete">
-        delete
-        from category
-        where c_id = #{id}
-    </delete>
+    <update id="delete">
+        update tag_category
+        set is_delete= true
+        where t_id = #{id}
+          and is_category = true;
+    </update>
 
     <select id="findCategoryByName" resultMap="categoryResultMap">
         select *
-        from category
-        where c_name = #{name}
+        from tag_category
+        where t_name = #{name}
+          and is_category = true;
     </select>
 
     <select id="findCategoryById" resultMap="categoryResultMap">
         select *
-        from category
-        where c_id = #{id}
+        from tag_category
+        where t_id = #{id}
+          and is_category = true;
     </select>
 
     <select id="findAll" resultMap="categoryResultMap">
         select *
-        from category
+        from tag_category
+        where is_category = true;
     </select>
 
     <select id="getAllName" resultType="java.lang.String">
-        select c_name
-        from category
+        select t_name
+        from tag_category
+        where is_category = true;
     </select>
 
     <select id="getNameById" resultType="java.lang.String">
-        select c_name
-        from category
-        where c_id = #{id}
+        select t_name
+        from tag_category
+        where is_category = true;
     </select>
 
-    <select id="getIDByName" resultType="java.lang.Long">
-        select c_id
-        from category
-        where c_name = #{name}
+    <select id="getIdByName" resultType="java.lang.Long">
+        select t_id
+        from tag_category
+        where is_category = true
+          and t_name = #{name}
     </select>
 
     <select id="existsByName" resultType="java.lang.Boolean">
-        SELECT EXISTS(SELECT * FROM category WHERE c_name = #{name})
+        SELECT EXISTS(SELECT * FROM tag_category WHERE t_name = #{name} and is_category = true)
     </select>
 
     <select id="existsById" resultType="java.lang.Boolean">
-        SELECT EXISTS(SELECT * FROM category WHERE c_id = #{id})
+        SELECT EXISTS(SELECT * FROM tag_category WHERE t_id = #{id})
     </select>
 
     <select id="getLastestCategory" resultMap="categoryResultMap">
         select *
-        from category
-        order by c_id desc
+        from tag_category
+        where is_category = true
+        order by t_id desc
         limit 1;
     </select>
 
     <select id="count" resultType="java.lang.Long">
         select count(*)
-        from category;
+        from tag_category
+        where is_category = true;
     </select>
 
 </mapper>

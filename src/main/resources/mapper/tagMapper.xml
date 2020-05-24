@@ -1,75 +1,66 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.celess.blog.mapper.TagMapper">
-    <resultMap id="tagResultMap" type="cn.celess.blog.entity.Tag">
-        <id column="tag_id" property="id"/>
-        <result column="tag_name" property="name"/>
+
+    <resultMap id="tagResultMap" type="cn.celess.blog.entity.Tag"
+               extends="cn.celess.blog.mapper.CategoryMapper.categoryResultMap">
+
     </resultMap>
 
-    <insert id="insert">
-        insert into tag (tag_name, articles)
-        VALUES (#{name}, #{articles});
-        <selectKey resultType="java.lang.Long" keyProperty="id">
-            SELECT LAST_INSERT_ID() AS id
-        </selectKey>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into tag_category (t_name, is_category)
+        VALUES (#{name}, false);
     </insert>
 
     <update id="update">
-        update tag
-        set tag_name=#{name},
-            articles=#{articles}
-        where tag_id = #{id}
+        update tag_category
+        set t_name=#{name}
+        where t_id = #{id}
+          and is_category = false;
     </update>
 
-    <delete id="delete">
-        delete
-        from tag
-        where tag_id = #{id}
-    </delete>
+    <update id="delete">
+        update tag_category
+        set is_delete = true
+        where t_id = #{id}
+          and is_category = false;
+    </update>
 
     <select id="findTagById" resultMap="tagResultMap">
         select *
-        from tag
-        where tag_id = #{id}
+        from tag_category
+        where t_id = #{id}
+          and is_category = false;
     </select>
 
     <select id="findTagByName" resultMap="tagResultMap">
         select *
-        from tag
-        where tag_name = #{name}
+        from tag_category
+        where t_name = #{name}
+          and is_category = false;
     </select>
 
     <select id="existsByName" resultType="boolean">
-        SELECT EXISTS(SELECT * FROM tag WHERE tag_name = #{name})
+        SELECT EXISTS(SELECT * FROM tag_category WHERE t_name = #{name} and is_category = false)
     </select>
-
-    <select id="getIDByName" resultType="long">
-        select tag_id
-        from tag
-        where tag_name = #{name}
-    </select>
-
-    <select id="getNameById" resultType="string">
-        select tag_name
-        from tag
-        where tag_id = #{id}
-    </select>
-
 
     <select id="getLastestTag" resultMap="tagResultMap">
         select *
-        from tag
-        order by tag_id desc
+        from tag_category
+        where is_category = false
+        order by t_id desc
         limit 1
     </select>
 
     <select id="findAll" resultMap="tagResultMap">
         select *
-        from tag
+        from tag_category
+        where is_category = false;
     </select>
 
     <select id="count" resultType="long">
         select count(*)
-        from tag;
+        from tag_category
+        where is_category = false;;
     </select>
 </mapper>

@@ -2,14 +2,12 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.LevelEnum;
 import cn.celess.blog.enmu.ResponseEnum;
+import cn.celess.blog.enmu.RoleEnum;
 import cn.celess.blog.entity.*;
 import cn.celess.blog.entity.model.ArticleModel;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.exception.MyException;
-import cn.celess.blog.mapper.ArticleMapper;
-import cn.celess.blog.mapper.CategoryMapper;
-import cn.celess.blog.mapper.CommentMapper;
-import cn.celess.blog.mapper.TagMapper;
+import cn.celess.blog.mapper.*;
 import cn.celess.blog.service.ArticleService;
 import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.DateFormatUtil;
@@ -50,6 +48,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     CommentMapper commentMapper;
     @Autowired
+    ArticleTagMapper articleTagMapper;
+    @Autowired
     UserService userService;
     @Autowired
     HttpServletRequest request;
@@ -79,12 +79,20 @@ public class ArticleServiceImpl implements ArticleService {
         if (reqBody.getCategory() == null || reqBody.getCategory().replaceAll(" ", "").isEmpty()) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
-        if (reqBody.getTags() == null || reqBody.getTags().replaceAll(" ", "").isEmpty()) {
+        if (reqBody.getTags() == null || reqBody.getTags().length == 0) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+        }
+        if (articleMapper.existsByTitle(reqBody.getTitle())) {
+            throw new MyException(ResponseEnum.ARTICLE_HAS_EXIST);
+        }
+        // 查看是否存在已有的分类
+        Category category = (Category) categoryMapper.findCategoryByName(reqBody.getCategory());
+        if (category == null) {
+            throw new MyException(ResponseEnum.CATEGORY_NOT_EXIST);
         }
 
 
-        //写入数据库的数据
+        // 构建 需要写入数据库的对象数据
         Article article = new Article();
         article.setTitle(reqBody.getTitle());
         article.setOpen(reqBody.getOpen());
@@ -92,282 +100,155 @@ public class ArticleServiceImpl implements ArticleService {
         article.setUrl(reqBody.getUrl());
         article.setType(reqBody.getType());
 
-        article.setAuthorId(redisUserUtil.get().getId());
+        article.setUser(redisUserUtil.get());
         article.setPublishDate(new Date());
-
-        //防止出现 “null,xxx”这种情况
-        article.setTagsId("");
-
-
-        //是否需要更新上一篇文章
-        boolean isUpdatePreArticle = true;
-
-        Article preArticle = null;
-
-
-        if (articleMapper.count() == 0) {
-            isUpdatePreArticle = false;
-
-
-        } else {
-            //获取最新的一条数据
-            preArticle = articleMapper.getLastestArticle();
-        }
-
-        if (isUpdatePreArticle) {
-            logger.info("上一篇文章的id为：" + preArticle.getId());
-            //设置上一篇文章的id
-            article.setPreArticleId(preArticle.getId());
-        }
 
         //markdown->html->summary
         String str = StringFromHtmlUtil.getString(MDTool.markdown2Html(article.getMdContent()));
         //获取摘要  摘要长度为255个字符
         String summary = str.length() > 240 ? str.substring(0, 240) + "......" : str;
-
-        //去除转换后存在的空格
-        String tagStr = reqBody.getTags().replaceAll(" ", "");
         article.setSummary(summary);
 
-        if (articleMapper.existsByTitle(article.getTitle())) {
-            throw new MyException(ResponseEnum.ARTICLE_HAS_EXIST);
-        }
-
-
-        //将分类写入数据库
-        Category category1 = categoryMapper.findCategoryByName(reqBody.getCategory());
-        if (category1 == null) {
-            category1 = new Category();
-            category1.setArticles("");
-            category1.setName(reqBody.getCategory());
-            categoryMapper.insert(category1);
-        }
-
-        article.setCategoryId(category1.getId());
+        article.setCategory(category);
 
         //文章存数据库
         articleMapper.insert(article);
-        //获取新增的文章
-
-        if (isUpdatePreArticle) {
-            //更新上一篇文章的“下一篇文章ID”
-            articleMapper.updateNextArticleId(preArticle.getId(), article.getId());
-        }
-
-        //无效
-        // articleMapper.updatePreArticleId(article.getId(), preArticle == null ? -1 : preArticle.getId());
-        article.setPreArticleId(preArticle == null ? -1 : preArticle.getId());
-
-        category1.setArticles(category1.getArticles() + article.getId() + ",");
-        categoryMapper.update(category1);
-
 
         //将标签写入数据库
-        for (String t : tagStr.split(",")) {
-            if (t.replaceAll(" ", "").length() == 0) {
+        for (String tagName : reqBody.getTags()) {
+            if (tagName.replaceAll(" ", "").length() == 0) {
                 //单个标签只含空格
                 continue;
             }
-            Tag tag = tagMapper.findTagByName(t);
+            Tag tag = (Tag) tagMapper.findTagByName(tagName);
             if (tag == null) {
                 tag = new Tag();
-                tag.setName(t);
-                tag.setArticles("");
+                tag.setName(tagName);
                 tagMapper.insert(tag);
             }
-            tag.setArticles(tag.getArticles() + article.getId() + ",");
-            article.setTagsId(article.getTagsId() + tag.getId() + ",");
-            tagMapper.update(tag);
+            ArticleTag articleTag = new ArticleTag(article, tag);
+            articleTagMapper.insert(articleTag);
         }
-        articleMapper.update(article);
-        return fullTransform(articleMapper.getLastestArticle());
+        return fullTransform(article);
     }
 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean delete(long articleID) {
-
-        Article articleForDel = articleMapper.findArticleById(articleID);
+    public boolean delete(long articleId) {
+        Article articleForDel = articleMapper.findArticleById(articleId);
 
         if (articleForDel == null) {
-            throw new MyException(ResponseEnum.ARTICLE_NOT_EXIST);//文章不存在
+            //文章不存在
+            throw new MyException(ResponseEnum.ARTICLE_NOT_EXIST);
         }
 
-        Article preArticle = articleMapper.findArticleById(articleForDel.getPreArticleId());
-        Article nextArticle = articleMapper.findArticleById(articleForDel.getNextArticleId());
-
-        //对访问情况进行判断  非博主/非自己文章 拒绝访问
+        //对访问情况进行判断  非admin 权限不可删除文章
         User user = redisUserUtil.get();
-        if (!user.getRole().contains("admin") && !articleForDel.getAuthorId().equals(user.getId())) {
+        if (!RoleEnum.ADMIN_ROLE.getRoleName().equals(user.getRole())) {
             throw new MyException(ResponseEnum.PERMISSION_ERROR);
         }
-
-        //删除的文章处于中间位置
-        if (nextArticle != null && preArticle != null) {
-
-            //修改上一篇文章的“下一篇文章”y
-            articleMapper.updateNextArticleId(articleForDel.getPreArticleId(), articleForDel.getNextArticleId());
-
-            //修改下一篇文章的 “上一篇文章”
-            articleMapper.updatePreArticleId(articleForDel.getNextArticleId(), articleForDel.getPreArticleId());
-        }
-        if (preArticle == null && nextArticle != null) {
-            //删除的是第一篇文章
-            articleMapper.updatePreArticleId(nextArticle.getId(), -1);
-        }
-        if (nextArticle == null && preArticle != null) {
-            //删除的是最后一篇文章
-            articleMapper.updateNextArticleId(preArticle.getId(), -1);
-        }
-        // delete count 为删除的数据数量
-        int deleteCount = commentMapper.deleteByArticleId(articleID);
-
-        //删除标签中的文章id
-        String tag = articleForDel.getTagsId();
-        if (tag.length() > 0) {
-            String[] tags = tag.split(",");
-            for (String t : tags) {
-                if (t != null) {
-                    //查询标签
-                    Tag tag1 = tagMapper.findTagById(Long.parseLong(t));
-                    //去除标签中的articleId中的待删除的文章id
-                    String s = tag1.getArticles().replaceAll(articleForDel.getId() + ",", "");
-                    tag1.setArticles(s);
-                    tagMapper.update(tag1);
-                }
-            }
-        }
-
-
-        //删除分类中的文章id
-        //获取文章的分类
-        long categoryId = articleForDel.getCategoryId();
-        Category category = categoryMapper.findCategoryById(categoryId);
-        //删除文章id
-        category.setArticles(category.getArticles().replaceAll(articleForDel.getId() + ",", ""));
-        //更新
-        categoryMapper.update(category);
-
         //删除指定文章
-        articleMapper.delete(articleID);
+        articleMapper.delete(articleId);
+
+        articleTagMapper.deleteByArticleId(articleId);
+
         return true;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ArticleModel update(ArticleReq reqBody) {
-        if (reqBody == null) {
+        if (reqBody == null || reqBody.getId() == null) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
+        // 查找数据
+        Article article = articleMapper.findArticleById(reqBody.getId());
+
         //数据判断
-        if (reqBody.getTitle() == null || reqBody.getTitle().replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
-        } else if (reqBody.getMdContent() == null || reqBody.getMdContent().replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+        if (reqBody.getTitle() != null && !reqBody.getTitle().replaceAll(" ", "").isEmpty()) {
+            if (articleMapper.existsByTitle(reqBody.getTitle())) {
+                throw new MyException(ResponseEnum.ARTICLE_HAS_EXIST);
+            }
+            article.setTitle(reqBody.getTitle());
         }
+        if (reqBody.getMdContent() != null && !reqBody.getMdContent().replaceAll(" ", "").isEmpty()) {
+            article.setMdContent(reqBody.getMdContent());
+        }
+
         //转载 判断链接
-        if (!reqBody.getType()) {
-            if (reqBody.getUrl() == null || reqBody.getUrl().replaceAll(" ", "").isEmpty()) {
+        if (reqBody.getType() != null) {
+            if (!reqBody.getType() && reqBody.getUrl() == null) {
                 throw new MyException(ResponseEnum.PARAMETERS_ERROR);
-            } else if (!RegexUtil.urlMatch(reqBody.getUrl())) {
+            }
+
+            if (!RegexUtil.urlMatch(reqBody.getUrl())) {
                 throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
             }
+            article.setType(reqBody.getType());
+            article.setUrl(reqBody.getUrl());
         }
-        if (reqBody.getCategory() == null || reqBody.getCategory().replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+        if (reqBody.getCategory() != null && !reqBody.getCategory().replaceAll(" ", "").isEmpty()) {
+            Category category = (Category) categoryMapper.findCategoryByName(reqBody.getCategory());
+            if (category == null) {
+                category = new Category();
+                category.setName(reqBody.getCategory());
+                categoryMapper.insert(category);
+            }
+            article.setCategory(category);
         }
-        // 暂时不更新tags
-        if (reqBody.getTags() == null || reqBody.getTags().replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+
+        if (reqBody.getTags() != null && reqBody.getTags().length != 0) {
+
         }
 
         //写入数据库的数据
-        Article article = new Article();
-        if (reqBody.getId() == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR.getCode(), "id不能为空");
-        }
-        article.setId(reqBody.getId());
-        article.setTitle(reqBody.getTitle());
-        article.setOpen(reqBody.getOpen());
-        article.setMdContent(reqBody.getMdContent());
-        article.setUrl(reqBody.getUrl());
-        article.setType(reqBody.getType());
-
-
-        Article oldArticle = articleMapper.findArticleById(reqBody.getId());
-
-        Category category = categoryMapper.findCategoryById(oldArticle.getCategoryId());
-        if (!(category.getName()).equals(reqBody.getCategory())) {
-            //修改更新之前数据 的分类
-            category.setArticles(category.getArticles().replace(reqBody.getId() + ",", ""));
-            //更新
-            categoryMapper.update(category);
-
-            //更新 更新之后的分类
-            Category category1 = categoryMapper.findCategoryByName(reqBody.getCategory());
-            if (category1 == null) {
-                category1 = new Category();
-                category1.setName(reqBody.getCategory());
-                category1.setArticles(reqBody.getId() + ",");
-                categoryMapper.insert(category1);
-            }
-            article.setCategoryId(category1.getId());
-        } else {
-            article.setCategoryId(oldArticle.getCategoryId());
-        }
-
-        String[] newTags = reqBody.getTags().split(",");
-        String[] tagIds = oldArticle.getTagsId().split(",");
-        //防止出现 ‘null2’这种情况
-        article.setTagsId("");
-        for (String t : newTags) {
-            Tag tag = tagMapper.findTagByName(t);
-            if (tag == null) {
-                tag = new Tag();
-                tag.setName(t);
-                tag.setArticles(oldArticle.getId() + ",");
-                int status = tagMapper.insert(tag);
-                if (status == 0) {
-                    // 插入失败
-                    throw new MyException(ResponseEnum.FAILURE);
-                }
-                article.setTagsId(article.getTagsId() + tag.getId() + ",");
-                continue;
-            }
-            article.setTagsId(article.getTagsId() + tag.getId() + ",");
-        }
-        for (String tagId : tagIds) {
-            Tag tagById = tagMapper.findTagById(Long.parseLong(tagId));
-            // 在新更新的tag中是否有原有的tag
-            boolean isOldTag = false;
-            for (String s : newTags) {
-                if (s.equals(tagById.getName())) {
-                    isOldTag = true;
-                    break;
-                }
-            }
-            if (!isOldTag) {
-                tagById.setArticles(tagById.getArticles().replace(oldArticle.getId() + ",", ""));
-            }
-            tagMapper.update(tagById);
-        }
-//
-//        // TODO:::: tag的更新
-//        article.setTagsId(oldArticle.getTagsId());
-
-
-        article.setUpdateDate(new Date());
-        // TODO::::换用beansUtil
-        // 设置不定参数
-        article.setReadingNumber(oldArticle.getReadingNumber());
-        article.setPublishDate(oldArticle.getPublishDate());
-        article.setAuthorId(redisUserUtil.get().getId());
-        article.setPreArticleId(oldArticle.getPreArticleId());
-        article.setNextArticleId(oldArticle.getNextArticleId());
+        article.setOpen(reqBody.getOpen() ? article.getOpen() : reqBody.getOpen());
         String str = StringFromHtmlUtil.getString(MDTool.markdown2Html(article.getMdContent()));
         article.setSummary(str.length() > 240 ? str.substring(0, 240) + "......" : str);
         articleMapper.update(article);
+
+
+        List<ArticleTag> allByArticleId = articleTagMapper.findAllByArticleId(article.getId());
+        List<ArticleTag> updateList = new ArrayList<>();
+        List<ArticleTag> deleteList = new ArrayList<>();
+
+        for (String tag : reqBody.getTags()) {
+            boolean contain = allByArticleId.stream().anyMatch(articleTag -> articleTag.getTag().getName().equals(tag));
+            if (!contain) {
+                ArticleTag articleTag = new ArticleTag();
+                articleTag.setArticle(article);
+                Tag tagByName = (Tag) tagMapper.findTagByName(tag);
+                if (tagByName == null) {
+                    tagByName = new Tag(tag);
+                    tagMapper.insert(tagByName);
+                }
+                articleTag.setTag(tagByName);
+                updateList.add(articleTag);
+            }
+        }
+
+        allByArticleId.forEach(articleTag -> {
+            boolean contain = false;
+            for (String tag : reqBody.getTags()) {
+                if (articleTag.getTag().getName().equals(tag)) {
+                    contain = true;
+                    break;
+                }
+            }
+            if (!contain) {
+                deleteList.add(articleTag);
+            }
+        });
+
+        if (updateList.size() != 0) {
+            updateList.forEach(articleTag -> articleTagMapper.insert(articleTag));
+        }
+
+        if (deleteList.size() != 0) {
+            articleTagMapper.deleteMultiById(deleteList);
+        }
+
         //更新完成移除
         request.getSession().removeAttribute("article4update");
         return fullTransform(article);
@@ -420,7 +301,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public PageInfo findByCategory(String name, int page, int count) {
-        Long idByName = categoryMapper.getIDByName(name);
+        Long idByName = categoryMapper.getIdByName(name);
         if (idByName == null) {
             throw new MyException(ResponseEnum.CATEGORY_NOT_EXIST);
         }
@@ -431,13 +312,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public PageInfo findByTag(String name, int page, int count) {
-        Tag tag = tagMapper.findTagByName(name);
+        Tag tag = (Tag) tagMapper.findTagByName(name);
         if (tag == null) {
             throw new MyException(ResponseEnum.TAG_NOT_EXIST);
         }
+        // TODO :
         PageHelper.startPage(page, count);
-        String[] split = tag.getArticles().split(",");
-        List<String> list = Arrays.asList(split);
+        List<String> list = Arrays.asList(null);
         List<Article> articleList = articleMapper.getSimpleInfoByTag(list);
         PageInfo pageInfo = new PageInfo(articleList);
         return pageInfo;
@@ -500,19 +381,19 @@ public class ArticleServiceImpl implements ArticleService {
      */
     private ArticleModel suitableTransform(Article a) {
         ArticleModel model = simpleTransform(a);
-        model.setAuthorName(userService.getNameById(a.getAuthorId()));
-        model.setPublishDateFormat(DateFormatUtil.get(a.getPublishDate()));
-        model.setOriginal(a.getType());
-        model.setCategory(categoryMapper.getNameById(a.getCategoryId()));
-        String[] split = a.getTagsId().split(",");
-        String[] tags = new String[split.length];
-        for (int i = 0; i < split.length; i++) {
-            if (split[i] == null || "".equals(split[i])) {
-                continue;
-            }
-            tags[i] = tagMapper.getNameById(Long.parseLong(split[i]));
-        }
-        model.setTags(tags);
+//        model.setAuthor(a.getUser());
+//        model.setPublishDateFormat(DateFormatUtil.get(a.getPublishDate()));
+//        model.setOriginal(a.getType());
+//        model.setCategory(categoryMapper.getNameById(a.getCategoryId()));
+//        String[] split = a.getTagsId().split(",");
+//        String[] tags = new String[split.length];
+//        for (int i = 0; i < split.length; i++) {
+//            if (split[i] == null || "".equals(split[i])) {
+//                continue;
+//            }
+//            tags[i] = tagMapper.getNameById(Long.parseLong(split[i]));
+//        }
+//        model.setTags(tags);
         return model;
     }
 
@@ -527,12 +408,12 @@ public class ArticleServiceImpl implements ArticleService {
      */
     private ArticleModel suitableTransformForAdmin(Article a) {
         ArticleModel model = simpleTransform(a);
-        model.setPublishDateFormat(DateFormatUtil.get(a.getPublishDate()));
-        model.setUpdateDateFormat(DateFormatUtil.get(a.getUpdateDate()));
-        model.setReadingNumber(a.getReadingNumber());
-        model.setOpen(a.getOpen());
-        model.setOriginal(a.getType());
-        model.setSummary(null);
+//        model.setPublishDateFormat(DateFormatUtil.get(a.getPublishDate()));
+//        model.setUpdateDateFormat(DateFormatUtil.get(a.getUpdateDate()));
+//        model.setReadingNumber(a.getReadingNumber());
+//        model.setOpen(a.getOpen());
+//        model.setOriginal(a.getType());
+//        model.setSummary(null);
         return model;
     }
 
@@ -547,15 +428,15 @@ public class ArticleServiceImpl implements ArticleService {
      */
     private ArticleModel fullTransform(Article a) {
         ArticleModel model = suitableTransform(a);
-        model.setUpdateDateFormat(DateFormatUtil.get(a.getUpdateDate()));
-        model.setMdContent(a.getMdContent());
-        model.setNextArticleId(a.getNextArticleId());
-        model.setNextArticleTitle(a.getNextArticleId() == -1 ? "无" : articleMapper.getTitleById(a.getNextArticleId()));
-        model.setPreArticleId(a.getPreArticleId());
-        model.setPreArticleTitle(a.getPreArticleId() == -1 ? "无" : articleMapper.getTitleById(a.getPreArticleId()));
-        model.setOpen(a.getOpen());
-        model.setUrl(a.getUrl());
-        model.setReadingNumber(a.getReadingNumber());
+//        model.setUpdateDateFormat(DateFormatUtil.get(a.getUpdateDate()));
+//        model.setMdContent(a.getMdContent());
+//        model.setNextArticleId(a.getNextArticleId());
+//        model.setNextArticleTitle(a.getNextArticleId() == -1 ? "无" : articleMapper.getTitleById(a.getNextArticleId()));
+//        model.setPreArticleId(a.getPreArticleId());
+//        model.setPreArticleTitle(a.getPreArticleId() == -1 ? "无" : articleMapper.getTitleById(a.getPreArticleId()));
+//        model.setOpen(a.getOpen());
+//        model.setUrl(a.getUrl());
+//        model.setReadingNumber(a.getReadingNumber());
         return model;
     }
 
