@@ -20,5 +20,7 @@ public interface VisitorMapper {
 
     List<Visitor> findAll();
 
+    List<Visitor> findAllNotDeleted();
+
     long count();
 }

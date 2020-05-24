@@ -15,6 +15,7 @@ public class Visitor {
     private String ip;
     private Date date;
     private String ua;
+    private boolean delete;
 
     public Visitor(String ip, Date date, String ua) {
         this.ip = ip;
