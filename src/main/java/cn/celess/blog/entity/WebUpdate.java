@@ -17,11 +17,12 @@ public class WebUpdate {
 
     private Date updateTime;
 
+    private boolean delete;
+
     public WebUpdate() {
     }
 
-    public WebUpdate(String updateInfo, Date updateTime) {
+    public WebUpdate(String updateInfo) {
         this.updateInfo = updateInfo;
-        this.updateTime = updateTime;
     }
 }

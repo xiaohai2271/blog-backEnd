@@ -2,47 +2,53 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.celess.blog.mapper.WebUpdateInfoMapper">
     <resultMap id="webUpdateResultMap" type="cn.celess.blog.entity.WebUpdate">
-        <id column="update_id" property="id"/>
-        <result column="update_info" property="updateInfo"/>
-        <result column="update_time" property="updateTime"/>
+        <id column="wu_id" property="id"/>
+        <result column="wu_info" property="updateInfo"/>
+        <result column="wu_time" property="updateTime"/>
+        <result column="is_delete" property="delete"/>
     </resultMap>
-    <insert id="insert" parameterType="cn.celess.blog.entity.WebUpdate">
-        insert into web_update(update_info, update_time)
-        values (#{updateInfo}, #{updateTime})
-        <selectKey resultType="java.lang.Long" keyProperty="id">
-            SELECT LAST_INSERT_ID() AS id
-        </selectKey>
+
+    <insert id="insert" parameterType="cn.celess.blog.entity.WebUpdate" useGeneratedKeys="true" keyProperty="id">
+        insert into web_update(wu_info, wu_time, is_delete)
+        values (#{updateInfo}, now(), false)
     </insert>
 
     <update id="update">
         update web_update
-        set update_info=#{info}
-        where update_id = #{id};
-
+        set wu_info=#{info}
+        where wu_id = #{id};
     </update>
 
-    <delete id="delete">
-        delete
-        from web_update
-        where update_id = #{id}
-    </delete>
+    <update id="delete">
+        update web_update
+        set is_delete = true
+        where wu_id = #{id}
+    </update>
     <select id="existsById" resultType="java.lang.Boolean">
-        select EXISTS(select * from web_update where update_id = #{id})
+        select EXISTS(select * from web_update where wu_id = #{id})
     </select>
+
     <select id="findById" resultMap="webUpdateResultMap">
         select *
         from web_update
-        where update_id = #{id}
+        where wu_id = #{id}
     </select>
 
     <select id="findAll" resultMap="webUpdateResultMap">
         select *
         from web_update
     </select>
+
+    <select id="findAllNotDeleted" resultMap="webUpdateResultMap">
+        select *
+        from web_update
+        where is_delete = false
+    </select>
+
     <select id="getLastestOne" resultMap="webUpdateResultMap">
         select *
         from web_update
-        order by update_id desc
+        order by wu_id desc
         limit 1
     </select>
 

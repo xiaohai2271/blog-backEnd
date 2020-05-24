@@ -27,5 +27,7 @@ public interface WebUpdateInfoMapper {
 
     List<WebUpdate> findAll();
 
+    List<WebUpdate> findAllNotDeleted();
+
     WebUpdate getLastestOne();
 }
