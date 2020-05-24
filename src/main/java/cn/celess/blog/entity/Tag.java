@@ -1,16 +1,15 @@
 package cn.celess.blog.entity;
 
-import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author : xiaohai
  * @date : 2019/03/28 22:19
  */
-@Data
-public class Tag {
-    private Long id;
+@NoArgsConstructor
+public class Tag extends TagCategory {
 
-    private String name;
-
-    private String articles;
+    public Tag(String name) {
+        super.setName(name);
+    }
 }

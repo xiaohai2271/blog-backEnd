@@ -4,7 +4,6 @@
 
     <resultMap id="tagResultMap" type="cn.celess.blog.entity.Tag"
                extends="cn.celess.blog.mapper.CategoryMapper.categoryResultMap">
-
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
