@@ -35,7 +35,6 @@ CREATE TABLE `tag_category`
     `t_id`        bigint(20) primary key auto_increment,
     `t_name`      varchar(255) not null,
     `is_category` boolean      not null default true,
-    `is_delete`   boolean      not null default false comment '该数据是否被删除'
 ) comment '标签和分类表';
 
 CREATE TABLE `comment`
