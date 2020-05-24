@@ -19,6 +19,12 @@ public class PartnerSite {
 
     private Boolean open;
 
+    private String iconPath;
+
+    private String desc;
+
+    private boolean delete;
+
     public PartnerSite() {
     }
 
