@@ -113,7 +113,7 @@
     <select id="findAllByAuthorId" resultMap="articleViewResultMap">
         select *
         from articleView
-        where authorId = #{authorID}
+        where authorId = #{authorId}
           and isDelete = false
         order by articleId desc
     </select>

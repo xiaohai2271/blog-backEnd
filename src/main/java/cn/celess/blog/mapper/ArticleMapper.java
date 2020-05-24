@@ -21,15 +21,6 @@ public interface ArticleMapper {
 
     int update(Article a);
 
-    @Deprecated
-    int updateNextArticleId(long targetArticleID, long nextArticleID);
-
-    @Deprecated
-    int updatePreArticleId(long targetArticleID, long preArticleID);
-
-    @Deprecated
-    long getLastestArticleId();
-
     Article getLastestArticle();
 
     Article findArticleById(long id);
@@ -38,7 +29,7 @@ public interface ArticleMapper {
 
     boolean isDeletedById(long id);
 
-    List<Article> findAllByAuthorId(long authorID);
+    List<Article> findAllByAuthorId(long authorId);
 
     List<Article> findAllByOpen(boolean isOpen);
 
@@ -47,15 +38,6 @@ public interface ArticleMapper {
     List<Article> findAllByCategoryId(long id);
 
     List<Article> findAll();
-
-    Article getSimpleInfo(long id);
-
-    List<Article> getSimpleInfoByCategory(long categoryId);
-
-    List<Article> getSimpleInfoByTag(List<String> idList);
-
-    @Deprecated
-    int setReadingNumber(long number, long id);
 
     int updateReadingNumber(long id);
 

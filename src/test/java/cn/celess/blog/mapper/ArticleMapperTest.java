@@ -20,7 +20,6 @@ public class ArticleMapperTest extends BaseTest {
 
     @Test
     public void insert() {
-
         Article article = generateArticle().getArticle();
         assertNotNull(article.getId());
     }
@@ -33,8 +32,6 @@ public class ArticleMapperTest extends BaseTest {
         assertFalse(articleMapper.isDeletedById(article.getId()));
         assertEquals(1, articleMapper.delete(article.getId()));
         assertTrue(articleMapper.isDeletedById(article.getId()));
-
-
     }
 
     @Test
@@ -88,7 +85,6 @@ public class ArticleMapperTest extends BaseTest {
         });
     }
 
-
     @Test
     public void updateReadCount() {
         Article article = generateArticle().getArticle();
@@ -98,7 +94,6 @@ public class ArticleMapperTest extends BaseTest {
         articleById = articleMapper.findArticleById(article.getId());
         assertEquals(Long.valueOf(1), articleById.getReadingNumber());
     }
-
 
     @Test
     public void getLastestArticle() {
@@ -110,6 +105,73 @@ public class ArticleMapperTest extends BaseTest {
         assertNotEquals(0, lastestArticle.getTags().size());
     }
 
+    @Test
+    public void findArticleById() {
+        Article article = generateArticle().getArticle();
+        Article articleById = articleMapper.findArticleById(article.getId());
+        assertNotNull(articleById);
+        assertEquals(article.getId(), articleById.getId());
+    }
+
+    @Test
+    public void existsByTitle() {
+        Article article = generateArticle().getArticle();
+        assertTrue(articleMapper.existsByTitle(article.getTitle()));
+        assertFalse(articleMapper.existsByTitle(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    public void isDeletedById() {
+        Article article = generateArticle().getArticle();
+        assertFalse(articleMapper.isDeletedById(article.getId()));
+        articleMapper.delete(article.getId());
+        assertTrue(articleMapper.isDeletedById(article.getId()));
+
+    }
+
+    @Test
+    public void findAllByAuthorId() {
+        List<Article> allByAuthorId = articleMapper.findAllByAuthorId(1);
+        assertNotEquals(0, allByAuthorId.size());
+    }
+
+    @Test
+    public void findAllByOpen() {
+        List<Article> allByOpen = articleMapper.findAllByOpen(true);
+        assertNotEquals(0, allByOpen);
+
+        Article article = generateArticle().getArticle();
+        article.setOpen(false);
+
+        articleMapper.update(article);
+
+        List<Article> privateArticles = articleMapper.findAllByOpen(false);
+        assertTrue(privateArticles.size() > 0);
+    }
+
+    @Test
+    public void getTitleById() {
+        Article article = generateArticle().getArticle();
+
+        assertEquals(article.getTitle(), articleMapper.getTitleById(article.getId()));
+    }
+
+    @Test
+    public void findAllByCategoryId() {
+        List<Article> allByCategoryId = articleMapper.findAllByCategoryId(1);
+        assertNotEquals(0, allByCategoryId.size());
+    }
+
+    @Test
+    public void findAll() {
+        List<Article> allByCategoryId = articleMapper.findAll();
+        assertNotEquals(0, allByCategoryId.size());
+    }
+
+    @Test
+    public void count() {
+        assertNotEquals(0, articleMapper.count());
+    }
 
     private ArticleTag generateArticle() {
         String randomText = UUID.randomUUID().toString();
@@ -122,7 +184,7 @@ public class ArticleMapperTest extends BaseTest {
         article.setMdContent("# unity test for  article");
         article.setSummary("unity test for  article");
 
-        Tag tag =  tagMapper.findTagByName("随笔");
+        Tag tag = tagMapper.findTagByName("随笔");
         User user = new User();
         user.setId(1L);
         article.setUser(user);
@@ -137,4 +199,5 @@ public class ArticleMapperTest extends BaseTest {
 
         return articleTag;
     }
+
 }

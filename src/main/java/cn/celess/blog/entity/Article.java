@@ -42,21 +42,6 @@ public class Article {
 
     private Date updateDate = null;
 
-    @Deprecated
-    private Long categoryId;
-
-    @Deprecated
-    private String tagsId;
-
-    @Deprecated
-    private Long authorId;
-
-    @Deprecated
-    private Long preArticleId;
-
-    @Deprecated
-    private Long nextArticleId;
-
     private Long readingNumber;
 
     /**
@@ -73,4 +58,6 @@ public class Article {
     private Integer dislikeCount;
 
     private User user;
+
+    private boolean deleted = false;
 }
