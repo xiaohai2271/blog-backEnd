@@ -90,11 +90,27 @@ public class ArticleTagMapperTest extends BaseTest {
         articleTagMapper.insert(articleTag);
 
         List<ArticleTag> allByArticleId = articleTagMapper.findAllByArticleId(-1L);
-        assertEquals(6, allByArticleId.size());
+        assertTrue(allByArticleId.size() >= 6);
         int lines = articleTagMapper.deleteMultiById(allByArticleId);
-        assertEquals(6, lines);
+        assertTrue(lines >= 6);
     }
 
+    @Test
+    public void findArticleByTag() {
+        ArticleTag articleTag = generateArticle();
+        List<ArticleTag> articleByTag = articleTagMapper.findArticleByTag(21L);
+        assertNotEquals(0, articleByTag.size());
+        articleByTag.forEach(articleTag1 -> assertEquals(articleTag.getTag().getName(), articleTag1.getTag().getName()));
+    }
+
+    @Test
+    public void findArticleByTagAndOpen() {
+        ArticleTag articleTag = generateArticle();
+        List<ArticleTag> articleByTag = articleTagMapper.findArticleByTag(21L);
+        assertNotEquals(0, articleByTag.size());
+        articleByTag.forEach(articleTag1 -> assertEquals(articleTag.getTag().getName(), articleTag1.getTag().getName()));
+        articleByTag.forEach(articleTag1 -> assertTrue(articleTag1.getArticle().getOpen()));
+    }
 
     private ArticleTag generateArticle() {
         String randomText = UUID.randomUUID().toString();
@@ -122,5 +138,4 @@ public class ArticleTagMapperTest extends BaseTest {
 
         return articleTag;
     }
-
 }

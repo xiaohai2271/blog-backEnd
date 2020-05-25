@@ -80,10 +80,10 @@ public class ArticleController {
     public Response retrieveOneById(@PathVariable("articleID") long articleId,
                                     @RequestParam(value = "update", defaultValue = "false") boolean is4update,
                                     HttpServletRequest request) {
-        ArticleModel article = articleService.retrieveOneByID(articleId, is4update);
+        ArticleModel article = articleService.retrieveOneById(articleId, is4update);
         if (article.getOpen()) {
             return ResponseUtil.success(article);
-        } else if (article.getAuthorId().equals(redisUserUtil.get().getId())) {
+        } else if (article.getAuthor().getId().equals(redisUserUtil.get().getId())) {
             return ResponseUtil.success(article);
         }
         return ResponseUtil.response(ResponseEnum.PERMISSION_ERROR, null);

@@ -43,8 +43,8 @@
 
     <delete id="deleteMultiById">
         delete from article_tag where at_id in
-        <foreach item="item" collection="list" separator=",">
-            (#{articleTag.id})
+        <foreach item="item" collection="list" open="(" close=")" separator=",">
+            #{item.id}
         </foreach>
     </delete>
 
@@ -71,6 +71,30 @@
              tag_category
         where article_tag.a_id = article.a_id
           and tag_category.t_id = article_tag.t_id
+    </select>
+
+
+    <select id="findArticleByTag" resultMap="articleTagResultMap">
+        select *
+        from tag_category,
+             article,
+             article_tag
+        where tag_category.t_id = #{tagId}
+          and is_category = false
+          and tag_category.t_id = article_tag.t_id
+          and article_tag.a_id = article.a_id
+    </select>
+
+    <select id="findArticleByTagAndOpen" resultMap="articleTagResultMap">
+        select *
+        from tag_category,
+             article,
+             article_tag
+        where tag_category.t_id = #{tagId}
+          and is_category = false
+          and tag_category.t_id = article_tag.t_id
+          and article.a_is_open = true
+          and article_tag.a_id = article.a_id
     </select>
 
 </mapper>

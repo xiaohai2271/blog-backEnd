@@ -1,9 +1,11 @@
 package cn.celess.blog.entity.model;
 
+import cn.celess.blog.entity.Tag;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author : xiaohai
@@ -57,40 +59,28 @@ public class ArticleModel {
     /**
      * 标签
      */
-    private String[] tags;
+    private List<Tag> tags;
 
     /**
      * 作者
      */
-    private Long authorId;
+    private UserModel author;
 
-    /**
-     * 作者名字
-     */
-    private String authorName;
+    private ArticleModel preArticle;
 
-    /**
-     * 上一篇文章
-     */
-    private Long preArticleId;
-
-    /**
-     * 下一篇文章
-     */
-    private Long nextArticleId;
-
-    private String preArticleTitle;
-
-    private String nextArticleTitle;
+    private ArticleModel nextArticle;
 
     /**
      * 阅读数
      */
     private Long readingNumber;
 
+    private Integer likeCount;
+
+    private Integer dislikeCount;
+
     /**
      * 文章的状态  true：公开  false:不公开
      */
     private Boolean open;
-
 }

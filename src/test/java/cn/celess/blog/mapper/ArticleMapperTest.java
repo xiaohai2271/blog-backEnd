@@ -163,6 +163,13 @@ public class ArticleMapperTest extends BaseTest {
     }
 
     @Test
+    public void findAllByCategoryIdAndOpen() {
+        List<Article> allByCategoryId = articleMapper.findAllByCategoryId(1);
+        assertNotEquals(0, allByCategoryId.size());
+        allByCategoryId.forEach(article -> assertTrue(article.getOpen()));
+    }
+
+    @Test
     public void findAll() {
         List<Article> allByCategoryId = articleMapper.findAll();
         assertNotEquals(0, allByCategoryId.size());
@@ -171,6 +178,21 @@ public class ArticleMapperTest extends BaseTest {
     @Test
     public void count() {
         assertNotEquals(0, articleMapper.count());
+    }
+
+    @Test
+    public void getPreArticle() {
+        ArticleTag articleTag = generateArticle();
+        Article preArticle = articleMapper.getPreArticle(articleTag.getArticle().getId());
+        assertNotNull(preArticle);
+        assertTrue(preArticle.getId() < articleTag.getArticle().getId());
+    }
+
+    @Test
+    public void getNextArticle() {
+        Article getNextArticle = articleMapper.getNextArticle(3L);
+        assertNotNull(getNextArticle);
+        assertTrue(getNextArticle.getId() > 3L);
     }
 
     private ArticleTag generateArticle() {
@@ -199,5 +221,4 @@ public class ArticleMapperTest extends BaseTest {
 
         return articleTag;
     }
-
 }

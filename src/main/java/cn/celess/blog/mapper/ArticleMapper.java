@@ -37,7 +37,13 @@ public interface ArticleMapper {
 
     List<Article> findAllByCategoryId(long id);
 
+    List<Article> findAllByCategoryIdAndOpen(long id);
+
     List<Article> findAll();
+
+    Article getPreArticle(Long id);
+
+    Article getNextArticle(Long id);
 
     int updateReadingNumber(long id);
 

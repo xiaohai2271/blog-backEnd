@@ -1,24 +1,21 @@
 package cn.celess.blog.service.serviceimpl;
 
-import cn.celess.blog.enmu.LevelEnum;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.enmu.RoleEnum;
 import cn.celess.blog.entity.*;
 import cn.celess.blog.entity.model.ArticleModel;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.*;
 import cn.celess.blog.service.ArticleService;
 import cn.celess.blog.service.UserService;
-import cn.celess.blog.util.DateFormatUtil;
-import cn.celess.blog.util.RedisUserUtil;
-import cn.celess.blog.util.RegexUtil;
-import cn.celess.blog.util.StringFromHtmlUtil;
+import cn.celess.blog.util.*;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.youbenzi.mdtool.tool.MDTool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 
@@ -35,8 +31,8 @@ import java.util.List;
  * @date : 2019/03/28 15:21
  */
 @Service
+@Slf4j
 public class ArticleServiceImpl implements ArticleService {
-    public static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
     @Autowired
     ArticleMapper articleMapper;
@@ -86,22 +82,16 @@ public class ArticleServiceImpl implements ArticleService {
             throw new MyException(ResponseEnum.ARTICLE_HAS_EXIST);
         }
         // 查看是否存在已有的分类
-        Category category = (Category) categoryMapper.findCategoryByName(reqBody.getCategory());
+        Category category = categoryMapper.findCategoryByName(reqBody.getCategory());
         if (category == null) {
             throw new MyException(ResponseEnum.CATEGORY_NOT_EXIST);
         }
 
-
         // 构建 需要写入数据库的对象数据
         Article article = new Article();
-        article.setTitle(reqBody.getTitle());
-        article.setOpen(reqBody.getOpen());
-        article.setMdContent(reqBody.getMdContent());
-        article.setUrl(reqBody.getUrl());
-        article.setType(reqBody.getType());
+        BeanUtils.copyProperties(reqBody, article);
 
         article.setUser(redisUserUtil.get());
-        article.setPublishDate(new Date());
 
         //markdown->html->summary
         String str = StringFromHtmlUtil.getString(MDTool.markdown2Html(article.getMdContent()));
@@ -113,14 +103,13 @@ public class ArticleServiceImpl implements ArticleService {
 
         //文章存数据库
         articleMapper.insert(article);
-
         //将标签写入数据库
         for (String tagName : reqBody.getTags()) {
             if (tagName.replaceAll(" ", "").length() == 0) {
                 //单个标签只含空格
                 continue;
             }
-            Tag tag = (Tag) tagMapper.findTagByName(tagName);
+            Tag tag = tagMapper.findTagByName(tagName);
             if (tag == null) {
                 tag = new Tag();
                 tag.setName(tagName);
@@ -129,9 +118,12 @@ public class ArticleServiceImpl implements ArticleService {
             ArticleTag articleTag = new ArticleTag(article, tag);
             articleTagMapper.insert(articleTag);
         }
-        return fullTransform(article);
-    }
+        Article articleFromDb = articleMapper.findArticleById(article.getId());
 
+        ArticleModel articleModel = ModalTrans.articleToModal(articleFromDb);
+        articleModel.setPreArticle(ModalTrans.articleToModal(articleMapper.getPreArticle(article.getId())));
+        return articleModel;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -189,7 +181,7 @@ public class ArticleServiceImpl implements ArticleService {
             article.setUrl(reqBody.getUrl());
         }
         if (reqBody.getCategory() != null && !reqBody.getCategory().replaceAll(" ", "").isEmpty()) {
-            Category category = (Category) categoryMapper.findCategoryByName(reqBody.getCategory());
+            Category category = categoryMapper.findCategoryByName(reqBody.getCategory());
             if (category == null) {
                 category = new Category();
                 category.setName(reqBody.getCategory());
@@ -198,12 +190,8 @@ public class ArticleServiceImpl implements ArticleService {
             article.setCategory(category);
         }
 
-        if (reqBody.getTags() != null && reqBody.getTags().length != 0) {
-
-        }
-
         //写入数据库的数据
-        article.setOpen(reqBody.getOpen() ? article.getOpen() : reqBody.getOpen());
+        article.setOpen(reqBody.getOpen() == null ? article.getOpen() : reqBody.getOpen());
         String str = StringFromHtmlUtil.getString(MDTool.markdown2Html(article.getMdContent()));
         article.setSummary(str.length() > 240 ? str.substring(0, 240) + "......" : str);
         articleMapper.update(article);
@@ -213,12 +201,13 @@ public class ArticleServiceImpl implements ArticleService {
         List<ArticleTag> updateList = new ArrayList<>();
         List<ArticleTag> deleteList = new ArrayList<>();
 
+        // 获取要更新 的标签
         for (String tag : reqBody.getTags()) {
             boolean contain = allByArticleId.stream().anyMatch(articleTag -> articleTag.getTag().getName().equals(tag));
             if (!contain) {
                 ArticleTag articleTag = new ArticleTag();
                 articleTag.setArticle(article);
-                Tag tagByName = (Tag) tagMapper.findTagByName(tag);
+                Tag tagByName = tagMapper.findTagByName(tag);
                 if (tagByName == null) {
                     tagByName = new Tag(tag);
                     tagMapper.insert(tagByName);
@@ -227,7 +216,7 @@ public class ArticleServiceImpl implements ArticleService {
                 updateList.add(articleTag);
             }
         }
-
+        // 获取要删除的标签
         allByArticleId.forEach(articleTag -> {
             boolean contain = false;
             for (String tag : reqBody.getTags()) {
@@ -251,12 +240,14 @@ public class ArticleServiceImpl implements ArticleService {
 
         //更新完成移除
         request.getSession().removeAttribute("article4update");
-        return fullTransform(article);
+        ArticleModel articleModel = ModalTrans.articleToModal(articleMapper.findArticleById(article.getId()));
+        setPreAndNextArticle(articleModel);
+        return articleModel;
     }
 
     @Override
-    public ArticleModel retrieveOneByID(long articleID, boolean is4update) {
-        Article article = articleMapper.findArticleById(articleID);
+    public ArticleModel retrieveOneById(long articleId, boolean is4update) {
+        Article article = articleMapper.findArticleById(articleId);
         if (article == null) {
             throw new MyException(ResponseEnum.ARTICLE_NOT_EXIST);
         }
@@ -266,178 +257,101 @@ public class ArticleServiceImpl implements ArticleService {
                 throw new MyException(ResponseEnum.ARTICLE_NOT_PUBLIC);
             }
         }
-        article.setReadingNumber(article.getReadingNumber() + 1);
+        ArticleModel articleModel = ModalTrans.articleToModal(article);
+
         if (is4update) {
             //因更新而获取文章  不需要增加阅读量
             request.getSession().setAttribute("article4update", article);
-            return fullTransform(article);
+            return articleModel;
         }
-        articleMapper.setReadingNumber(article.getReadingNumber() + 1, articleID);
-        return fullTransform(article);
+        setPreAndNextArticle(articleModel);
+        articleMapper.updateReadingNumber(articleId);
+        return articleModel;
     }
 
     /**
      * @param count 数目
      * @param page  页面 默认减1
-     * @return
+     * @return PageInfo
      */
     @Override
-    public PageInfo adminArticles(int count, int page) {
+    public PageData<ArticleModel> adminArticles(int count, int page) {
         PageHelper.startPage(page, count);
         List<Article> articleList = articleMapper.findAll();
-        PageInfo pageInfo = new PageInfo(articleList);
-        pageInfo.setList(list2list(articleList, LevelEnum.BETWEEN_M_AND_H));
-        return pageInfo;
+        PageData<ArticleModel> pageData = new PageData<ArticleModel>(new PageInfo<Article>(articleList));
+        List<ArticleModel> articleModelList = new ArrayList<>();
+        articleList.forEach(article -> {
+            ArticleModel articleModel = ModalTrans.articleToModal(article);
+            articleModel.setMdContent(null);
+            articleModelList.add(articleModel);
+        });
+        pageData.setList(articleModelList);
+        return pageData;
     }
 
     @Override
-    public PageInfo retrievePageForOpen(int count, int page) {
+    public PageData<ArticleModel> retrievePageForOpen(int count, int page) {
         PageHelper.startPage(page, count);
         List<Article> articleList = articleMapper.findAllByOpen(true);
-        PageInfo pageInfo = new PageInfo(articleList);
-        pageInfo.setList(list2list(articleList, LevelEnum.MIDDLE));
-        return pageInfo;
+        PageData<ArticleModel> pageData = new PageData<>(new PageInfo<Article>(articleList));
+
+        List<ArticleModel> articleModelList = new ArrayList<>();
+
+        articleList.forEach(article -> {
+            ArticleModel model = ModalTrans.articleToModal(article);
+            setPreAndNextArticle(model);
+            model.setOpen(null);
+            model.setMdContent(null);
+            articleModelList.add(model);
+        });
+
+        pageData.setList(articleModelList);
+        return pageData;
     }
 
     @Override
-    public PageInfo findByCategory(String name, int page, int count) {
-        Long idByName = categoryMapper.getIdByName(name);
-        if (idByName == null) {
+    public PageData<ArticleModel> findByCategory(String name, int page, int count) {
+        Category category = categoryMapper.findCategoryByName(name);
+        if (category == null) {
             throw new MyException(ResponseEnum.CATEGORY_NOT_EXIST);
         }
         PageHelper.startPage(page, count);
-        PageInfo pageInfo = new PageInfo(articleMapper.getSimpleInfoByCategory(idByName));
-        return pageInfo;
+        List<Article> open = articleMapper.findAllByCategoryIdAndOpen(category.getId());
+
+        List<ArticleModel> modelList = new ArrayList<>();
+
+        open.forEach(article -> {
+            ArticleModel model = ModalTrans.articleToModal(article);
+            model.setMdContent(null);
+            model.setTags(null);
+            model.setOpen(null);
+            setPreAndNextArticle(model);
+        });
+        return new PageData<ArticleModel>(new PageInfo<Article>(open), modelList);
     }
 
     @Override
-    public PageInfo findByTag(String name, int page, int count) {
-        Tag tag = (Tag) tagMapper.findTagByName(name);
+    public PageData<ArticleModel> findByTag(String name, int page, int count) {
+        Tag tag = tagMapper.findTagByName(name);
         if (tag == null) {
             throw new MyException(ResponseEnum.TAG_NOT_EXIST);
         }
-        // TODO :
         PageHelper.startPage(page, count);
-        List<String> list = Arrays.asList(null);
-        List<Article> articleList = articleMapper.getSimpleInfoByTag(list);
-        PageInfo pageInfo = new PageInfo(articleList);
-        return pageInfo;
+        List<ArticleTag> articleByTag = articleTagMapper.findArticleByTagAndOpen(tag.getId());
+        List<ArticleModel> modelList = new ArrayList<>();
+        articleByTag.forEach(articleTag -> {
+            ArticleModel model = ModalTrans.articleToModal(articleTag.getArticle());
+            model.setMdContent(null);
+            model.setOpen(null);
+        });
+        return new PageData<ArticleModel>(new PageInfo<ArticleTag>(articleByTag), modelList);
     }
 
-    /**
-     * page转换
-     *
-     * @param articleList 数据源
-     * @param level       转换级别
-     * @return list
-     */
-    private List<ArticleModel> list2list(List<Article> articleList, LevelEnum level) {
-        List<ArticleModel> content = new ArrayList<>();
-        for (Article a : articleList) {
-            ArticleModel model;
-            switch (level.getLevelCode()) {
-                case 0:
-                    model = simpleTransform(a);
-                    break;
-                case 1:
-                    model = suitableTransform(a);
-                    break;
-                case 2:
-                    model = suitableTransformForAdmin(a);
-                    break;
-                case 3:
-                default:
-                    model = fullTransform(a);
-            }
-            content.add(model);
+    private void setPreAndNextArticle(ArticleModel articleModel) {
+        if (articleModel == null) {
+            return;
         }
-        return content;
+        articleModel.setPreArticle(ModalTrans.articleToModal(articleMapper.getPreArticle(articleModel.getId())));
+        articleModel.setNextArticle(ModalTrans.articleToModal(articleMapper.getNextArticle(articleModel.getId())));
     }
-
-    /**
-     * 简单的模型转换
-     * [id,title,summary]
-     *
-     * @param a 源数据
-     * @return 模型
-     */
-    private ArticleModel simpleTransform(Article a) {
-        ArticleModel model = new ArticleModel();
-        model.setId(a.getId());
-        model.setTitle(a.getTitle());
-        model.setSummary(a.getSummary());
-
-        return model;
-    }
-
-    /**
-     * 中等转换
-     * [id,title,summary]
-     * +
-     * [original,tags,category]
-     *
-     * @param a
-     * @return
-     */
-    private ArticleModel suitableTransform(Article a) {
-        ArticleModel model = simpleTransform(a);
-//        model.setAuthor(a.getUser());
-//        model.setPublishDateFormat(DateFormatUtil.get(a.getPublishDate()));
-//        model.setOriginal(a.getType());
-//        model.setCategory(categoryMapper.getNameById(a.getCategoryId()));
-//        String[] split = a.getTagsId().split(",");
-//        String[] tags = new String[split.length];
-//        for (int i = 0; i < split.length; i++) {
-//            if (split[i] == null || "".equals(split[i])) {
-//                continue;
-//            }
-//            tags[i] = tagMapper.getNameById(Long.parseLong(split[i]));
-//        }
-//        model.setTags(tags);
-        return model;
-    }
-
-    /**
-     * 中等转换 for admin页面
-     * [id,title]
-     * +
-     * [original,UpdateDate,open,readingNumber]
-     *
-     * @param a
-     * @return
-     */
-    private ArticleModel suitableTransformForAdmin(Article a) {
-        ArticleModel model = simpleTransform(a);
-//        model.setPublishDateFormat(DateFormatUtil.get(a.getPublishDate()));
-//        model.setUpdateDateFormat(DateFormatUtil.get(a.getUpdateDate()));
-//        model.setReadingNumber(a.getReadingNumber());
-//        model.setOpen(a.getOpen());
-//        model.setOriginal(a.getType());
-//        model.setSummary(null);
-        return model;
-    }
-
-    /**
-     * 全转换
-     * [id,title,summary,original,tags,category]
-     * +
-     * [UpdateDate,MdContent,NextArticleId,NextArticleTitle,preArticleId,preArticleTitle,open,url,readingNumber]
-     *
-     * @param a
-     * @return
-     */
-    private ArticleModel fullTransform(Article a) {
-        ArticleModel model = suitableTransform(a);
-//        model.setUpdateDateFormat(DateFormatUtil.get(a.getUpdateDate()));
-//        model.setMdContent(a.getMdContent());
-//        model.setNextArticleId(a.getNextArticleId());
-//        model.setNextArticleTitle(a.getNextArticleId() == -1 ? "无" : articleMapper.getTitleById(a.getNextArticleId()));
-//        model.setPreArticleId(a.getPreArticleId());
-//        model.setPreArticleTitle(a.getPreArticleId() == -1 ? "无" : articleMapper.getTitleById(a.getPreArticleId()));
-//        model.setOpen(a.getOpen());
-//        model.setUrl(a.getUrl());
-//        model.setReadingNumber(a.getReadingNumber());
-        return model;
-    }
-
 }

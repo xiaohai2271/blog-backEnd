@@ -28,4 +28,8 @@ public interface ArticleTagMapper {
     List<ArticleTag> findAllByArticleId(Long articleId);
 
     int deleteMultiById(List<ArticleTag> articleTags);
+
+    List<ArticleTag> findArticleByTag(Long tagId);
+
+    List<ArticleTag> findArticleByTagAndOpen(Long tagId);
 }

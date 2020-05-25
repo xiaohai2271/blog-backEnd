@@ -141,6 +141,15 @@
         order by articleId desc
     </select>
 
+    <select id="findAllByCategoryIdAndOpen" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where categoryId = #{id}
+          and isDelete = false
+          and isOpen = true
+        order by articleId desc
+    </select>
+
 
     <select id="findAll" resultMap="articleViewResultMap">
         select *
@@ -153,6 +162,23 @@
     <select id="count" resultType="long">
         select count(*)
         from article;
+    </select>
+
+    <select id="getPreArticle" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where articleId = (select max(articleId)
+                           from articleView
+                           where articleId &lt; #{id}
+        )
+    </select>
+    <select id="getNextArticle" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where articleId = (select min(articleId)
+                           from articleView
+                           where articleId &gt; #{id}
+        )
     </select>
 
 
