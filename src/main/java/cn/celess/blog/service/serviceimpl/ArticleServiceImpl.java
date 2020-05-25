@@ -120,8 +120,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
         Article articleFromDb = articleMapper.findArticleById(article.getId());
 
-        ArticleModel articleModel = ModalTrans.articleToModal(articleFromDb);
-        articleModel.setPreArticle(ModalTrans.articleToModal(articleMapper.getPreArticle(article.getId())));
+        ArticleModel articleModel = ModalTrans.article(articleFromDb);
+        articleModel.setPreArticle(ModalTrans.article(articleMapper.getPreArticle(article.getId())));
         return articleModel;
     }
 
@@ -240,7 +240,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         //更新完成移除
         request.getSession().removeAttribute("article4update");
-        ArticleModel articleModel = ModalTrans.articleToModal(articleMapper.findArticleById(article.getId()));
+        ArticleModel articleModel = ModalTrans.article(articleMapper.findArticleById(article.getId()));
         setPreAndNextArticle(articleModel);
         return articleModel;
     }
@@ -257,7 +257,7 @@ public class ArticleServiceImpl implements ArticleService {
                 throw new MyException(ResponseEnum.ARTICLE_NOT_PUBLIC);
             }
         }
-        ArticleModel articleModel = ModalTrans.articleToModal(article);
+        ArticleModel articleModel = ModalTrans.article(article);
 
         if (is4update) {
             //因更新而获取文章  不需要增加阅读量
@@ -281,7 +281,7 @@ public class ArticleServiceImpl implements ArticleService {
         PageData<ArticleModel> pageData = new PageData<ArticleModel>(new PageInfo<Article>(articleList));
         List<ArticleModel> articleModelList = new ArrayList<>();
         articleList.forEach(article -> {
-            ArticleModel articleModel = ModalTrans.articleToModal(article);
+            ArticleModel articleModel = ModalTrans.article(article);
             articleModel.setMdContent(null);
             articleModelList.add(articleModel);
         });
@@ -298,7 +298,7 @@ public class ArticleServiceImpl implements ArticleService {
         List<ArticleModel> articleModelList = new ArrayList<>();
 
         articleList.forEach(article -> {
-            ArticleModel model = ModalTrans.articleToModal(article);
+            ArticleModel model = ModalTrans.article(article);
             setPreAndNextArticle(model);
             model.setOpen(null);
             model.setMdContent(null);
@@ -321,7 +321,7 @@ public class ArticleServiceImpl implements ArticleService {
         List<ArticleModel> modelList = new ArrayList<>();
 
         open.forEach(article -> {
-            ArticleModel model = ModalTrans.articleToModal(article);
+            ArticleModel model = ModalTrans.article(article);
             model.setMdContent(null);
             model.setTags(null);
             model.setOpen(null);
@@ -340,7 +340,7 @@ public class ArticleServiceImpl implements ArticleService {
         List<ArticleTag> articleByTag = articleTagMapper.findArticleByTagAndOpen(tag.getId());
         List<ArticleModel> modelList = new ArrayList<>();
         articleByTag.forEach(articleTag -> {
-            ArticleModel model = ModalTrans.articleToModal(articleTag.getArticle());
+            ArticleModel model = ModalTrans.article(articleTag.getArticle());
             model.setMdContent(null);
             model.setOpen(null);
         });
@@ -351,7 +351,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (articleModel == null) {
             return;
         }
-        articleModel.setPreArticle(ModalTrans.articleToModal(articleMapper.getPreArticle(articleModel.getId())));
-        articleModel.setNextArticle(ModalTrans.articleToModal(articleMapper.getNextArticle(articleModel.getId())));
+        articleModel.setPreArticle(ModalTrans.article(articleMapper.getPreArticle(articleModel.getId())));
+        articleModel.setNextArticle(ModalTrans.article(articleMapper.getNextArticle(articleModel.getId())));
     }
 }

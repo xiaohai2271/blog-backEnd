@@ -1,8 +1,10 @@
 package cn.celess.blog.util;
 
 import cn.celess.blog.entity.Article;
+import cn.celess.blog.entity.Category;
 import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.ArticleModel;
+import cn.celess.blog.entity.model.CategoryModel;
 import cn.celess.blog.entity.model.UserModel;
 import org.springframework.beans.BeanUtils;
 
@@ -13,7 +15,7 @@ import org.springframework.beans.BeanUtils;
  */
 public class ModalTrans {
 
-    public static ArticleModel articleToModal(Article article) {
+    public static ArticleModel article(Article article) {
         if (article == null) {
             return null;
         }
@@ -23,15 +25,20 @@ public class ModalTrans {
         articleModel.setUpdateDateFormat(DateFormatUtil.get(article.getUpdateDate()));
         articleModel.setOriginal(article.getType());
         articleModel.setCategory(article.getCategory().getName());
-        articleModel.setAuthor(userToModal(article.getUser()));
+        articleModel.setAuthor(user(article.getUser()));
         return articleModel;
     }
 
 
-    public static UserModel userToModal(User user) {
+    public static UserModel user(User user) {
         UserModel userModel = new UserModel();
         BeanUtils.copyProperties(user, userModel);
         return userModel;
     }
 
+    public static CategoryModel category(Category category) {
+        CategoryModel model = new CategoryModel();
+        BeanUtils.copyProperties(category, model);
+        return model;
+    }
 }
