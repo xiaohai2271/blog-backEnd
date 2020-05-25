@@ -57,7 +57,8 @@ public class CategoryController {
      * @return Response
      */
     @GetMapping("/categories")
-    public Response getPage() {
-        return ResponseUtil.success(categoryService.retrievePage());
+    public Response getPage(@RequestParam(name = "page", defaultValue = "1") int page,
+                            @RequestParam(name = "count", defaultValue = "1000") int count) {
+        return ResponseUtil.success(categoryService.retrievePage(page, count));
     }
 }

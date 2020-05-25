@@ -23,7 +23,7 @@ public class CategoryControllerTest extends BaseTest {
 
     @Test
     public void addOne() throws Exception {
-        String categoryName = UUID.randomUUID().toString().substring(0, 4);
+        String categoryName = randomStr(4);
         System.out.println("categoryName: ==> " + categoryName);
         // 未登录
         mockMvc.perform(post("/admin/category/create?name=" + categoryName)).andExpect(status().isOk())
@@ -84,7 +84,7 @@ public class CategoryControllerTest extends BaseTest {
     @Test
     public void updateOne() throws Exception {
         Category category = categoryMapper.getLastestCategory();
-        String name = UUID.randomUUID().toString().substring(0, 4);
+        String name = randomStr(4);
         // 未登录
         mockMvc.perform(put("/admin/category/update?id=" + category.getId() + "&name=" + name)).andExpect(status().isOk())
                 .andDo(result -> {
@@ -119,7 +119,7 @@ public class CategoryControllerTest extends BaseTest {
                 .andDo(result -> {
                     JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
                     assertEquals(SUCCESS.getCode(), object.getInt(Code));
-                    JSONArray jsonArray = object.getJSONArray(Result);
+                    JSONArray jsonArray = object.getJSONObject(Result).getJSONArray("list");
                     assertNotNull(jsonArray);
                     jsonArray.forEach(o -> {
                         CategoryModel c = (CategoryModel) JSONObject.toBean(JSONObject.fromObject(o), CategoryModel.class);

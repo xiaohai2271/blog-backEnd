@@ -17,47 +17,47 @@
         update tag_category
         set t_name=#{name}
         where t_id = #{id}
-          and is_category = true;
+          and is_category = true
     </update>
 
     <update id="delete">
         update tag_category
         set is_delete= true
         where t_id = #{id}
-          and is_category = true;
+          and is_category = true
     </update>
 
     <select id="findCategoryByName" resultMap="categoryResultMap">
         select *
         from tag_category
         where t_name = #{name}
-          and is_category = true;
+          and is_category = true
     </select>
 
     <select id="findCategoryById" resultMap="categoryResultMap">
         select *
         from tag_category
         where t_id = #{id}
-          and is_category = true;
+          and is_category = true
     </select>
 
     <select id="findAll" resultMap="categoryResultMap">
         select *
         from tag_category
-        where is_category = true;
+        where is_category = true
     </select>
 
     <select id="getAllName" resultType="java.lang.String">
         select t_name
         from tag_category
-        where is_category = true;
+        where is_category = true
     </select>
 
     <select id="getNameById" resultType="java.lang.String">
         select t_name
         from tag_category
         where is_category = true
-          and t_id = #{id};
+          and t_id = #{id}
     </select>
 
     <select id="getIdByName" resultType="java.lang.Long">
