@@ -14,27 +14,21 @@ public class Comment {
 
     private Long id;
 
-    /**
-     * 是评论还是留言 0:评论  其他（1）：留言
-     */
-    private Boolean type;
+    private int status;
 
-    private Long authorID;
+    private String pagePath;
 
     private String content;
 
-    private Long articleID;
-
     private Date date;
 
-    /**
-     * 回应着ID  默认为顶级回复
-     */
-    private String responseId = "";
+    private User fromUser;
 
+    private User toUser;
     /**
      * 评论的父ID
      */
     private Long pid;
 
+    private boolean delete;
 }

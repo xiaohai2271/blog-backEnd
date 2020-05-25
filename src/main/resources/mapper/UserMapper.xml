@@ -4,68 +4,74 @@
     <resultMap id="userResultMap" type="cn.celess.blog.entity.User">
         <id column="u_id" property="id"/>
         <result column="u_email" property="email"/>
-        <result column="u_uid" property="uid"/>
         <result column="u_pwd" property="pwd"/>
-        <result column="email_status" property="emailStatus"/>
+        <result column="u_email_status" property="emailStatus"/>
         <result column="u_avatar" property="avatarImgUrl"/>
         <result column="u_desc" property="desc"/>
-        <result column="recently_landed_time" property="recentlyLandedDate"/>
-        <result column="email_verify_id" property="emailVerifyId"/>
-        <result column="display_name" property="displayName"/>
-        <result column="role" property="role"/>
+        <result column="u_recently_landed_time" property="recentlyLandedDate"/>
+        <result column="u_display_name" property="displayName"/>
+        <result column="u_role" property="role"/>
+        <result column="status" property="status"/>
     </resultMap>
 
-    <insert id="addUser">
+    <insert id="addUser" useGeneratedKeys="true" keyProperty="id">
         insert into user(u_email, u_pwd)
         values (#{email}, #{pwd})
     </insert>
 
     <update id="updateInfo">
         update user set
-        <if test="desc!=null">`u_desc`=#{desc},</if>
-        <if test="displayName!=null">`display_name`=#{displayName}</if>
+        <if test="desc!=null">u_desc=#{desc},</if>
+        <if test="displayName!=null">u_display_name=#{displayName}</if>
         where u_id=#{id}
     </update>
     <update id="updateLoginTime">
         update user
-        set `recently_landed_time`=#{date}
-        where `u_email` = #{email}
+        set u_recently_landed_time=now()
+        where u_email = #{email}
     </update>
     <update id="updateAvatarImgUrl">
         update user
-        set `u_avatar`=#{avatarImgUrl}
-        where `u_id` = #{id}
+        set u_avatar=#{avatarImgUrl}
+        where u_id = #{id}
     </update>
     <update id="updateEmailStatus">
         update user
-        set `email_status`=#{status}
-        where `u_email` = #{email}
+        set u_email_status=#{status}
+        where u_email = #{email}
     </update>
     <update id="updatePwd">
         update user
-        set `u_pwd`=#{pwd}
-        where `u_email` = #{email}
+        set u_pwd=#{pwd}
+        where u_email = #{email}
     </update>
     <update id="setUserRole">
         update user
-        set role=#{role}
-        where u_id = #{uid}
+        set u_role=#{role}
+        where u_id = #{id}
     </update>
     <update id="update">
         update user
-        set `u_email`      = #{email},
-            `u_pwd`        = #{pwd},
-            `email_status` = #{emailStatus},
-            `u_desc`       = #{desc},
-            `display_name` = #{displayName},
-            `role`         = #{role}
-        where `u_id` = #{id}
-    </update>
-    <delete id="delete">
-        delete
-        from user
+        set u_email        = #{email},
+            u_pwd          = #{pwd},
+            u_email_status = #{emailStatus},
+            u_desc         = #{desc},
+            u_display_name = #{displayName},
+            u_avatar       = #{avatarImgUrl},
+            u_role         = #{role}
         where u_id = #{id}
-    </delete>
+    </update>
+    <update id="delete">
+        update user
+        set status= 2
+        where u_id = #{id}
+    </update>
+
+    <update id="lock">
+        update user
+        set status= 1
+        where u_id = #{id}
+    </update>
 
     <select id="existsByEmail" resultType="java.lang.Boolean">
         select exists(select * from user where u_email = #{email})
@@ -96,7 +102,7 @@
     </select>
 
     <select id="getDisPlayName" resultType="java.lang.String">
-        select display_name
+        select u_display_name
         from user
         where u_id = #{id}
     </select>
@@ -107,7 +113,7 @@
         where u_email = #{email}
     </select>
     <select id="getRoleByEmail" resultType="java.lang.String">
-        select role
+        select u_role
         from user
         where u_email = #{emai}
     </select>
@@ -116,7 +122,7 @@
         from user
     </select>
     <select id="getRoleById" resultType="java.lang.String">
-        select role
+        select u_role
         from user
         where u_id = #{id}
     </select>

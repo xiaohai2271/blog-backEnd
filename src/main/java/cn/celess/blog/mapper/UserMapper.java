@@ -16,13 +16,13 @@ import java.util.List;
 @Repository
 public interface UserMapper {
 
-    int addUser(String email, String pwd);
+    int addUser(User user);
 
     int updateInfo(String desc, String displayName, long id);
 
     int updateAvatarImgUrl(String avatarImgUrl, long id);
 
-    int updateLoginTime(String email, Date date);
+    int updateLoginTime(String email);
 
     int updateEmailStatus(String email, boolean status);
 
@@ -50,7 +50,9 @@ public interface UserMapper {
 
     int delete(long id);
 
-    int setUserRole(Long uid, String role);
+    int lock(long id);
+
+    int setUserRole(Long id, String role);
 
     List<User> findAll();
 
