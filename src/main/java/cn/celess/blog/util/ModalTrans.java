@@ -40,6 +40,11 @@ public class ModalTrans {
     public static UserModel user(User user) {
         UserModel userModel = new UserModel();
         BeanUtils.copyProperties(user, userModel);
+        userModel.setAvatarImgUrl(user.getAvatarImgUrl() == null || user.getAvatarImgUrl().length() == 0 ?
+                null :
+                "http://cdn.celess.cn/" + user.getAvatarImgUrl());
+        userModel.setDisplayName(user.getDisplayName() == null ? user.getEmail() : user.getDisplayName());
+        userModel.setRecentlyLandedDate(DateFormatUtil.get(user.getRecentlyLandedDate()));
         return userModel;
     }
 

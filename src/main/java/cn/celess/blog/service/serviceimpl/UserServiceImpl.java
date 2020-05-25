@@ -1,7 +1,9 @@
 package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
+import cn.celess.blog.enmu.RoleEnum;
 import cn.celess.blog.entity.User;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.QiniuResponse;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
@@ -26,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.beans.Transient;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -74,7 +75,8 @@ public class UserServiceImpl implements UserService {
         if (userMapper.existsByEmail(email)) {
             throw new MyException(ResponseEnum.USERNAME_HAS_EXIST);
         }
-        boolean b = userMapper.addUser(email, MD5Util.getMD5(password)) == 1;
+        User user = new User(email, MD5Util.getMD5(password));
+        boolean b = userMapper.addUser(user) == 1;
         if (b) {
             String verifyId = UUID.randomUUID().toString().replaceAll("-", "");
             redisUtil.setEx(email + "-verify", verifyId, 2, TimeUnit.DAYS);
@@ -116,7 +118,7 @@ public class UserServiceImpl implements UserService {
         }
         if (user.getPwd().equals(MD5Util.getMD5(loginReq.getPassword()))) {
             logger.info("====> {}  进行权限认证  状态：登录成功 <====", loginReq.getEmail());
-            userMapper.updateLoginTime(loginReq.getEmail(), new Date());
+            userMapper.updateLoginTime(loginReq.getEmail());
             redisUtil.delete(loginReq.getEmail() + "-passwordWrongTime");
             // redis 标记
             redisUserUtil.set(user, loginReq.getIsRememberMe());
@@ -137,7 +139,7 @@ public class UserServiceImpl implements UserService {
             redisUtil.setEx(loginReq.getEmail() + "-passwordWrongTime", count + "", 2, TimeUnit.HOURS);
             throw new MyException(ResponseEnum.LOGIN_FAILURE);
         }
-        UserModel trans = trans(user);
+        UserModel trans = ModalTrans.user(user);
         trans.setToken(token);
         return trans;
 
@@ -164,7 +166,7 @@ public class UserServiceImpl implements UserService {
 
         userMapper.updateInfo(desc, displayName, user.getId());
         redisUserUtil.set(user);
-        return trans(user);
+        return ModalTrans.user(user);
     }
 
     @Override
@@ -174,20 +176,6 @@ public class UserServiceImpl implements UserService {
             throw new MyException(ResponseEnum.USER_NOT_EXIST);
         }
         return role;
-    }
-
-    @Override
-    public User getUserInfoByEmail(String email) {
-        User user = userMapper.findByEmail(email);
-        if (user == null) {
-            throw new MyException(ResponseEnum.USER_NOT_EXIST);
-        }
-        return user;
-    }
-
-    @Override
-    public String getAvatarImg(long id) {
-        return userMapper.getAvatarImgUrlById(id);
     }
 
     @Override
@@ -203,24 +191,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel getUserInfoBySession() {
         User user = redisUserUtil.get();
-        return trans(user);
+        return ModalTrans.user(user);
     }
 
     @Override
     public boolean isExistOfEmail(String email) {
         return userMapper.existsByEmail(email);
-    }
-
-    @Override
-    public String getNameById(long id) {
-        String name = userMapper.getDisPlayName(id);
-        if (name == null) {
-            name = userMapper.getEmail(id);
-            if (name == null) {
-                throw new MyException(ResponseEnum.USER_NOT_EXIST);
-            }
-        }
-        return name;
     }
 
     /**
@@ -254,7 +230,6 @@ public class UserServiceImpl implements UserService {
         return "发送成功!";
     }
 
-    //TODO
     @Override
     public Object sendVerifyEmail(String email) {
         if (!RegexUtil.emailMatch(email)) {
@@ -366,14 +341,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageInfo<UserModel> getUserList(Integer page, Integer count) {
+    public PageData<UserModel> getUserList(Integer page, Integer count) {
         PageHelper.startPage(page, count);
         List<User> all = userMapper.findAll();
-        PageInfo pageInfo = PageInfo.of(all);
         List<UserModel> modelList = new ArrayList<>();
-        all.forEach(user -> modelList.add(trans(user)));
-        pageInfo.setList(modelList);
-        return pageInfo;
+        all.forEach(user -> modelList.add(ModalTrans.user(user)));
+        return new PageData<UserModel>(PageInfo.of(all), modelList);
     }
 
     @Override
@@ -402,8 +375,7 @@ public class UserServiceImpl implements UserService {
             user.setPwd(MD5Util.getMD5(userReq.getPwd()));
         }
         if (userReq.getRole() != null) {
-            // TODO:用enum存放角色分类
-            if ("user".equals(userReq.getRole()) || "admin".equals(userReq.getRole())) {
+            if (RoleEnum.USER_ROLE.getRoleName().equals(userReq.getRole()) || RoleEnum.ADMIN_ROLE.getRoleName().equals(userReq.getRole())) {
                 user.setRole(userReq.getRole());
             } else {
                 throw new MyException(ResponseEnum.PARAMETERS_ERROR);
@@ -413,7 +385,6 @@ public class UserServiceImpl implements UserService {
             if (!RegexUtil.emailMatch(userReq.getEmail())) {
                 throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
             }
-            // TODO :: 邮件提醒
             user.setEmail(userReq.getEmail());
         }
         // 数据写入
@@ -425,7 +396,7 @@ public class UserServiceImpl implements UserService {
             redisUserUtil.set(user);
         }
         logger.info("修改了用户 [id={}] 的用户的资料", userReq.getId());
-        return trans(user);
+        return ModalTrans.user(user);
     }
 
     @Override
@@ -444,19 +415,6 @@ public class UserServiceImpl implements UserService {
             throw new MyException(ResponseEnum.PWD_NOT_SAME);
         }
         userMapper.updatePwd(user.getEmail(), MD5Util.getMD5(newPwd));
-        return trans(userMapper.findByEmail(user.getEmail()));
-    }
-
-    private UserModel trans(User u) {
-        UserModel user = new UserModel();
-        user.setId(u.getId());
-        user.setAvatarImgUrl(u.getAvatarImgUrl() == null ? null : "http://cdn.celess.cn/" + u.getAvatarImgUrl());
-        user.setEmail(u.getEmail());
-        user.setDesc(u.getDesc());
-        user.setDisplayName(u.getDisplayName() == null ? u.getEmail() : u.getDisplayName());
-        user.setEmailStatus(u.getEmailStatus());
-        user.setRecentlyLandedDate(DateFormatUtil.get(u.getRecentlyLandedDate()));
-        user.setRole(u.getRole());
-        return user;
+        return ModalTrans.user(userMapper.findByEmail(user.getEmail()));
     }
 }

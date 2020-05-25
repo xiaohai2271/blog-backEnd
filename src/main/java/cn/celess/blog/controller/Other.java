@@ -55,7 +55,6 @@ public class Other {
         Map<String, Long> countMap = new HashMap<>();
         countMap.put("articleCount", countService.getArticleCount());
         countMap.put("commentCount", countService.getCommentCount());
-        countMap.put("leaveMsgCount", countService.getLeaveMessageCount());
         countMap.put("categoryCount", countService.getCategoriesCount());
         countMap.put("tagCount", countService.getTagsCount());
         countMap.put("visitorCount", countService.getVisitorCount());
