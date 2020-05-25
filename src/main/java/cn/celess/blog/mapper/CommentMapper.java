@@ -37,4 +37,6 @@ public interface CommentMapper {
     List<Comment> findAllByPagePathAndPid(String pagePath, long pid);
 
     long countByPagePath(String pagePath);
+
+    long count();
 }

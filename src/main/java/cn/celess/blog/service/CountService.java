@@ -37,13 +37,6 @@ public interface CountService {
     long getTagsCount();
 
     /**
-     * 获取留言数量
-     *
-     * @return 留言数量
-     */
-    long getLeaveMessageCount();
-
-    /**
      * 获取用户量
      *
      * @return 用户量

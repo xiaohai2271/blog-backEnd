@@ -108,7 +108,7 @@
         limit 1
     </select>
 
-    <select id="count">
+    <select id="count" resultType="long">
         select count(*)
         from article where is_delete = false;
     </select>
