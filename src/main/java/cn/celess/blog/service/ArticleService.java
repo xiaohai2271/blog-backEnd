@@ -1,8 +1,8 @@
 package cn.celess.blog.service;
 
 import cn.celess.blog.entity.model.ArticleModel;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
-import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
 
@@ -39,11 +39,11 @@ public interface ArticleService {
     /**
      * 获取一篇文章的数据
      *
-     * @param articleID 文章id
+     * @param articleId 文章id
      * @param is4update 是否是因文章更新而请求数据
      * @return 文章数据
      */
-    ArticleModel retrieveOneByID(long articleID, boolean is4update);
+    ArticleModel retrieveOneById(long articleId, boolean is4update);
 
     /**
      * 管理员 获取分页数据
@@ -52,7 +52,7 @@ public interface ArticleService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageInfo adminArticles(int count, int page);
+    PageData<ArticleModel> adminArticles(int count, int page);
 
     /**
      * 获取文章状态为开放的文章
@@ -61,7 +61,7 @@ public interface ArticleService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageInfo retrievePageForOpen(int count, int page);
+    PageData<ArticleModel> retrievePageForOpen(int count, int page);
 
     /**
      * 根据分类名获取文章数据
@@ -71,7 +71,7 @@ public interface ArticleService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageInfo findByCategory(String name, int page, int count);
+    PageData<ArticleModel> findByCategory(String name, int page, int count);
 
     /**
      * 根据标签名获取文章数据
@@ -81,5 +81,5 @@ public interface ArticleService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageInfo findByTag(String name, int page, int count);
+    PageData<ArticleModel> findByTag(String name, int page, int count);
 }
