@@ -11,5 +11,7 @@ public class LinkReq {
     private long id;
     private String name;
     private String url;
+    private String iconPath;
+    private String desc;
     private boolean open;
 }

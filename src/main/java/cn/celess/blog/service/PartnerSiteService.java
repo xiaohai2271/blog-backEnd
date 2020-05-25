@@ -1,8 +1,8 @@
 package cn.celess.blog.service;
 
 import cn.celess.blog.entity.PartnerSite;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.LinkReq;
-import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public interface PartnerSiteService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageInfo<PartnerSite> PartnerSitePages(int page, int count);
+    PageData<PartnerSite> partnerSitePages(int page, int count);
 
     /**
      * 获取全部数据

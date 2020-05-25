@@ -2,6 +2,7 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.PartnerSite;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.LinkReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.PartnerMapper;
@@ -87,17 +88,16 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
     }
 
     @Override
-    public PageInfo<PartnerSite> PartnerSitePages(int page, int count) {
+    public PageData<PartnerSite> partnerSitePages(int page, int count) {
         PageHelper.startPage(page, count);
         List<PartnerSite> sitePage = partnerMapper.findAll();
-        PageInfo pageInfo = new PageInfo(sitePage);
-        return pageInfo;
+        PageInfo<PartnerSite> pageInfo = new PageInfo<PartnerSite>(sitePage);
+        return new PageData<>(pageInfo, sitePage);
     }
 
     @Override
     public List<PartnerSite> findAll() {
-        List<PartnerSite> all = partnerMapper.findAll();
-        return all;
+        return partnerMapper.findAll();
     }
 
 

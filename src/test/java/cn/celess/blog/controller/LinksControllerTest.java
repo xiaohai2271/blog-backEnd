@@ -2,6 +2,7 @@ package cn.celess.blog.controller;
 
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.PartnerSite;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.LinkReq;
 import cn.celess.blog.mapper.PartnerMapper;
 import com.github.pagehelper.PageInfo;
@@ -73,6 +74,8 @@ public class LinksControllerTest extends BaseTest {
         PartnerSite partnerSite = new PartnerSite();
         partnerSite.setName(UUID.randomUUID().toString().substring(0, 4));
         partnerSite.setOpen(true);
+        partnerSite.setDesc("");
+        partnerSite.setIconPath("");
         partnerSite.setUrl("https://www.celess.cn");
         mapper.insert(partnerSite);
         PartnerSite lastest = mapper.getLastest();
@@ -99,6 +102,9 @@ public class LinksControllerTest extends BaseTest {
         PartnerSite partnerSite = new PartnerSite();
         partnerSite.setName(UUID.randomUUID().toString().substring(0, 4));
         partnerSite.setOpen(true);
+        partnerSite.setDesc("");
+        partnerSite.setIconPath("");
+        partnerSite.setDelete(false);
         partnerSite.setUrl("https://www.celess.cn");
         mapper.insert(partnerSite);
         // 查数据
@@ -147,17 +153,15 @@ public class LinksControllerTest extends BaseTest {
         mockMvc.perform(get("/admin/links?page=1&count=10").header("Authorization", adminLogin())).andDo(result -> {
             JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
             assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            PageInfo pageInfo = (PageInfo) JSONObject.toBean(object.getJSONObject(Result), PageInfo.class);
-            assertNotEquals(0, pageInfo.getStartRow());
-            assertNotEquals(0, pageInfo.getEndRow());
-            assertEquals(1, pageInfo.getPageNum());
-            assertEquals(10, pageInfo.getPageSize());
-            pageInfo.getList().forEach(o -> {
+            PageData<PartnerSite> pageData = (PageData<PartnerSite>) JSONObject.toBean(object.getJSONObject(Result), PageData.class);
+            assertEquals(1, pageData.getPageNum());
+            assertEquals(10, pageData.getPageSize());
+            for (Object o : pageData.getList()) {
                 PartnerSite site = (PartnerSite) JSONObject.toBean(JSONObject.fromObject(o), PartnerSite.class);
                 assertNotNull(site.getUrl());
                 assertNotNull(site.getName());
                 assertNotNull(site.getOpen());
-            });
+            }
         });
     }
 

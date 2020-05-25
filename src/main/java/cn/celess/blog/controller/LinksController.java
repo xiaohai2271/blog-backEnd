@@ -66,7 +66,7 @@ public class LinksController {
     @GetMapping("/admin/links")
     public Response all(@RequestParam("page") int page,
                         @RequestParam("count") int count) {
-        return ResponseUtil.success(partnerSiteService.PartnerSitePages(page, count));
+        return ResponseUtil.success(partnerSiteService.partnerSitePages(page, count));
     }
 
     @PostMapping("/apply")
@@ -94,6 +94,5 @@ public class LinksController {
         Boolean send = mailService.send(message);
         redisUtil.setEx(request.getRemoteAddr() + "-Apply", applyTime + 1 + "", 2, TimeUnit.HOURS);
         return send ? ResponseUtil.success("") : ResponseUtil.failure("");
-
     }
 }
