@@ -2,16 +2,23 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Article;
+import cn.celess.blog.entity.ArticleTag;
 import cn.celess.blog.entity.Tag;
+import cn.celess.blog.entity.TagCategory;
+import cn.celess.blog.entity.model.ArticleModel;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.TagModel;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.ArticleMapper;
+import cn.celess.blog.mapper.ArticleTagMapper;
 import cn.celess.blog.mapper.TagMapper;
 import cn.celess.blog.service.TagService;
+import cn.celess.blog.util.ModalTrans;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -29,6 +36,8 @@ public class TagServiceImpl implements TagService {
     HttpServletRequest request;
     @Autowired
     ArticleMapper articleMapper;
+    @Autowired
+    ArticleTagMapper articleTagMapper;
 
     @Override
     public TagModel create(String name) {
@@ -39,40 +48,19 @@ public class TagServiceImpl implements TagService {
         Tag tag = new Tag();
         tag.setName(name);
         tagMapper.insert(tag);
-        return new TagModel(tag);
+        return ModalTrans.tag(tag);
     }
 
     @Override
-    public TagModel create(Tag tag) {
-        if (tag == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
-        }
-        tagMapper.insert(tag);
-        return new TagModel(tag);
-    }
-
-    @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean delete(long tagId) {
         Tag tag = tagMapper.findTagById(tagId);
         if (tag == null) {
             throw new MyException(ResponseEnum.TAG_NOT_EXIST);
         }
-        if (tag.getArticles() == null) {
-            return tagMapper.delete(tagId) == 1;
-        }
-        String[] articleArray = tag.getArticles().split(",");
-        for (int i = 0; i < articleArray.length; i++) {
-            if (articleArray[i] == null || "".equals(articleArray[i])) {
-                continue;
-            }
-            long articleID = Long.parseLong(articleArray[i]);
-            Article article = articleMapper.findArticleById(articleID);
-            if (article == null) {
-                continue;
-            }
-            article.setTagsId(article.getTagsId().replace(tagId + ",", ""));
-            articleMapper.update(article);
-        }
+        List<ArticleTag> articleByTag = articleTagMapper.findArticleByTag(tagId);
+        // 删除文章
+        articleByTag.forEach(articleTag -> articleMapper.delete(articleTag.getArticle().getId()));
         return tagMapper.delete(tagId) == 1;
     }
 
@@ -82,47 +70,33 @@ public class TagServiceImpl implements TagService {
         if (id == null) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR.getCode(), "缺少ID");
         }
-        Tag tagFromDB = tagMapper.findTagById(id);
-        tagFromDB.setName(name);
-
-        tagMapper.update(tagFromDB);
-        return new TagModel(tagFromDB);
+        Tag tag = tagMapper.findTagById(id);
+        tag.setName(name);
+        tagMapper.update(tag);
+        return ModalTrans.tag(tag);
 
     }
 
     @Override
-    public TagModel retrieveOneById(long tagId) {
-        Tag tag = tagMapper.findTagById(tagId);
-        if (tag == null) {
-            throw new MyException(ResponseEnum.TAG_NOT_EXIST);
-        }
-        return new TagModel(tag);
-    }
-
-    @Override
-    public TagModel retrieveOneByName(String name) {
-        Tag tag = tagMapper.findTagByName(name);
-        if (tag == null) {
-            throw new MyException(ResponseEnum.TAG_NOT_EXIST);
-        }
-        return new TagModel(tag);
-    }
-
-    @Override
-    public PageInfo<TagModel> retrievePage(int page, int count) {
+    public PageData<TagModel> retrievePage(int page, int count) {
         PageHelper.startPage(page, count);
         List<Tag> tagList = tagMapper.findAll();
-        PageInfo pageInfo = new PageInfo(tagList);
-        List<TagModel> list = new ArrayList<>();
-        tagList.forEach(e -> list.add(new TagModel(e)));
-        pageInfo.setList(list);
-        return pageInfo;
+        List<TagModel> modelList = new ArrayList<>();
+        tagList.forEach(tag -> modelList.add(ModalTrans.tag(tag)));
+        return new PageData<TagModel>(new PageInfo<Tag>(tagList), modelList);
     }
 
     @Override
     public List<TagModel> findAll() {
         List<TagModel> list = new ArrayList<>();
-        tagMapper.findAll().forEach(e -> list.add(new TagModel(e)));
+        tagMapper.findAll().forEach(e -> {
+            TagModel model = ModalTrans.tag(e);
+            List<ArticleTag> articleByTagAndOpen = articleTagMapper.findArticleByTagAndOpen(e.getId());
+            List<ArticleModel> articleModelList = new ArrayList<>();
+            articleByTagAndOpen.forEach(articleTag -> articleModelList.add(ModalTrans.article(articleTag.getArticle(), true)));
+            model.setArticles(articleModelList);
+            list.add(model);
+        });
         return list;
     }
 }

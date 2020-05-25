@@ -38,16 +38,6 @@ public class TagController {
         return ResponseUtil.success(tagService.update(id, name));
     }
 
-    @GetMapping("/tag/id/{id}")
-    public Response retrieveOneById(@PathVariable("id") long id) {
-        return ResponseUtil.success(tagService.retrieveOneById(id));
-    }
-
-    @GetMapping("/tag/name/{name}")
-    public Response retrieveOneByName(@PathVariable("name") String name) {
-        return ResponseUtil.success(tagService.retrieveOneByName(name));
-    }
-
     @GetMapping("/tags")
     public Response getPage(@RequestParam(required = false, defaultValue = "10", value = "count") int count,
                             @RequestParam(required = false, defaultValue = "1", value = "page") int page) {
@@ -61,7 +51,7 @@ public class TagController {
         for (TagModel t : all) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", t.getName());
-            jsonObject.put("size", t.getArticles() == null ? 0 : t.getArticles().size());
+            jsonObject.put("size", t.getArticles().size());
             nameAndCount.add(jsonObject);
         }
         return ResponseUtil.success(nameAndCount);

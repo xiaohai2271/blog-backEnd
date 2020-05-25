@@ -11,7 +11,7 @@ public class ArticleReq {
     private Long id;
     private String title;
     private String mdContent;
-    private String tags;
+    private String[] tags;
     private Boolean type;
     private String url;
     private String category;

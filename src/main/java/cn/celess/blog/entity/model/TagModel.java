@@ -1,11 +1,9 @@
 package cn.celess.blog.entity.model;
 
-import cn.celess.blog.entity.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,21 +19,6 @@ public class TagModel {
 
     private String name;
 
-    private List<Integer> articles;
+    private List<ArticleModel> articles;
 
-    public TagModel(Tag tag) {
-        this.id = tag.getId();
-        this.name = tag.getName();
-        if (tag.getArticles() == null || tag.getArticles().length() == 0) {
-            articles = null;
-        } else {
-            articles = new ArrayList<>();
-            for (String s : tag.getArticles().split(",")) {
-                if ("".equals(s)) {
-                    return;
-                }
-                articles.add(Integer.parseInt(s));
-            }
-        }
-    }
 }

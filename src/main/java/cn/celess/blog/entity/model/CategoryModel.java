@@ -20,5 +20,5 @@ public class CategoryModel {
 
     private String name;
 
-    private List<Article> articles;
+    private List<ArticleModel> articles;
 }

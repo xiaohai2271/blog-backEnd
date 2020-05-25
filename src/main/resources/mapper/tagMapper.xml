@@ -54,7 +54,7 @@
     <select id="findAll" resultMap="tagResultMap">
         select *
         from tag_category
-        where is_category = false;
+        where is_category = false
     </select>
 
     <select id="count" resultType="long">

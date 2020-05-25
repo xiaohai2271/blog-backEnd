@@ -2,9 +2,11 @@ package cn.celess.blog.util;
 
 import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Category;
+import cn.celess.blog.entity.Tag;
 import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.ArticleModel;
 import cn.celess.blog.entity.model.CategoryModel;
+import cn.celess.blog.entity.model.TagModel;
 import cn.celess.blog.entity.model.UserModel;
 import org.springframework.beans.BeanUtils;
 
@@ -30,6 +32,17 @@ public class ModalTrans {
     }
 
 
+    public static ArticleModel article(Article article, boolean noMdContent) {
+        ArticleModel article1 = article(article);
+        if (!noMdContent) {
+            return article1;
+        }
+        article1.setMdContent(null);
+        article1.setOpen(null);
+        return article1;
+    }
+
+
     public static UserModel user(User user) {
         UserModel userModel = new UserModel();
         BeanUtils.copyProperties(user, userModel);
@@ -39,6 +52,13 @@ public class ModalTrans {
     public static CategoryModel category(Category category) {
         CategoryModel model = new CategoryModel();
         BeanUtils.copyProperties(category, model);
+        return model;
+    }
+
+
+    public static TagModel tag(Tag tag) {
+        TagModel model = new TagModel();
+        BeanUtils.copyProperties(tag, model);
         return model;
     }
 }
