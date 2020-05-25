@@ -1,5 +1,6 @@
 package cn.celess.blog.service;
 
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.VisitorModel;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public interface VisitorService {
      * @param showLocation 是否显示位置信息 开启改选项数据响应超慢
      * @return 分页数据
      */
-    PageInfo<VisitorModel> visitorPage(int page, int count, boolean showLocation);
+    PageData<VisitorModel> visitorPage(int page, int count, boolean showLocation);
 
     /**
      * 新增访客
