@@ -161,7 +161,8 @@
 
     <select id="count" resultType="long">
         select count(*)
-        from article;
+        from article
+        where is_delete = false;
     </select>
 
     <select id="getPreArticle" resultMap="articleViewResultMap">

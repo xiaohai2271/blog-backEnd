@@ -60,6 +60,7 @@
     <select id="count" resultType="long">
         select count(*)
         from tag_category
-        where is_category = false;;
+        where is_category = false
+          and is_delete = false;
     </select>
 </mapper>

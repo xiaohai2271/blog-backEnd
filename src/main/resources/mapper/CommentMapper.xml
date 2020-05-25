@@ -108,5 +108,9 @@
         limit 1
     </select>
 
+    <select id="count">
+        select count(*)
+        from article where is_delete = false;
+    </select>
 
 </mapper>
