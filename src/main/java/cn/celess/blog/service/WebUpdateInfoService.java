@@ -1,5 +1,6 @@
 package cn.celess.blog.service;
 
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.WebUpdateModel;
 import com.github.pagehelper.PageInfo;
 import net.sf.json.JSONObject;
@@ -45,7 +46,7 @@ public interface WebUpdateInfoService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageInfo<WebUpdateModel> pages(int count, int page);
+    PageData<WebUpdateModel> pages(int count, int page);
 
     /**
      * 获取全部的更新记录

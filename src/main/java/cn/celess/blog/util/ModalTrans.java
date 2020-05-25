@@ -1,13 +1,7 @@
 package cn.celess.blog.util;
 
-import cn.celess.blog.entity.Article;
-import cn.celess.blog.entity.Category;
-import cn.celess.blog.entity.Tag;
-import cn.celess.blog.entity.User;
-import cn.celess.blog.entity.model.ArticleModel;
-import cn.celess.blog.entity.model.CategoryModel;
-import cn.celess.blog.entity.model.TagModel;
-import cn.celess.blog.entity.model.UserModel;
+import cn.celess.blog.entity.*;
+import cn.celess.blog.entity.model.*;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -59,6 +53,15 @@ public class ModalTrans {
     public static TagModel tag(Tag tag) {
         TagModel model = new TagModel();
         BeanUtils.copyProperties(tag, model);
+        return model;
+    }
+
+
+    public static WebUpdateModel webUpdate(WebUpdate update) {
+        WebUpdateModel model = new WebUpdateModel();
+        model.setId(update.getId());
+        model.setInfo(update.getUpdateInfo());
+        model.setTime(DateFormatUtil.get(update.getUpdateTime()));
         return model;
     }
 }

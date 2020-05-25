@@ -2,12 +2,14 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.WebUpdate;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.WebUpdateModel;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.WebUpdateInfoMapper;
 import cn.celess.blog.service.WebUpdateInfoService;
 import cn.celess.blog.util.DateFormatUtil;
 import cn.celess.blog.util.HttpUtil;
+import cn.celess.blog.util.ModalTrans;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -39,11 +41,11 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
         if (info == null || info.replaceAll(" ", "").isEmpty()) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
-        WebUpdate webUpdate = new WebUpdate(info, new Date());
+        WebUpdate webUpdate = new WebUpdate(info);
         if (webUpdateInfoMapper.insert(webUpdate) == 0) {
             throw new MyException(ResponseEnum.FAILURE);
         }
-        return trans(webUpdate);
+        return ModalTrans.webUpdate(webUpdateInfoMapper.findById(webUpdate.getId()));
     }
 
     @Override
@@ -65,26 +67,20 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
         }
         webUpdate.setUpdateInfo(info);
         webUpdateInfoMapper.update(id, info);
-        return trans(webUpdate);
+        return ModalTrans.webUpdate(webUpdate);
     }
 
     @Override
-    public PageInfo<WebUpdateModel> pages(int count, int page) {
+    public PageData<WebUpdateModel> pages(int count, int page) {
         PageHelper.startPage(page, count);
         List<WebUpdate> updateList = webUpdateInfoMapper.findAll();
-        PageInfo pageInfo = new PageInfo(updateList);
-        pageInfo.setList(list2List(updateList));
-        return pageInfo;
+        return new PageData<WebUpdateModel>(new PageInfo<WebUpdate>(updateList), list2List(updateList));
     }
 
     @Override
     public List<WebUpdateModel> findAll() {
         List<WebUpdate> all = webUpdateInfoMapper.findAll();
-        List<WebUpdateModel> webUpdateModels = new ArrayList<>();
-        for (WebUpdate w : all) {
-            webUpdateModels.add(trans(w));
-        }
-        return webUpdateModels;
+        return list2List(all);
     }
 
     @Override
@@ -101,7 +97,7 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
             SimpleDateFormat sdf = new SimpleDateFormat();
             Instant parse = Instant.parse(commit.getJSONObject("committer").getString("date"));
             jsonObject.put("committerDate", DateFormatUtil.get(Date.from(parse)));
-            jsonObject.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/"+object.getString("sha"));
+            jsonObject.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/" + object.getString("sha"));
         } catch (IOException e) {
             log.info("网络请求失败{}", e.getMessage());
         }
@@ -110,14 +106,7 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
 
     private List<WebUpdateModel> list2List(List<WebUpdate> webUpdates) {
         List<WebUpdateModel> webUpdateModels = new ArrayList<>();
-        for (WebUpdate w : webUpdates) {
-            webUpdateModels.add(trans(w));
-        }
+        webUpdates.forEach(update -> webUpdateModels.add(ModalTrans.webUpdate(update)));
         return webUpdateModels;
     }
-
-    private WebUpdateModel trans(WebUpdate webUpdate) {
-        return new WebUpdateModel(webUpdate.getId(), webUpdate.getUpdateInfo(), DateFormatUtil.get(webUpdate.getUpdateTime()));
-    }
-
 }
