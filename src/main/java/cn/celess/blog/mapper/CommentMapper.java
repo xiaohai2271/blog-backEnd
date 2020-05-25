@@ -8,8 +8,8 @@ import java.util.List;
 
 /**
  * @Author: 小海
- * @Date： 2019/06/30 16:19
- * @Description：
+ * @Date: 2019/06/30 16:19
+ * @Description:
  */
 @Mapper
 @Repository
@@ -18,11 +18,9 @@ public interface CommentMapper {
 
     int updateContent(String content, long id);
 
-    int updateResponder(String responder, long id);
-
     int delete(long id);
 
-    int deleteByArticleId(long articleId);
+    int deleteByPagePath(String pagePath);
 
     boolean existsById(long id);
 
@@ -30,19 +28,13 @@ public interface CommentMapper {
 
     Comment getLastestComment();
 
-    List<Comment> findAllByAuthorIDAndType(long id, boolean isComment);
+    List<Comment> findAllByFromUser(long id);
 
-    List<Comment> findAllByPId(long pid);
+    List<Comment> findAllByPid(long pid);
 
-    List<Comment> findAllByArticleID(long articleId);
+    List<Comment> findAllByPagePath(String pagePath);
 
-    List<Comment> findAllByArticleIDAndPId(long articleID, long pid);
+    List<Comment> findAllByPagePathAndPid(String pagePath, long pid);
 
-    List<Comment> findCommentsByTypeAndPId(boolean isComment, long pid);
-
-    List<Comment> findAllByPId(int pid);
-
-    List<Comment> findAllByType(boolean isComment);
-
-    long countByType(boolean isComment);
+    long countByPagePath(String pagePath);
 }
