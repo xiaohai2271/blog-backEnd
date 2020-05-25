@@ -18,11 +18,11 @@
 
     <update id="update" parameterType="cn.celess.blog.entity.PartnerSite">
         update links set
-        <if test="name!=null">l_name=#{name},</if>
-        <if test="url!=null">l_url=#{url},</if>
         <if test="open!=null">l_is_open=#{open},</if>
         <if test="iconPath!=null">l_icon_path=#{iconPath},</if>
-        <if test="desc!=null">l_desc=#{desc}</if>
+        <if test="desc!=null">l_desc=#{desc},</if>
+        <if test="url!=null">l_url=#{url},</if>
+        <if test="name!=null">l_name=#{name}</if>
         where l_id=#{id}
     </update>
 
