@@ -321,7 +321,10 @@ public class ArticleServiceImpl implements ArticleService {
         open.forEach(article -> {
             ArticleModel model = ModalTrans.article(article, true);
             model.setTags(null);
-            setPreAndNextArticle(model);
+            //            setPreAndNextArticle(model);
+            model.setNextArticle(null);
+            model.setPreArticle(null);
+            modelList.add(model);
         });
         return new PageData<ArticleModel>(new PageInfo<Article>(open), modelList);
     }
@@ -337,6 +340,9 @@ public class ArticleServiceImpl implements ArticleService {
         List<ArticleModel> modelList = new ArrayList<>();
         articleByTag.forEach(articleTag -> {
             ArticleModel model = ModalTrans.article(articleTag.getArticle(), true);
+            model.setNextArticle(null);
+            model.setPreArticle(null);
+            modelList.add(model);
         });
         return new PageData<ArticleModel>(new PageInfo<ArticleTag>(articleByTag), modelList);
     }

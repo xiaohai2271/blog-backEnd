@@ -32,10 +32,10 @@ public class TagMapperTest extends BaseTest {
     @Test
     public void delete() {
         Tag tag = generateTag();
-        assertFalse(tag.isDeleted());
+        assertFalse(tag.getDeleted());
         assertEquals(1, tagMapper.delete(tag.getId()));
         Tag tagById = tagMapper.findTagById(tag.getId());
-        assertTrue(tagById.isDeleted());
+        assertTrue(tagById.getDeleted());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class TagMapperTest extends BaseTest {
     public void count() {
         assertNotEquals(0, tagMapper.count());
         List<Tag> all = tagMapper.findAll();
-        List<Tag> collect = all.stream().filter(tag -> !tag.isDeleted()).collect(Collectors.toList());
+        List<Tag> collect = all.stream().filter(tag -> !tag.getDeleted()).collect(Collectors.toList());
         assertEquals(collect.size(), tagMapper.count());
     }
 

@@ -37,6 +37,7 @@
     <select id="findAll" resultMap="webUpdateResultMap">
         select *
         from web_update
+        order by wu_id desc
     </select>
 
     <select id="findAllNotDeleted" resultMap="webUpdateResultMap">

@@ -13,7 +13,7 @@ public class TagCategory {
 
     private String name;
 
-    private boolean category = true;
+    private Boolean category = true;
 
-    private boolean deleted = false;
+    private Boolean deleted = false;
 }

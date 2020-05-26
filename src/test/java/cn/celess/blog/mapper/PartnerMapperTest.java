@@ -25,7 +25,7 @@ public class PartnerMapperTest extends BaseTest {
         PartnerSite partnerSite = generatePartnerSite();
         assertEquals(1, partnerMapper.delete(partnerSite.getId()));
         partnerSite = partnerMapper.findById(partnerSite.getId());
-        assertTrue(partnerSite.isDelete());
+        assertTrue(partnerSite.getDelete());
     }
 
     @Test

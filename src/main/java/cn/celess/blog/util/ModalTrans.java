@@ -22,6 +22,10 @@ public class ModalTrans {
         articleModel.setOriginal(article.getType());
         articleModel.setCategory(article.getCategory().getName());
         articleModel.setAuthor(user(article.getUser()));
+        articleModel.getTags().forEach(tag -> {
+            tag.setCategory(null);
+            tag.setDeleted(null);
+        });
         return articleModel;
     }
 
@@ -46,6 +50,8 @@ public class ModalTrans {
         userModel.setAvatarImgUrl(user.getAvatarImgUrl() == null || user.getAvatarImgUrl().length() == 0 ?
                 null :
                 "http://cdn.celess.cn/" + user.getAvatarImgUrl());
+        userModel.setRole(null);
+        userModel.setEmailStatus(null);
         userModel.setDisplayName(user.getDisplayName() == null ? user.getEmail() : user.getDisplayName());
         userModel.setRecentlyLandedDate(DateFormatUtil.get(user.getRecentlyLandedDate()));
         return userModel;

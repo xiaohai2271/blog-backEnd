@@ -25,11 +25,11 @@ public class CategoryMapperTest extends BaseTest {
     @Test
     public void delete() {
         Category category = generateCategory();
-        assertFalse(category.isDeleted());
+        assertFalse(category.getDeleted());
         int lines = categoryMapper.delete(category.getId());
         assertNotEquals(0, lines);
         Category categoryById = categoryMapper.findCategoryById(category.getId());
-        assertTrue(categoryById.isDeleted());
+        assertTrue(categoryById.getDeleted());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class CategoryMapperTest extends BaseTest {
     public void findAll() {
         List<Category> all = categoryMapper.findAll();
         assertNotEquals(0, all);
-        all.forEach(category -> assertTrue(category.isCategory()));
+        all.forEach(category -> assertTrue(category.getCategory()));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class CategoryMapperTest extends BaseTest {
     @Test
     public void count() {
         List<Category> all = categoryMapper.findAll();
-        List<Category> collect = all.stream().filter(category -> !category.isDeleted()).collect(Collectors.toList());
+        List<Category> collect = all.stream().filter(category -> !category.getDeleted()).collect(Collectors.toList());
         assertEquals(collect.size(), categoryMapper.count());
     }
 

@@ -23,7 +23,7 @@ public class PartnerSite {
 
     private String desc;
 
-    private boolean delete;
+    private Boolean delete = false;
 
     public PartnerSite() {
     }

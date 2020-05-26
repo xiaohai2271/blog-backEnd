@@ -97,7 +97,9 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
 
     @Override
     public List<PartnerSite> findAll() {
-        return partnerMapper.findAll();
+        List<PartnerSite> all = partnerMapper.findAll();
+        all.forEach(partnerSite -> partnerSite.setDelete(null));
+        return all;
     }
 
 
