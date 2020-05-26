@@ -28,7 +28,7 @@ public class ModalTrans {
 
     public static ArticleModel article(Article article, boolean noMdContent) {
         ArticleModel article1 = article(article);
-        if (!noMdContent) {
+        if (!noMdContent || article1 == null) {
             return article1;
         }
         article1.setMdContent(null);

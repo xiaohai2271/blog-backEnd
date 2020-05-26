@@ -31,7 +31,7 @@
                 t_id = #{tag.id},
             </if>
         </set>
-        where at_id = #{tag.id}
+        where at_id = #{id}
     </update>
 
     <!--通过主键删除-->
@@ -69,7 +69,8 @@
         from article_tag,
              article,
              tag_category
-        where article_tag.a_id = article.a_id
+        where article_tag.at_id = #{id}
+          and article_tag.a_id = article.a_id
           and tag_category.t_id = article_tag.t_id
     </select>
 

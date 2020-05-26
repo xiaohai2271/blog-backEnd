@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -79,7 +80,8 @@ public class TagMapperTest extends BaseTest {
     public void count() {
         assertNotEquals(0, tagMapper.count());
         List<Tag> all = tagMapper.findAll();
-        assertEquals(all.size(), tagMapper.count());
+        List<Tag> collect = all.stream().filter(tag -> !tag.isDeleted()).collect(Collectors.toList());
+        assertEquals(collect.size(), tagMapper.count());
     }
 
     private Tag generateTag() {

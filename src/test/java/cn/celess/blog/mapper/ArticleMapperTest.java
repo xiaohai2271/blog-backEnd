@@ -164,7 +164,7 @@ public class ArticleMapperTest extends BaseTest {
 
     @Test
     public void findAllByCategoryIdAndOpen() {
-        List<Article> allByCategoryId = articleMapper.findAllByCategoryId(1);
+        List<Article> allByCategoryId = articleMapper.findAllByCategoryIdAndOpen(1);
         assertNotEquals(0, allByCategoryId.size());
         allByCategoryId.forEach(article -> assertTrue(article.getOpen()));
     }

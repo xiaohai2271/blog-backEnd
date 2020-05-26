@@ -106,7 +106,7 @@ public class ArticleTagMapperTest extends BaseTest {
     @Test
     public void findArticleByTagAndOpen() {
         ArticleTag articleTag = generateArticle();
-        List<ArticleTag> articleByTag = articleTagMapper.findArticleByTag(21L);
+        List<ArticleTag> articleByTag = articleTagMapper.findArticleByTagAndOpen(21L);
         assertNotEquals(0, articleByTag.size());
         articleByTag.forEach(articleTag1 -> assertEquals(articleTag.getTag().getName(), articleTag1.getTag().getName()));
         articleByTag.forEach(articleTag1 -> assertTrue(articleTag1.getArticle().getOpen()));

@@ -281,7 +281,8 @@ public class ArticleServiceImpl implements ArticleService {
         PageData<ArticleModel> pageData = new PageData<ArticleModel>(new PageInfo<Article>(articleList));
         List<ArticleModel> articleModelList = new ArrayList<>();
         articleList.forEach(article -> {
-            ArticleModel articleModel = ModalTrans.article(article, true);
+            ArticleModel articleModel = ModalTrans.article(article);
+            articleModel.setMdContent(null);
             articleModelList.add(articleModel);
         });
         pageData.setList(articleModelList);

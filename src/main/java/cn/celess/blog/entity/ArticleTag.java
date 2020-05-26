@@ -1,6 +1,5 @@
 package cn.celess.blog.entity;
 
-import com.sun.xml.internal.ws.policy.EffectiveAlternativeSelector;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

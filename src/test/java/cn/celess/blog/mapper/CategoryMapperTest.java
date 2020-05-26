@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -106,7 +107,8 @@ public class CategoryMapperTest extends BaseTest {
     @Test
     public void count() {
         List<Category> all = categoryMapper.findAll();
-        assertEquals(all.size(), categoryMapper.count());
+        List<Category> collect = all.stream().filter(category -> !category.isDeleted()).collect(Collectors.toList());
+        assertEquals(collect.size(), categoryMapper.count());
     }
 
     private Category generateCategory() {
