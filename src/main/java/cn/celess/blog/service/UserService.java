@@ -1,17 +1,12 @@
 package cn.celess.blog.service;
 
-import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
-import com.github.pagehelper.PageInfo;
-import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * @author : xiaohai
@@ -154,8 +149,9 @@ public interface UserService {
 
     /**
      * 设置密码
-     * @param pwd pwd
-     * @param newPwd newPwd
+     *
+     * @param pwd        pwd
+     * @param newPwd     newPwd
      * @param confirmPwd confirmPwd
      * @return UserModel
      */

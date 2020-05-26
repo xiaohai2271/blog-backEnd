@@ -1,11 +1,8 @@
 package cn.celess.blog.service;
 
-import cn.celess.blog.entity.Category;
 import cn.celess.blog.entity.model.CategoryModel;
 import cn.celess.blog.entity.model.PageData;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author : xiaohai

@@ -3,7 +3,6 @@ package cn.celess.blog.service;
 import cn.celess.blog.entity.model.CommentModel;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.CommentReq;
-import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

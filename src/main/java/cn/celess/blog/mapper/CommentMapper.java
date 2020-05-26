@@ -34,7 +34,7 @@ public interface CommentMapper {
 
     List<Comment> findAllByPagePath(String pagePath);
 
-    List<Comment> findAllByPagePathAndFromUser(String pagePath,long userId);
+    List<Comment> findAllByPagePathAndFromUser(String pagePath, long userId);
 
     List<Comment> findAllByPagePathAndPid(String pagePath, long pid);
 

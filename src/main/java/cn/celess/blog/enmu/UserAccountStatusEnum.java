@@ -1,7 +1,5 @@
 package cn.celess.blog.enmu;
 
-import lombok.Data;
-
 /**
  * @Author: 小海
  * @Date: 2020-05-22 21:32
@@ -26,7 +24,7 @@ public enum UserAccountStatusEnum {
     private final int code;
     private final String desc;
 
-    private UserAccountStatusEnum(int code, String desc) {
+    UserAccountStatusEnum(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }

@@ -33,18 +33,28 @@ import java.util.Map;
 @Component
 public class SitemapGenerateUtil {
 
+    @Autowired
+    ArticleMapper articleMapper;
     @Value("${sitemap.path}")
     private String path;
     private Map<String, String> urlList;
 
-    @Autowired
-    ArticleMapper articleMapper;
+    private static DocumentBuilder getDocumentBuilder() {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = null;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        return db;
+    }
 
     @Async
     public void createSitemap() {
         initList();
         if ("".equals(path) || "classpath".equals(path)) {
-            path = System.getProperty("user.dir")+"/sitemap.xml";
+            path = System.getProperty("user.dir") + "/sitemap.xml";
         }
         File file = new File(path);
         try {
@@ -94,18 +104,6 @@ public class SitemapGenerateUtil {
             urlList.put("https://www.celess.cn/article/" + article.getId(), DateFormatUtil.getForXmlDate(
                     article.getUpdateDate() == null ? article.getPublishDate() : article.getUpdateDate()));
         });
-    }
-
-
-    private static DocumentBuilder getDocumentBuilder() {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
-        return db;
     }
 
 }

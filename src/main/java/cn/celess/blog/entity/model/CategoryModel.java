@@ -1,6 +1,5 @@
 package cn.celess.blog.entity.model;
 
-import cn.celess.blog.entity.Article;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

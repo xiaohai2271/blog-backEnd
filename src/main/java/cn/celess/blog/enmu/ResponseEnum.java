@@ -70,8 +70,8 @@ public enum ResponseEnum {
     PARAMETERS_QQ_ERROR(8540, "QQ格式错误"),
     PARAMETERS_PWD_ERROR(8550, "密码格式错误"),
     VERIFY_OUT(8400, "已经验证过了");
-    private int code;
-    private String msg;
+    private final int code;
+    private final String msg;
 
 
     ResponseEnum(int code, String msg) {

@@ -1,6 +1,5 @@
 package cn.celess.blog.entity.model;
 
-import cn.celess.blog.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 

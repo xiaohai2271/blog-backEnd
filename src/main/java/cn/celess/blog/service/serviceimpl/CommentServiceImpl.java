@@ -11,8 +11,6 @@ import cn.celess.blog.mapper.ArticleMapper;
 import cn.celess.blog.mapper.CommentMapper;
 import cn.celess.blog.mapper.UserMapper;
 import cn.celess.blog.service.CommentService;
-import cn.celess.blog.service.UserService;
-import cn.celess.blog.util.DateFormatUtil;
 import cn.celess.blog.util.ModalTrans;
 import cn.celess.blog.util.RedisUserUtil;
 import com.github.pagehelper.PageHelper;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -76,10 +73,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public boolean delete(long id) {
         Comment b = commentMapper.findCommentById(id);
-        if (b == null ) {
+        if (b == null) {
             throw new MyException(ResponseEnum.COMMENT_NOT_EXIST);
         }
-        if(b.isDelete()){
+        if (b.isDelete()) {
             throw new MyException(ResponseEnum.DATA_IS_DELETED);
         }
         commentMapper.delete(id);

@@ -21,7 +21,7 @@ import java.io.InputStream;
  */
 @Service
 public class QiniuServiceImpl implements QiniuService {
-    private static Configuration cfg = new Configuration(Zone.zone2());
+    private static final Configuration cfg = new Configuration(Zone.zone2());
     private static UploadManager uploadManager;
     private static BucketManager bucketManager;
     private static Auth auth;
