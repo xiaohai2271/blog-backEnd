@@ -2,6 +2,7 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.enmu.RoleEnum;
+import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.QiniuResponse;
@@ -185,7 +186,7 @@ public class UserServiceImpl implements UserService {
         user.setAvatarImgUrl(upload.key);
         userMapper.updateAvatarImgUrl(upload.key, user.getId());
         redisUserUtil.set(user);
-        return ResponseUtil.success(user.getAvatarImgUrl());
+        return Response.success(user.getAvatarImgUrl());
     }
 
     @Override

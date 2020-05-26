@@ -1,16 +1,15 @@
 package cn.celess.blog.configuration.filter;
 
 import cn.celess.blog.enmu.ResponseEnum;
+import cn.celess.blog.entity.Response;
 import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.JwtUtil;
 import cn.celess.blog.util.RedisUtil;
-import cn.celess.blog.util.ResponseUtil;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,19 +21,17 @@ import java.io.IOException;
  * @Description: 鉴权拦截器
  */
 public class AuthenticationFilter implements HandlerInterceptor {
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
+    private static final String USER_PREFIX = "/user";
+    private static final String ADMIN_PREFIX = "/admin";
+    private static final String ROLE_ADMIN = "admin";
+    private static final String ROLE_USER = "user";
     @Autowired
     JwtUtil jwtUtil;
     @Autowired
     RedisUtil redisUtil;
     @Autowired
     UserService userService;
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
-
-    private static final String USER_PREFIX = "/user";
-    private static final String ADMIN_PREFIX = "/admin";
-    private static final String ROLE_ADMIN = "admin";
-    private static final String ROLE_USER = "user";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -67,7 +64,7 @@ public class AuthenticationFilter implements HandlerInterceptor {
         if (role.equals(ROLE_USER) || role.equals(ROLE_ADMIN)) {
             // 更新token
             String token = jwtUtil.updateTokenDate(jwtStr);
-            response.setHeader("Authorization",token);
+            response.setHeader("Authorization", token);
         }
         if (role.equals(ROLE_ADMIN)) {
             // admin
@@ -84,7 +81,7 @@ public class AuthenticationFilter implements HandlerInterceptor {
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
         try {
             logger.info("鉴权失败，[code:{},msg:{},path:{}]", e.getCode(), e.getMsg(), request.getRequestURI() + "?" + request.getQueryString());
-            response.getWriter().println(JSONObject.fromObject(ResponseUtil.response(e, null)));
+            response.getWriter().println(JSONObject.fromObject(Response.response(e, null)));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

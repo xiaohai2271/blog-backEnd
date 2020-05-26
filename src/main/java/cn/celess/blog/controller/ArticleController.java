@@ -6,7 +6,6 @@ import cn.celess.blog.entity.model.ArticleModel;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.service.ArticleService;
 import cn.celess.blog.util.RedisUserUtil;
-import cn.celess.blog.util.ResponseUtil;
 import cn.celess.blog.util.SitemapGenerateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +35,7 @@ public class ArticleController {
     public Response create(@RequestBody ArticleReq body) {
         ArticleModel articleModel = articleService.create(body);
         sitemapGenerateUtil.createSitemap();
-        return ResponseUtil.success(articleModel);
+        return Response.success(articleModel);
     }
 
     /**
@@ -49,7 +48,7 @@ public class ArticleController {
     public Response delete(@RequestParam("articleID") long articleId) {
         boolean delete = articleService.delete(articleId);
         sitemapGenerateUtil.createSitemap();
-        return ResponseUtil.success(delete);
+        return Response.success(delete);
     }
 
     /**
@@ -62,7 +61,7 @@ public class ArticleController {
     public Response update(@RequestBody ArticleReq body) {
         ArticleModel update = articleService.update(body);
         sitemapGenerateUtil.createSitemap();
-        return ResponseUtil.success(update);
+        return Response.success(update);
     }
 
     /**
@@ -82,11 +81,11 @@ public class ArticleController {
                                     HttpServletRequest request) {
         ArticleModel article = articleService.retrieveOneById(articleId, is4update);
         if (article.getOpen()) {
-            return ResponseUtil.success(article);
+            return Response.success(article);
         } else if (article.getAuthor().getId().equals(redisUserUtil.get().getId())) {
-            return ResponseUtil.success(article);
+            return Response.success(article);
         }
-        return ResponseUtil.response(ResponseEnum.PERMISSION_ERROR, null);
+        return Response.response(ResponseEnum.PERMISSION_ERROR, null);
     }
 
     /**
@@ -99,7 +98,7 @@ public class ArticleController {
     @GetMapping("/articles")
     public Response articles(@RequestParam(name = "page", defaultValue = "1") int page,
                              @RequestParam(name = "count", defaultValue = "5") int count) {
-        return ResponseUtil.success(articleService.retrievePageForOpen(count, page));
+        return Response.success(articleService.retrievePageForOpen(count, page));
     }
 
     /**
@@ -112,7 +111,7 @@ public class ArticleController {
     @GetMapping("/admin/articles")
     public Response adminArticles(@RequestParam(name = "page", defaultValue = "1") int page,
                                   @RequestParam(name = "count", defaultValue = "10") int count) {
-        return ResponseUtil.success(articleService.adminArticles(count, page));
+        return Response.success(articleService.adminArticles(count, page));
     }
 
     /**
@@ -127,7 +126,7 @@ public class ArticleController {
     public Response findByCategory(@PathVariable("name") String name,
                                    @RequestParam(name = "page", defaultValue = "1") int page,
                                    @RequestParam(name = "count", defaultValue = "10") int count) {
-        return ResponseUtil.success(articleService.findByCategory(name, page, count));
+        return Response.success(articleService.findByCategory(name, page, count));
     }
 
     /**
@@ -142,13 +141,13 @@ public class ArticleController {
     public Response findByTag(@PathVariable("name") String name,
                               @RequestParam(name = "page", defaultValue = "1") int page,
                               @RequestParam(name = "count", defaultValue = "10") int count) {
-        return ResponseUtil.success(articleService.findByTag(name, page, count));
+        return Response.success(articleService.findByTag(name, page, count));
     }
 
 
     @GetMapping("/createSitemap")
     public Response createSitemap() {
         sitemapGenerateUtil.createSitemap();
-        return ResponseUtil.success(null);
+        return Response.success(null);
     }
 }

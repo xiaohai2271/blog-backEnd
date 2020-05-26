@@ -28,7 +28,7 @@ public class MultipleSubmitFilter implements HandlerInterceptor {
             // 请求参数和路径均相同 且请求时间间隔小于 WAIT_TIME
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            Response result = new Response(ResponseEnum.FAILURE.getCode(), "重复请求", null, System.currentTimeMillis());
+            Response result = new Response(ResponseEnum.FAILURE.getCode(), "重复请求", null);
             response.getWriter().println(result.toString());
             return false;
         }

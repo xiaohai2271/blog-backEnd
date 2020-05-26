@@ -1,10 +1,8 @@
 package cn.celess.blog.controller;
 
-import cn.celess.blog.entity.Comment;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.request.CommentReq;
 import cn.celess.blog.service.CommentService;
-import cn.celess.blog.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,17 +24,17 @@ public class CommentController {
      */
     @PostMapping("/user/comment/create")
     public Response addOne(@RequestBody CommentReq reqBody) {
-        return ResponseUtil.success(commentService.create(reqBody));
+        return Response.success(commentService.create(reqBody));
     }
 
     @DeleteMapping("/user/comment/del")
     public Response delete(@RequestParam("id") long id) {
-        return ResponseUtil.success(commentService.delete(id));
+        return Response.success(commentService.delete(id));
     }
 
     @PutMapping("/user/comment/update")
     public Response update(@RequestBody CommentReq reqBody) {
-        return ResponseUtil.success(commentService.update(reqBody));
+        return Response.success(commentService.update(reqBody));
     }
 
     /**
@@ -52,7 +50,7 @@ public class CommentController {
                                       @RequestParam(value = "pid", required = false, defaultValue = "-1") long pid,
                                       @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                       @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByPageAndPid(pagePath, pid, page, count));
+        return Response.success(commentService.retrievePageByPageAndPid(pagePath, pid, page, count));
     }
 
     /**
@@ -63,17 +61,18 @@ public class CommentController {
      * @param page     page
      * @return Response
      */
+    // FIXME:: 左斜线转义的异常
     @GetMapping("/comment/pagePath/{pagePath}")
     public Response retrievePage(@PathVariable("pagePath") String pagePath,
                                  @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePage(pagePath, page, count));
+        return Response.success(commentService.retrievePage(pagePath, page, count));
     }
 
     @GetMapping("/user/comment/pagePath/{pagePath}")
     public Response userComment(@PathVariable("pagePath") String pagePath,
                                 @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByAuthor(pagePath, page, count));
+        return Response.success(commentService.retrievePageByAuthor(pagePath, page, count));
     }
 }

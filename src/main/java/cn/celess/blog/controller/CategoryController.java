@@ -2,7 +2,6 @@ package cn.celess.blog.controller;
 
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.service.CategoryService;
-import cn.celess.blog.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ public class CategoryController {
      */
     @PostMapping("/admin/category/create")
     public Response addOne(@RequestParam("name") String name) {
-        return ResponseUtil.success(categoryService.create(name));
+        return Response.success(categoryService.create(name));
     }
 
     /**
@@ -35,7 +34,7 @@ public class CategoryController {
      */
     @DeleteMapping("/admin/category/del")
     public Response deleteOne(@RequestParam("id") long id) {
-        return ResponseUtil.success(categoryService.delete(id));
+        return Response.success(categoryService.delete(id));
     }
 
     /**
@@ -48,7 +47,7 @@ public class CategoryController {
     @PutMapping("/admin/category/update")
     public Response updateOne(@RequestParam("id") Long id,
                               @RequestParam("name") String name) {
-        return ResponseUtil.success(categoryService.update(id, name));
+        return Response.success(categoryService.update(id, name));
     }
 
     /**
@@ -59,6 +58,6 @@ public class CategoryController {
     @GetMapping("/categories")
     public Response getPage(@RequestParam(name = "page", defaultValue = "1") int page,
                             @RequestParam(name = "count", defaultValue = "1000") int count) {
-        return ResponseUtil.success(categoryService.retrievePage(page, count));
+        return Response.success(categoryService.retrievePage(page, count));
     }
 }

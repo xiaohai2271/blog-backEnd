@@ -1,10 +1,8 @@
 package cn.celess.blog.controller;
 
 import cn.celess.blog.entity.Response;
-import cn.celess.blog.entity.Tag;
 import cn.celess.blog.entity.model.TagModel;
 import cn.celess.blog.service.TagService;
-import cn.celess.blog.util.ResponseUtil;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,24 +22,24 @@ public class TagController {
 
     @PostMapping("/admin/tag/create")
     public Response addOne(@RequestParam("name") String name) {
-        return ResponseUtil.success(tagService.create(name));
+        return Response.success(tagService.create(name));
     }
 
     @DeleteMapping("/admin/tag/del")
     public Response delOne(@RequestParam("id") long id) {
-        return ResponseUtil.success(tagService.delete(id));
+        return Response.success(tagService.delete(id));
     }
 
 
     @PutMapping("/admin/tag/update")
     public Response updateOne(@RequestParam("id") Long id, @RequestParam("name") String name) {
-        return ResponseUtil.success(tagService.update(id, name));
+        return Response.success(tagService.update(id, name));
     }
 
     @GetMapping("/tags")
     public Response getPage(@RequestParam(required = false, defaultValue = "10", value = "count") int count,
                             @RequestParam(required = false, defaultValue = "1", value = "page") int page) {
-        return ResponseUtil.success(tagService.retrievePage(page, count));
+        return Response.success(tagService.retrievePage(page, count));
     }
 
     @GetMapping("/tags/nac")
@@ -54,7 +52,7 @@ public class TagController {
             jsonObject.put("size", t.getArticles().size());
             nameAndCount.add(jsonObject);
         }
-        return ResponseUtil.success(nameAndCount);
+        return Response.success(nameAndCount);
     }
 
 }

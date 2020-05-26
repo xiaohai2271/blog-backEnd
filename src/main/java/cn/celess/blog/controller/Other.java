@@ -8,7 +8,6 @@ import cn.celess.blog.service.CountService;
 import cn.celess.blog.service.QiniuService;
 import cn.celess.blog.util.HttpUtil;
 import cn.celess.blog.util.RedisUtil;
-import cn.celess.blog.util.ResponseUtil;
 import cn.celess.blog.util.VeriCodeUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -24,9 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +54,7 @@ public class Other {
         countMap.put("categoryCount", countService.getCategoriesCount());
         countMap.put("tagCount", countService.getTagsCount());
         countMap.put("visitorCount", countService.getVisitorCount());
-        return ResponseUtil.success(countMap);
+        return Response.success(countMap);
     }
 
 
@@ -79,7 +75,7 @@ public class Other {
         }
         map.put("sessionID", request.getSession().getId());
         map.put("request.getRemoteAddr()", request.getRemoteAddr());
-        return ResponseUtil.success(map);
+        return Response.success(map);
     }
 
     /**
@@ -122,10 +118,10 @@ public class Other {
         if (code.equals(codeStr)) {
             request.getSession().removeAttribute("code");
             request.getSession().setAttribute("verImgCodeStatus", true);
-            return ResponseUtil.success("验证成功");
+            return Response.success("验证成功");
         } else {
             request.getSession().removeAttribute("code");
-            return ResponseUtil.failure("验证失败，请重新获取验证码");
+            return Response.failure("验证失败，请重新获取验证码");
         }
     }
 
@@ -181,10 +177,10 @@ public class Other {
         try {
             imageObj = JSONObject.fromObject(HttpUtil.get("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"));
         } catch (IOException e) {
-            return ResponseUtil.failure(null);
+            return Response.failure(null);
         }
         JSONArray jsonArray = imageObj.getJSONArray("images");
         String imageName = jsonArray.getJSONObject(0).getString("url");
-        return ResponseUtil.success("https://cn.bing.com" + imageName);
+        return Response.success("https://cn.bing.com" + imageName);
     }
 }
