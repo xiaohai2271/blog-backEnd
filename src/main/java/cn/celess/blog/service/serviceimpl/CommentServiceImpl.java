@@ -2,18 +2,22 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Comment;
+import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.CommentModel;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.CommentReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.ArticleMapper;
 import cn.celess.blog.mapper.CommentMapper;
+import cn.celess.blog.mapper.UserMapper;
 import cn.celess.blog.service.CommentService;
 import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.DateFormatUtil;
+import cn.celess.blog.util.ModalTrans;
 import cn.celess.blog.util.RedisUserUtil;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     CommentMapper commentMapper;
     @Autowired
-    UserService userService;
+    UserMapper userMapper;
     @Autowired
     ArticleMapper articleMapper;
     @Autowired
@@ -41,17 +45,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentModel create(CommentReq reqBody) {
-
         if (reqBody == null) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
-        long authorID = redisUserUtil.get().getId();
+        User user = redisUserUtil.get();
         Comment pComment = null;
-        if (reqBody.getPid() != null && reqBody.getPid() != -1) {
+        if (reqBody.getPid() != -1) {
             pComment = commentMapper.findCommentById(reqBody.getPid());
-        }
-        if (reqBody.getPid() == null) {
-            reqBody.setPid(-1L);
         }
         //不是一级评论
         if (reqBody.getPid() != -1 && pComment == null) {
@@ -59,33 +59,28 @@ public class CommentServiceImpl implements CommentService {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
         }
         Comment comment = new Comment();
-        comment.setAuthorID(authorID);
-        comment.setType(reqBody.getComment());
-        if (reqBody.getComment()) {
-            //若为评论
-            if (reqBody.getArticleID() <= 0) {
-                throw new MyException(ResponseEnum.PARAMETERS_ERROR);
-            }
-            comment.setArticleID(reqBody.getArticleID());
-        } else {
-            comment.setArticleID(-1L);
+        comment.setFromUser(user);
+        User userTo = new User();
+        userTo.setId(-1L);
+        if (reqBody.getToUserId() != -1) {
+            userTo = userMapper.findById(reqBody.getToUserId());
+            comment.setToUser(userTo);
         }
-        comment.setContent(reqBody.getContent());
-        comment.setPid(reqBody.getPid());
-        comment.setDate(new Date());
-        comment.setResponseId("");
+        comment.setToUser(userTo);
+        userMapper.findById(reqBody.getToUserId());
+        BeanUtils.copyProperties(reqBody, comment);
         commentMapper.insert(comment);
-        if (reqBody.getPid() != -1) {
-            commentMapper.updateResponder(pComment.getResponseId() + comment.getId() + ",", reqBody.getPid());
-        }
-        return trans(comment);
+        return ModalTrans.comment(commentMapper.findCommentById(comment.getId()));
     }
 
     @Override
     public boolean delete(long id) {
-        boolean b = commentMapper.existsById(id);
-        if (!b) {
+        Comment b = commentMapper.findCommentById(id);
+        if (b == null ) {
             throw new MyException(ResponseEnum.COMMENT_NOT_EXIST);
+        }
+        if(b.isDelete()){
+            throw new MyException(ResponseEnum.DATA_IS_DELETED);
         }
         commentMapper.delete(id);
         return true;
@@ -101,86 +96,54 @@ public class CommentServiceImpl implements CommentService {
             commentMapper.updateContent(reqBody.getContent(), reqBody.getId());
             comment.setContent(reqBody.getContent());
         }
-        if (!comment.getResponseId().equals(reqBody.getResponseId())) {
-            commentMapper.updateResponder(reqBody.getResponseId(), reqBody.getId());
-            comment.setResponseId(reqBody.getResponseId());
-        }
-        return trans(comment);
+        return ModalTrans.comment(comment);
     }
 
-
     @Override
-    public PageInfo<CommentModel> retrievePage(Boolean isComment, int page, int count) {
+    public PageData<CommentModel> retrievePage(String pagePath, int page, int count) {
         PageHelper.startPage(page, count);
-        List<Comment> commentList = commentMapper.findAllByType(isComment);
-        return pageTrans(commentList);
+        List<Comment> list = commentMapper.findAllByPagePath(pagePath);
+        return pageTrans(list);
     }
 
     @Override
     public List<CommentModel> retrievePageByPid(long pid) {
-        List<Comment> commentList = commentMapper.findAllByPId(pid);
+        List<Comment> allByPagePath = commentMapper.findAllByPid(pid);
+        List<CommentModel> commentModels = new ArrayList<>();
+        allByPagePath.forEach(comment -> commentModels.add(ModalTrans.comment(comment)));
+        return commentModels;
+    }
+
+    @Override
+    public PageData<CommentModel> retrievePageByAuthor(String pagePath, int page, int count) {
+        User user = redisUserUtil.get();
+        PageHelper.startPage(page, count);
+        List<Comment> list = commentMapper.findAllByPagePathAndFromUser(pagePath, user.getId());
+        return pageTrans(list);
+    }
+
+    @Override
+    public PageData<CommentModel> retrievePageByPageAndPid(String pagePath, long pid, int page, int count) {
+        PageHelper.startPage(page, count);
+        List<Comment> list = commentMapper.findAllByPagePathAndPid(pagePath, pid);
+        return pageTrans(list);
+    }
+
+    @Override
+    public PageData<CommentModel> retrievePageByPage(String pagePath, int page, int count) {
+        PageHelper.startPage(page, count);
+        List<Comment> list = commentMapper.findAllByPagePathAndPid(pagePath, -1);
+        return pageTrans(list);
+    }
+
+    private PageData<CommentModel> pageTrans(List<Comment> commentList) {
+        PageInfo<Comment> p = PageInfo.of(commentList);
         List<CommentModel> modelList = new ArrayList<>();
-        commentList.forEach(m -> modelList.add(trans(m)));
-        return modelList;
-    }
-
-    @Override
-    public PageInfo<CommentModel> retrievePageByArticle(long articleID, long pid, int page, int count) {
-        PageHelper.startPage(page, count);
-        List<Comment> commentList = commentMapper.findAllByArticleIDAndPId(articleID, pid);
-        return pageTrans(commentList);
-    }
-
-    @Override
-    public PageInfo<CommentModel> retrievePageByTypeAndPid(Boolean isComment, int pid, int page, int count) {
-        PageHelper.startPage(page, count);
-        List<Comment> commentList = commentMapper.findCommentsByTypeAndPId(isComment, pid);
-        return pageTrans(commentList);
-    }
-
-    @Override
-    public PageInfo<CommentModel> retrievePageByAuthor(Boolean isComment, int page, int count) {
-        PageHelper.startPage(page, count);
-        List<Comment> commentList = commentMapper.findAllByAuthorIDAndType(redisUserUtil.get().getId(), isComment);
-        return pageTrans(commentList);
-    }
-
-
-    @Override
-    public PageInfo<CommentModel> retrievePageByType(Boolean isComment, int page, int count) {
-        PageHelper.startPage(page, count);
-        List<Comment> commentList = commentMapper.findAllByType(isComment);
-        return pageTrans(commentList);
-    }
-
-    private CommentModel trans(Comment comment) {
-        CommentModel commentModel = new CommentModel();
-        commentModel.setId(comment.getId());
-        commentModel.setComment(comment.getType());
-        commentModel.setContent(comment.getContent());
-        commentModel.setArticleID(comment.getArticleID());
-        commentModel.setDate(DateFormatUtil.get(comment.getDate()));
-        commentModel.setResponseId(comment.getResponseId());
-        commentModel.setPid(comment.getPid());
-        commentModel.setAuthorName(userService.getNameById(comment.getAuthorID()));
-        commentModel.setAuthorAvatarImgUrl("http://cdn.celess.cn/" + userService.getAvatarImg(comment.getAuthorID()));
-
-        if (comment.getType() && commentModel.getArticleID() > 0) {
-            commentModel.setArticleTitle(articleMapper.getTitleById(comment.getArticleID()));
-        }
-        return commentModel;
-    }
-
-    private PageInfo<CommentModel> pageTrans(List<Comment> commentList) {
-        PageInfo p = new PageInfo(commentList);
-        List<CommentModel> modelList = new ArrayList<>();
-
         commentList.forEach(l -> {
-            CommentModel model = trans(l);
+            CommentModel model = ModalTrans.comment(l);
             model.setRespComment(this.retrievePageByPid(model.getId()));
             modelList.add(model);
         });
-        p.setList(modelList);
-        return p;
+        return new PageData<CommentModel>(p, modelList);
     }
 }

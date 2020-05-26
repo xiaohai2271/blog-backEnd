@@ -137,30 +137,42 @@ where article.a_id = article_tag.a_id
   and category.is_category = true
   and article.a_author_id = user.u_id;
 
+
 CREATE VIEW commentView
-            (commentId, pagePath, content, date, status, pid,
-             fromAuthorId, fromAuthorEmail, fromAuthorDisplayName, fromAuthorAvatar, toAuthorId,
-             toAuthorEmail, toAuthorDisplayName, toAuthorAvatar, isDelete
-                )
+            (commentId, pagePath, content, date, status, pid, toAuthorId, toAuthorEmail, toAuthorDisplayName,
+             toAuthorAvatar, fromAuthorId, fromAuthorEmail, fromAuthorDisplayName,
+             fromAuthorAvatar, isDelete)
 as
-select comment.co_id             as commentId,
-       comment.co_page_path      as pagePath,
-       comment.co_content        as content,
-       comment.co_date           as date,
-       comment.co_status         as status,
-       comment.co_pid            as pid,
-       comment.co_from_author_id as fromAuthorId,
-       userFrom.u_email          as fromAuthorEmail,
-       userFrom.u_display_name   as fromAuthorDisplayName,
-       userFrom.u_avatar         as fromAuthorAvatar,
-       comment.co_to_author_id   as toAuthorId,
-       userTo.u_email            as toAuthorEmail,
-       userTo.u_display_name     as toAuthorDisplayName,
-       userTo.u_avatar           as toAuthorAvatar,
-       comment.is_delete         as isDelete
-from comment,
-     user as userFrom,
-     user as userTo
-where comment.co_from_author_id = userFrom.u_id
-  and comment.co_to_author_id = userTo.u_id;
+select cuT.co_id               as commentId,
+       cuT.co_page_path        as pagePath,
+       cuT.co_content          as content,
+       cuT.co_date             as date,
+       cuT.co_status           as status,
+       cuT.co_pid              as pid,
+       cuT.co_to_author_id     as toAuthorId,
+       cuT.toEmail             as toAuthorEmail,
+       cuT.toDisplayName       as toAuthorDisplayName,
+       cuT.toAvatar            as toAuthorAvatar,
+       userFrom.u_id           as fromAuthorId,
+       userFrom.u_email        as fromAuthorEmail,
+       userFrom.u_display_name as fromAuthorDisplayName,
+       userFrom.u_avatar       as fromAuthorAvatar,
+       cuT.is_delete           as isDelete
+from (select comment.co_id,
+             comment.co_page_path,
+             comment.co_content,
+             comment.co_date,
+             comment.co_status,
+             comment.co_pid,
+             comment.co_from_author_id,
+             comment.co_to_author_id,
+             userTo.u_email        as toEmail,
+             userTo.u_display_name as toDisplayName,
+             userTo.u_avatar       as toAvatar,
+             comment.is_delete
+      from comment
+               left join user userTo on (comment.co_to_author_id = userTo.u_id)
+     ) as cuT,
+     user as userFrom
+where cuT.co_from_author_id = userFrom.u_id;
 

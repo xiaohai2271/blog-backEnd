@@ -11,6 +11,8 @@ public enum ResponseEnum {
     FAILURE(-1, "失败"),
     ERROR(-2, "错误"),
 
+    DATA_IS_DELETED(1000, "数据已被删除"),
+
     //文章类
     ARTICLE_NOT_EXIST(2010, "文章不存在"),
     ARTICLE_HAS_EXIST(2020, "文章已存在"),
@@ -68,7 +70,6 @@ public enum ResponseEnum {
     PARAMETERS_QQ_ERROR(8540, "QQ格式错误"),
     PARAMETERS_PWD_ERROR(8550, "密码格式错误"),
     VERIFY_OUT(8400, "已经验证过了");
-
     private int code;
     private String msg;
 

@@ -1,5 +1,6 @@
 package cn.celess.blog.entity.model;
 
+import cn.celess.blog.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,14 +15,9 @@ import java.util.List;
 public class CommentModel {
     private long id;
 
-    /**
-     * 是评论还是留言 0:评论  其他（1）：留言
-     */
-    private boolean isComment;
+    private UserModel fromUser;
 
-    private String authorName;
-
-    private String authorAvatarImgUrl;
+    private UserModel toUser;
 
     /**
      * 内容
@@ -29,14 +25,9 @@ public class CommentModel {
     private String content;
 
     /**
-     * 文章ID
-     */
-    private long articleID;
-
-    /**
      * 文章标题
      */
-    private String articleTitle;
+    private String pagePath;
 
     /**
      * 发布日期
@@ -44,16 +35,11 @@ public class CommentModel {
     private String date;
 
     /**
-     * 回应着ID  默认为顶级回复
-     */
-    private String responseId = "";
-
-    /**
      * 评论的父ID
      */
-    private long pid = -1;
+    private Long pid;
 
     private List<CommentModel> respComment;
 
-
+    private int status;
 }

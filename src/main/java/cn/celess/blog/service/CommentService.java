@@ -1,6 +1,7 @@
 package cn.celess.blog.service;
 
 import cn.celess.blog.entity.model.CommentModel;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.CommentReq;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
@@ -40,17 +41,17 @@ public interface CommentService {
     /**
      * 分页获取数据
      *
-     * @param isComment true：评论   false：留言
-     * @param count     单页数据量
-     * @param page      数据页
+     * @param pagePath pagePath
+     * @param count    单页数据量
+     * @param page     数据页
      * @return 分页数据
      */
-    PageInfo<CommentModel> retrievePage(Boolean isComment, int page, int count);
+    PageData<CommentModel> retrievePage(String pagePath, int page, int count);
 
     /**
      * 通过pid获取数据
      *
-     * @param pid   父id
+     * @param pid 父id
      * @return 分页数据
      */
     List<CommentModel> retrievePageByPid(long pid);
@@ -59,43 +60,33 @@ public interface CommentService {
     /**
      * 根据评论者获取数据
      *
-     * @param isComment true：评论   false：留言
-     * @param count     单页数据量
-     * @param page      数据页
+     * @param pagePath pagePath
+     * @param count    单页数据量
+     * @param page     数据页
      * @return 分页数据
      */
-    PageInfo<CommentModel> retrievePageByAuthor(Boolean isComment, int page, int count);
+    PageData<CommentModel> retrievePageByAuthor(String pagePath, int page, int count);
 
-    /**
-     * 根据文章获取数据
-     *
-     * @param articleID 文章id
-     * @param pid       父id
-     * @param count     单页数据量
-     * @param page      数据页
-     * @return 分页数据
-     */
-    PageInfo<CommentModel> retrievePageByArticle(long articleID, long pid, int page, int count);
 
     /**
      * 根据数据的type和pid获取数据
      *
-     * @param isComment true：评论   false：留言
-     * @param pid       父id
-     * @param count     单页数据量
-     * @param page      数据页
+     * @param pagePath pagePath
+     * @param pid      父id
+     * @param count    单页数据量
+     * @param page     数据页
      * @return 分页数据
      */
-    PageInfo<CommentModel> retrievePageByTypeAndPid(Boolean isComment, int pid, int page, int count);
+    PageData<CommentModel> retrievePageByPageAndPid(String pagePath, long pid, int page, int count);
 
     /**
      * 根据type获取数据
      *
-     * @param isComment true：评论   false：留言
-     * @param count     单页数据量
-     * @param page      数据页
+     * @param pagePath pagePath
+     * @param count    单页数据量
+     * @param page     数据页
      * @return 分页数据
      */
-    PageInfo<CommentModel> retrievePageByType(Boolean isComment, int page, int count);
+    PageData<CommentModel> retrievePageByPage(String pagePath, int page, int count);
 
 }

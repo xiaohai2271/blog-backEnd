@@ -68,7 +68,7 @@
     <select id="findCommentById" resultMap="commentViewResultMap">
         select *
         from commentView
-        where commentId = #{id}
+        where commentId = #{sqid}
     </select>
 
     <select id="findAllByFromUser" resultMap="commentViewResultMap">
@@ -87,6 +87,13 @@
         select *
         from commentView
         where pagePath = #{pagePath}
+    </select>
+
+    <select id="findAllByPagePathAndFromUser" resultMap="commentViewResultMap">
+        select *
+        from commentView
+        where pagePath = #{pagePath}
+          and fromAuthorId = #{userId}
     </select>
 
     <select id="findAllByPagePathAndPid" resultMap="commentViewResultMap">
@@ -110,7 +117,8 @@
 
     <select id="count" resultType="long">
         select count(*)
-        from article where is_delete = false;
+        from article
+        where is_delete = false;
     </select>
 
 </mapper>

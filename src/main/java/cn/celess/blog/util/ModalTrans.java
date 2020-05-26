@@ -38,6 +38,9 @@ public class ModalTrans {
 
 
     public static UserModel user(User user) {
+        if (user == null || user.getId() == -1) {
+            return null;
+        }
         UserModel userModel = new UserModel();
         BeanUtils.copyProperties(user, userModel);
         userModel.setAvatarImgUrl(user.getAvatarImgUrl() == null || user.getAvatarImgUrl().length() == 0 ?
@@ -49,6 +52,9 @@ public class ModalTrans {
     }
 
     public static CategoryModel category(Category category) {
+        if (category == null) {
+            return null;
+        }
         CategoryModel model = new CategoryModel();
         BeanUtils.copyProperties(category, model);
         return model;
@@ -56,6 +62,9 @@ public class ModalTrans {
 
 
     public static TagModel tag(Tag tag) {
+        if (tag == null) {
+            return null;
+        }
         TagModel model = new TagModel();
         BeanUtils.copyProperties(tag, model);
         return model;
@@ -63,10 +72,25 @@ public class ModalTrans {
 
 
     public static WebUpdateModel webUpdate(WebUpdate update) {
+        if (update == null) {
+            return null;
+        }
         WebUpdateModel model = new WebUpdateModel();
         model.setId(update.getId());
         model.setInfo(update.getUpdateInfo());
         model.setTime(DateFormatUtil.get(update.getUpdateTime()));
+        return model;
+    }
+
+    public static CommentModel comment(Comment comment) {
+        if (comment == null) {
+            return null;
+        }
+        CommentModel model = new CommentModel();
+        BeanUtils.copyProperties(comment, model);
+        model.setFromUser(user(comment.getFromUser()));
+        model.setToUser(user(comment.getToUser()));
+        model.setDate(DateFormatUtil.get(comment.getDate()));
         return model;
     }
 }

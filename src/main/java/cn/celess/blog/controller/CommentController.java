@@ -40,58 +40,40 @@ public class CommentController {
     }
 
     /**
-     * 获取所有的一级评论
+     * 获取所有的评论
      *
-     * @param articleId 文章id
-     * @param count     单页数据量
-     * @param page      页码
+     * @param pagePath pagePath
+     * @param count    单页数据量
+     * @param page     页码
      * @return Response
      */
     @GetMapping("/comments")
-    public Response commentsOfArticle(@RequestParam("articleId") long articleId,
+    public Response commentsOfArticle(@RequestParam("pagePath") String pagePath,
+                                      @RequestParam(value = "pid", required = false, defaultValue = "-1") long pid,
                                       @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                       @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByArticle(articleId, -1, page, count));
+        return ResponseUtil.success(commentService.retrievePageByPageAndPid(pagePath, pid, page, count));
     }
 
     /**
      * 通过pid获取数据
      *
-     * @param pid
-     * @return
+     * @param pagePath pagePath
+     * @param count    count
+     * @param page     page
+     * @return Response
      */
-    @GetMapping("/comment/pid/{pid}")
-    public Response retrievePage(@PathVariable("pid") long pid) {
-        return ResponseUtil.success(commentService.retrievePageByPid(pid));
+    @GetMapping("/comment/pagePath/{pagePath}")
+    public Response retrievePage(@PathVariable("pagePath") String pagePath,
+                                 @RequestParam(value = "count", required = false, defaultValue = "10") int count,
+                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        return ResponseUtil.success(commentService.retrievePage(pagePath, page, count));
     }
 
-    /**
-     * 获取所以的一级留言
-     *
-     * @param count
-     * @param page
-     * @return
-     */
-    @GetMapping("/leaveMsg")
-    public Response retrievePageOfLeaveMsg(@RequestParam(value = "count", required = false, defaultValue = "10") int count,
-                                           @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByTypeAndPid(false, -1, page, count));
+    @GetMapping("/user/comment/pagePath/{pagePath}")
+    public Response userComment(@PathVariable("pagePath") String pagePath,
+                                @RequestParam(value = "count", required = false, defaultValue = "10") int count,
+                                @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        return ResponseUtil.success(commentService.retrievePageByAuthor(pagePath, page, count));
     }
-
-    @GetMapping("/admin/comment/type/{type}")
-    public Response retrievePageAdmin(
-            @PathVariable("type") int isComment,
-            @RequestParam(value = "count", required = false, defaultValue = "10") int count,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByType(1 == isComment, page, count));
-    }
-
-    @GetMapping("/user/comment/type/{type}")
-    public Response retrievePageByAuthor(
-            @PathVariable(value = "type") int isComment,
-            @RequestParam(value = "count", required = false, defaultValue = "10") int count,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByAuthor(1 == isComment, page, count));
-    }
-
 }
