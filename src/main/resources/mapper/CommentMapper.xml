@@ -37,8 +37,8 @@
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into comment (co_page_path, co_content, co_date, co_pid, co_from_author_id, co_to_author_id, is_delete)
-        VALUES (#{pagePath}, #{content}, now(), #{pid}, #{fromUser.id}, #{toUser.id}, false)
+        insert into comment (co_page_path, co_content, co_date, co_pid, co_from_author_id, co_to_author_id, co_status)
+        VALUES (#{pagePath}, #{content}, now(), #{pid}, #{fromUser.id}, #{toUser.id}, 0)
     </insert>
 
     <update id="updateContent">
