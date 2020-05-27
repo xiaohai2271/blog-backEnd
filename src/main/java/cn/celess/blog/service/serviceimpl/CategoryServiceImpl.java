@@ -1,7 +1,9 @@
 package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
+import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Category;
+import cn.celess.blog.entity.model.ArticleModel;
 import cn.celess.blog.entity.model.CategoryModel;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.exception.MyException;
@@ -67,7 +69,21 @@ public class CategoryServiceImpl implements CategoryService {
         PageHelper.startPage(page, count);
         List<Category> all = categoryMapper.findAll();
         List<CategoryModel> modelList = new ArrayList<>();
-        all.forEach(e -> modelList.add(ModalTrans.category(e)));
+        all.forEach(e -> {
+            CategoryModel model = ModalTrans.category(e);
+            List<Article> allByCategoryId = articleMapper.findAllByCategoryId(e.getId());
+            List<ArticleModel> articleModelList = new ArrayList<>();
+            allByCategoryId.forEach(article -> {
+                ArticleModel articleModel = ModalTrans.article(article, true);
+                articleModel.setPreArticle(null);
+                articleModel.setNextArticle(null);
+                articleModel.setTags(null);
+                articleModelList.add(articleModel);
+            });
+            model.setArticles(articleModelList);
+            modelList.add(model);
+        });
+
         return new PageData<CategoryModel>(new PageInfo<Category>(all), modelList);
     }
 }

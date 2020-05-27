@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
             redisUtil.setEx(loginReq.getEmail() + "-passwordWrongTime", count + "", 2, TimeUnit.HOURS);
             throw new MyException(ResponseEnum.LOGIN_FAILURE);
         }
-        UserModel trans = ModalTrans.user(user);
+        UserModel trans = ModalTrans.userFullInfo(user);
         trans.setToken(token);
         return trans;
 
@@ -167,7 +167,7 @@ public class UserServiceImpl implements UserService {
 
         userMapper.updateInfo(desc, displayName, user.getId());
         redisUserUtil.set(user);
-        return ModalTrans.user(user);
+        return ModalTrans.userFullInfo(user);
     }
 
     @Override
@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel getUserInfoBySession() {
         User user = redisUserUtil.get();
-        return ModalTrans.user(user);
+        return ModalTrans.userFullInfo(user);
     }
 
     @Override
@@ -346,7 +346,7 @@ public class UserServiceImpl implements UserService {
         PageHelper.startPage(page, count);
         List<User> all = userMapper.findAll();
         List<UserModel> modelList = new ArrayList<>();
-        all.forEach(user -> modelList.add(ModalTrans.user(user)));
+        all.forEach(user -> modelList.add(ModalTrans.userFullInfo(user)));
         return new PageData<UserModel>(PageInfo.of(all), modelList);
     }
 
@@ -397,7 +397,7 @@ public class UserServiceImpl implements UserService {
             redisUserUtil.set(user);
         }
         logger.info("修改了用户 [id={}] 的用户的资料", userReq.getId());
-        return ModalTrans.user(user);
+        return ModalTrans.userFullInfo(user);
     }
 
     @Override
@@ -416,6 +416,6 @@ public class UserServiceImpl implements UserService {
             throw new MyException(ResponseEnum.PWD_NOT_SAME);
         }
         userMapper.updatePwd(user.getEmail(), MD5Util.getMD5(newPwd));
-        return ModalTrans.user(userMapper.findByEmail(user.getEmail()));
+        return ModalTrans.userFullInfo(userMapper.findByEmail(user.getEmail()));
     }
 }

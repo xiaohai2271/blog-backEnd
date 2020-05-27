@@ -99,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public PageData<CommentModel> retrievePage(String pagePath, int page, int count) {
         PageHelper.startPage(page, count);
-        List<Comment> list = commentMapper.findAllByPagePath(pagePath);
+        List<Comment> list = commentMapper.findAllByPagePathAndPid(pagePath, -1);
         return pageTrans(list);
     }
 
@@ -122,23 +122,29 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public PageData<CommentModel> retrievePageByPageAndPid(String pagePath, long pid, int page, int count) {
         PageHelper.startPage(page, count);
-        List<Comment> list = commentMapper.findAllByPagePathAndPid(pagePath, pid);
-        return pageTrans(list);
+        List<Comment> list = commentMapper.findAllByPagePath(pagePath);
+        return pageTrans(list, true);
     }
 
     @Override
     public PageData<CommentModel> retrievePageByPage(String pagePath, int page, int count) {
         PageHelper.startPage(page, count);
-        List<Comment> list = commentMapper.findAllByPagePathAndPid(pagePath, -1);
-        return pageTrans(list);
+        List<Comment> list = commentMapper.findAllByPagePath(pagePath);
+        return pageTrans(list, true);
     }
 
     private PageData<CommentModel> pageTrans(List<Comment> commentList) {
+        return pageTrans(commentList, false);
+    }
+
+    private PageData<CommentModel> pageTrans(List<Comment> commentList, boolean noResponseList) {
         PageInfo<Comment> p = PageInfo.of(commentList);
         List<CommentModel> modelList = new ArrayList<>();
         commentList.forEach(l -> {
             CommentModel model = ModalTrans.comment(l);
-            model.setRespComment(this.retrievePageByPid(model.getId()));
+            if (!noResponseList) {
+                model.setRespComment(this.retrievePageByPid(model.getId()));
+            }
             modelList.add(model);
         });
         return new PageData<CommentModel>(p, modelList);

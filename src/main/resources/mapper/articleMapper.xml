@@ -155,7 +155,6 @@
         select *
         from articleView
         where isDelete = false
-        order by articleId desc
     </select>
 
 

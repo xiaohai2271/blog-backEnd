@@ -45,12 +45,20 @@ public class CommentController {
      * @param page     页码
      * @return Response
      */
-    @GetMapping("/comments")
-    public Response commentsOfArticle(@RequestParam("pagePath") String pagePath,
-                                      @RequestParam(value = "pid", required = false, defaultValue = "-1") long pid,
+    @GetMapping("/comments/{pagePath}/{pid}")
+    public Response commentsOfArticle(@PathVariable("pagePath") String pagePath, @PathVariable(value = "pid") long pid,
                                       @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                       @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return Response.success(commentService.retrievePageByPageAndPid(pagePath, pid, page, count));
+        String path = "";
+        if (pagePath.contains("article+")) {
+            path = "article/" + pagePath.split("\\+", 2)[1];
+        } else {
+            path = pagePath;
+        }
+        if ("*".equals(pagePath)) {
+            path = null;
+        }
+        return Response.success(commentService.retrievePageByPageAndPid(path, pid, page, count));
     }
 
     /**
@@ -61,18 +69,51 @@ public class CommentController {
      * @param page     page
      * @return Response
      */
-    // FIXME:: 左斜线转义的异常
     @GetMapping("/comment/pagePath/{pagePath}")
     public Response retrievePage(@PathVariable("pagePath") String pagePath,
                                  @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return Response.success(commentService.retrievePage(pagePath, page, count));
+        String path = "";
+        if (pagePath.contains("article+")) {
+            path = "article/" + pagePath.split("\\+", 2)[1];
+        } else {
+            path = pagePath;
+        }
+        if ("*".equals(pagePath)) {
+            path = null;
+        }
+        return Response.success(commentService.retrievePage(path, page, count));
     }
 
     @GetMapping("/user/comment/pagePath/{pagePath}")
     public Response userComment(@PathVariable("pagePath") String pagePath,
                                 @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return Response.success(commentService.retrievePageByAuthor(pagePath, page, count));
+        String path = "";
+        if (pagePath.contains("article+")) {
+            path = "article/" + pagePath.split("\\+", 2)[1];
+        } else {
+            path = pagePath;
+        }
+        if ("*".equals(pagePath)) {
+            path = null;
+        }
+        return Response.success(commentService.retrievePageByAuthor(path, page, count));
+    }
+
+    @GetMapping("/admin/comment/pagePath/{pagePath}")
+    public Response adminComment(@PathVariable("pagePath") String pagePath,
+                                 @RequestParam(value = "count", required = false, defaultValue = "10") int count,
+                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        String path = "";
+        if (pagePath.contains("article+")) {
+            path = "article/" + pagePath.split("\\+", 2)[1];
+        } else {
+            path = pagePath;
+        }
+        if ("*".equals(pagePath)) {
+            path = null;
+        }
+        return Response.success(commentService.retrievePageByPage(path, page, count));
     }
 }

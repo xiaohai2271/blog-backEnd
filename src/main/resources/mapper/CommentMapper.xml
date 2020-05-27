@@ -86,21 +86,29 @@
     <select id="findAllByPagePath" resultMap="commentViewResultMap">
         select *
         from commentView
-        where pagePath = #{pagePath}
+        <if test="pagePath!= null ">
+            where pagePath = #{pagePath}
+        </if>
     </select>
 
     <select id="findAllByPagePathAndFromUser" resultMap="commentViewResultMap">
         select *
         from commentView
-        where pagePath = #{pagePath}
-          and fromAuthorId = #{userId}
+        where
+        <if test="pagePath!= null ">
+            pagePath = #{pagePath} and
+        </if>
+        fromAuthorId = #{userId}
     </select>
 
     <select id="findAllByPagePathAndPid" resultMap="commentViewResultMap">
         select *
         from commentView
-        where pagePath = #{pagePath}
-          and pid = #{pid}
+        where
+        <if test="pagePath!= null ">
+            pagePath = #{pagePath} and
+        </if>
+        pid = #{pid}
     </select>
 
     <select id="countByPagePath" resultType="java.lang.Long">
@@ -108,6 +116,7 @@
         from commentView
         where pagePath = #{pagePath}
     </select>
+
     <select id="getLastestComment" resultMap="commentViewResultMap">
         select *
         from commentView
@@ -117,7 +126,7 @@
 
     <select id="count" resultType="long">
         select count(*)
-        from article
+        from comment
         where is_delete = false;
     </select>
 

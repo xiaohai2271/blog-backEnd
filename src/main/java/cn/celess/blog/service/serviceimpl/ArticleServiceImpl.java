@@ -161,7 +161,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         //数据判断
         if (reqBody.getTitle() != null && !reqBody.getTitle().replaceAll(" ", "").isEmpty()) {
-            if (articleMapper.existsByTitle(reqBody.getTitle())) {
+            if (!article.getTitle().equals(reqBody.getTitle()) && articleMapper.existsByTitle(reqBody.getTitle())) {
                 throw new MyException(ResponseEnum.ARTICLE_HAS_EXIST);
             }
             article.setTitle(reqBody.getTitle());
@@ -176,7 +176,7 @@ public class ArticleServiceImpl implements ArticleService {
                 throw new MyException(ResponseEnum.PARAMETERS_ERROR);
             }
 
-            if (!RegexUtil.urlMatch(reqBody.getUrl())) {
+            if (!reqBody.getType() && !RegexUtil.urlMatch(reqBody.getUrl())) {
                 throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
             }
             article.setType(reqBody.getType());
@@ -278,7 +278,7 @@ public class ArticleServiceImpl implements ArticleService {
      */
     @Override
     public PageData<ArticleModel> adminArticles(int count, int page) {
-        PageHelper.startPage(page, count);
+        PageHelper.startPage(page, count, "articleId desc");
         List<Article> articleList = articleMapper.findAll();
         PageData<ArticleModel> pageData = new PageData<ArticleModel>(new PageInfo<Article>(articleList));
         List<ArticleModel> articleModelList = new ArrayList<>();

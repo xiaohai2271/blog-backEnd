@@ -40,8 +40,7 @@ public class ModalTrans {
         return article1;
     }
 
-
-    public static UserModel user(User user) {
+    public static UserModel userFullInfo(User user) {
         if (user == null || user.getId() == -1) {
             return null;
         }
@@ -50,11 +49,19 @@ public class ModalTrans {
         userModel.setAvatarImgUrl(user.getAvatarImgUrl() == null || user.getAvatarImgUrl().length() == 0 ?
                 null :
                 "http://cdn.celess.cn/" + user.getAvatarImgUrl());
-        userModel.setRole(null);
-        userModel.setEmailStatus(null);
         userModel.setDisplayName(user.getDisplayName() == null ? user.getEmail() : user.getDisplayName());
         userModel.setRecentlyLandedDate(DateFormatUtil.get(user.getRecentlyLandedDate()));
         return userModel;
+    }
+
+    public static UserModel user(User user) {
+        UserModel model = userFullInfo(user);
+        if (model == null) {
+            return null;
+        }
+        model.setRole(null);
+        model.setEmailStatus(null);
+        return model;
     }
 
     public static CategoryModel category(Category category) {
