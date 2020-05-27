@@ -9,9 +9,8 @@ import lombok.Data;
 @Data
 public class CommentReq {
     private Long id;
-    private Boolean comment;
     private String content;
-    private Long pid;
-    private Long articleID;
-    private String responseId;
+    private long pid = -1;
+    private String pagePath;
+    private long toUserId = -1;
 }

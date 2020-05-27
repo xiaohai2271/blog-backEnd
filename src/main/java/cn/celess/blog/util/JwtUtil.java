@@ -21,17 +21,15 @@ import java.util.Map;
 @Component
 @Log4j2
 public class JwtUtil {
-    private static final String CLAIM_KEY_USERNAME = "sub";
-
     /**
      * 5天(毫秒)
      */
     public static final long EXPIRATION_LONG_TIME = 432000000;
-
     /**
      * 两小时（毫秒）
      */
     public static final long EXPIRATION_SHORT_TIME = 7200000;
+    private static final String CLAIM_KEY_USERNAME = "sub";
     /**
      * JWT 秘钥需自行设置不可泄露
      */

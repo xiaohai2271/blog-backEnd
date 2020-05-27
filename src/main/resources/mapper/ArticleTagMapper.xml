@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.celess.blog.mapper.ArticleTagMapper">
+
+    <resultMap id="articleTagResultMap" type="cn.celess.blog.entity.ArticleTag">
+        <id column="at_id" property="id"/>
+        <result column="a_id" property="article.id"/>
+        <result column="t_id" property="tag.id"/>
+        <association property="article" column="a_id" resultMap="cn.celess.blog.mapper.ArticleMapper.articleResultMap"
+                     javaType="cn.celess.blog.entity.Article">
+        </association>
+        <association property="tag" column="t_id" resultMap="cn.celess.blog.mapper.CategoryMapper.categoryResultMap"
+                     javaType="cn.celess.blog.entity.TagCategory">
+        </association>
+    </resultMap>
+
+    <!--新增-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into article_tag(a_id, t_id)
+        values (#{article.id}, #{tag.id})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update article_tag
+        <set>
+            <if test="article!=null and article.id != null">
+                a_id = #{article.id},
+            </if>
+            <if test="tag!=null and tag.id != null">
+                t_id = #{tag.id},
+            </if>
+        </set>
+        where at_id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from article_tag
+        where at_id = #{id};
+    </delete>
+
+    <delete id="deleteMultiById">
+        delete from article_tag where at_id in
+        <foreach item="item" collection="list" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+    </delete>
+
+    <!--通过主键删除-->
+    <update id="deleteByArticleId">
+        delete
+        from article_tag
+        where a_id = #{id}
+    </update>
+
+
+    <select id="findAllByArticleId" resultMap="articleTagResultMap">
+        select *
+        from article_tag,
+             tag_category
+        where a_id = #{articleId}
+          and article_tag.t_id = tag_category.t_id
+    </select>
+
+    <select id="findOneById" resultMap="articleTagResultMap">
+        select *
+        from article_tag,
+             article,
+             tag_category
+        where article_tag.at_id = #{id}
+          and article_tag.a_id = article.a_id
+          and tag_category.t_id = article_tag.t_id
+    </select>
+
+
+    <select id="findArticleByTag" resultMap="articleTagResultMap">
+        select *
+        from tag_category,
+             article,
+             article_tag
+        where tag_category.t_id = #{tagId}
+          and is_category = false
+          and tag_category.t_id = article_tag.t_id
+          and article_tag.a_id = article.a_id
+    </select>
+
+    <select id="findArticleByTagAndOpen" resultMap="articleTagResultMap">
+        select *
+        from tag_category,
+             article,
+             article_tag
+        where tag_category.t_id = #{tagId}
+          and is_category = false
+          and tag_category.t_id = article_tag.t_id
+          and article.a_is_open = true
+          and article_tag.a_id = article.a_id
+    </select>
+
+</mapper>

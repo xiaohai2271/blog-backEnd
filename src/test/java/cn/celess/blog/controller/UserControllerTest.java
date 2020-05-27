@@ -2,12 +2,12 @@ package cn.celess.blog.controller;
 
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.User;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
 import cn.celess.blog.mapper.UserMapper;
 import cn.celess.blog.util.MD5Util;
-import com.github.pagehelper.PageInfo;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -50,8 +50,7 @@ public class UserControllerTest extends BaseTest {
 
     @Test
     public void registration() {
-        // 自行手动测试！
-        // TODO :
+        // ignore
     }
 
     @Test
@@ -136,7 +135,8 @@ public class UserControllerTest extends BaseTest {
             String s = UUID.randomUUID().toString();
             String email = s.substring(s.length() - 4) + "@celess.cn";
             String pwd = MD5Util.getMD5("123456789");
-            int i1 = userMapper.addUser(email, pwd);
+            User user = new User(email, pwd);
+            int i1 = userMapper.addUser(user);
             if (i1 == 0) {
                 continue;
             }
@@ -177,7 +177,8 @@ public class UserControllerTest extends BaseTest {
     public void updateInfoByAdmin() throws Exception {
         UserReq userReq = new UserReq();
         String email = UUID.randomUUID().toString().substring(0, 4) + "@celess.cn";
-        userMapper.addUser(email, MD5Util.getMD5("123456789"));
+        User user = new User(email, MD5Util.getMD5("123456789"));
+        userMapper.addUser(user);
         User userByDb = userMapper.findByEmail(email);
         userReq.setId(userByDb.getId());
         userReq.setPwd(UUID.randomUUID().toString().replaceAll("-", "").substring(0, 10));
@@ -194,12 +195,12 @@ public class UserControllerTest extends BaseTest {
                 .andDo(result -> {
                     JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
                     assertEquals(SUCCESS.getCode(), object.getInt(Code));
-                    UserModel user = (UserModel) JSONObject.toBean(object.getJSONObject(Result), UserModel.class);
-                    assertEquals(userReq.getId(), user.getId());
-                    assertEquals(userReq.getRole(), user.getRole());
-                    assertEquals(userReq.getEmail(), user.getEmail());
-                    assertEquals(userReq.getDesc(), user.getDesc());
-                    assertEquals(userReq.getDisplayName(), user.getDisplayName());
+                    UserModel userModel = (UserModel) JSONObject.toBean(object.getJSONObject(Result), UserModel.class);
+                    assertEquals(userReq.getId(), userModel.getId());
+                    assertEquals(userReq.getRole(), userModel.getRole());
+                    assertEquals(userReq.getEmail(), userModel.getEmail());
+                    assertEquals(userReq.getDesc(), userModel.getDesc());
+                    assertEquals(userReq.getDisplayName(), userModel.getDisplayName());
                 });
     }
 
@@ -217,14 +218,12 @@ public class UserControllerTest extends BaseTest {
                     assertNotNull(object.getJSONObject(Result));
                     // 判断pageInfo是否包装完全
                     JSONObject resultJson = JSONObject.fromObject(object.getJSONObject(Result));
-                    PageInfo pageInfo = (PageInfo) JSONObject.toBean(resultJson, PageInfo.class);
-                    assertNotEquals(0, pageInfo.getTotal());
-                    assertNotEquals(0, pageInfo.getStartRow());
-                    assertNotEquals(0, pageInfo.getEndRow());
-                    assertEquals(1, pageInfo.getPageNum());
-                    assertEquals(10, pageInfo.getPageSize());
+                    PageData<UserModel> pageData = (PageData<UserModel>) JSONObject.toBean(resultJson, PageData.class);
+                    assertNotEquals(0, pageData.getTotal());
+                    assertEquals(1, pageData.getPageNum());
+                    assertEquals(10, pageData.getPageSize());
                     // 内容完整
-                    for (Object user : pageInfo.getList()) {
+                    for (Object user : pageData.getList()) {
                         UserModel u = (UserModel) JSONObject.toBean(JSONObject.fromObject(user), UserModel.class);
                         assertNotNull(u.getId());
                         assertNotNull(u.getEmail());
@@ -254,7 +253,7 @@ public class UserControllerTest extends BaseTest {
     @Test
     public void setPwd() throws Exception {
         String email = UUID.randomUUID().toString().substring(0, 4) + "@celess.cn";
-        assertEquals(1, userMapper.addUser(email, MD5Util.getMD5("1234567890")));
+        assertEquals(1, userMapper.addUser(new User(email, MD5Util.getMD5("1234567890"))));
         LoginReq req = new LoginReq();
         req.setEmail(email);
         req.setPassword("1234567890");

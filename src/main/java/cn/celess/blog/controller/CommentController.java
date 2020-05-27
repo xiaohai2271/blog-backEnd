@@ -1,10 +1,8 @@
 package cn.celess.blog.controller;
 
-import cn.celess.blog.entity.Comment;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.request.CommentReq;
 import cn.celess.blog.service.CommentService;
-import cn.celess.blog.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,72 +24,96 @@ public class CommentController {
      */
     @PostMapping("/user/comment/create")
     public Response addOne(@RequestBody CommentReq reqBody) {
-        return ResponseUtil.success(commentService.create(reqBody));
+        return Response.success(commentService.create(reqBody));
     }
 
     @DeleteMapping("/user/comment/del")
     public Response delete(@RequestParam("id") long id) {
-        return ResponseUtil.success(commentService.delete(id));
+        return Response.success(commentService.delete(id));
     }
 
     @PutMapping("/user/comment/update")
     public Response update(@RequestBody CommentReq reqBody) {
-        return ResponseUtil.success(commentService.update(reqBody));
+        return Response.success(commentService.update(reqBody));
     }
 
     /**
-     * 获取所有的一级评论
+     * 获取所有的评论
      *
-     * @param articleId 文章id
-     * @param count     单页数据量
-     * @param page      页码
+     * @param pagePath pagePath
+     * @param count    单页数据量
+     * @param page     页码
      * @return Response
      */
-    @GetMapping("/comments")
-    public Response commentsOfArticle(@RequestParam("articleId") long articleId,
+    @GetMapping("/comments/{pagePath}/{pid}")
+    public Response commentsOfArticle(@PathVariable("pagePath") String pagePath, @PathVariable(value = "pid") long pid,
                                       @RequestParam(value = "count", required = false, defaultValue = "10") int count,
                                       @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByArticle(articleId, -1, page, count));
+        String path = "";
+        if (pagePath.contains("article+")) {
+            path = "article/" + pagePath.split("\\+", 2)[1];
+        } else {
+            path = pagePath;
+        }
+        if ("*".equals(pagePath)) {
+            path = null;
+        }
+        return Response.success(commentService.retrievePageByPageAndPid(path, pid, page, count));
     }
 
     /**
      * 通过pid获取数据
      *
-     * @param pid
-     * @return
+     * @param pagePath pagePath
+     * @param count    count
+     * @param page     page
+     * @return Response
      */
-    @GetMapping("/comment/pid/{pid}")
-    public Response retrievePage(@PathVariable("pid") long pid) {
-        return ResponseUtil.success(commentService.retrievePageByPid(pid));
+    @GetMapping("/comment/pagePath/{pagePath}")
+    public Response retrievePage(@PathVariable("pagePath") String pagePath,
+                                 @RequestParam(value = "count", required = false, defaultValue = "10") int count,
+                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        String path = "";
+        if (pagePath.contains("article+")) {
+            path = "article/" + pagePath.split("\\+", 2)[1];
+        } else {
+            path = pagePath;
+        }
+        if ("*".equals(pagePath)) {
+            path = null;
+        }
+        return Response.success(commentService.retrievePage(path, page, count));
     }
 
-    /**
-     * 获取所以的一级留言
-     *
-     * @param count
-     * @param page
-     * @return
-     */
-    @GetMapping("/leaveMsg")
-    public Response retrievePageOfLeaveMsg(@RequestParam(value = "count", required = false, defaultValue = "10") int count,
-                                           @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByTypeAndPid(false, -1, page, count));
+    @GetMapping("/user/comment/pagePath/{pagePath}")
+    public Response userComment(@PathVariable("pagePath") String pagePath,
+                                @RequestParam(value = "count", required = false, defaultValue = "10") int count,
+                                @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        String path = "";
+        if (pagePath.contains("article+")) {
+            path = "article/" + pagePath.split("\\+", 2)[1];
+        } else {
+            path = pagePath;
+        }
+        if ("*".equals(pagePath)) {
+            path = null;
+        }
+        return Response.success(commentService.retrievePageByAuthor(path, page, count));
     }
 
-    @GetMapping("/admin/comment/type/{type}")
-    public Response retrievePageAdmin(
-            @PathVariable("type") int isComment,
-            @RequestParam(value = "count", required = false, defaultValue = "10") int count,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByType(1 == isComment, page, count));
+    @GetMapping("/admin/comment/pagePath/{pagePath}")
+    public Response adminComment(@PathVariable("pagePath") String pagePath,
+                                 @RequestParam(value = "count", required = false, defaultValue = "10") int count,
+                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
+        String path = "";
+        if (pagePath.contains("article+")) {
+            path = "article/" + pagePath.split("\\+", 2)[1];
+        } else {
+            path = pagePath;
+        }
+        if ("*".equals(pagePath)) {
+            path = null;
+        }
+        return Response.success(commentService.retrievePageByPage(path, page, count));
     }
-
-    @GetMapping("/user/comment/type/{type}")
-    public Response retrievePageByAuthor(
-            @PathVariable(value = "type") int isComment,
-            @RequestParam(value = "count", required = false, defaultValue = "10") int count,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page) {
-        return ResponseUtil.success(commentService.retrievePageByAuthor(1 == isComment, page, count));
-    }
-
 }

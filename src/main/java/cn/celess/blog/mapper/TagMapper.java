@@ -26,10 +26,6 @@ public interface TagMapper {
 
     Boolean existsByName(String name);
 
-    Long getIDByName(String name);
-
-    String getNameById(long id);
-
     Tag getLastestTag();
 
     List<Tag> findAll();

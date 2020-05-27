@@ -7,10 +7,9 @@ import cn.celess.blog.entity.request.LinkReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.service.MailService;
 import cn.celess.blog.service.PartnerSiteService;
+import cn.celess.blog.util.DateFormatUtil;
 import cn.celess.blog.util.RedisUtil;
 import cn.celess.blog.util.RegexUtil;
-import cn.celess.blog.util.ResponseUtil;
-import cn.celess.blog.util.DateFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.*;
@@ -37,17 +36,17 @@ public class LinksController {
 
     @PostMapping("/admin/links/create")
     public Response create(@RequestBody LinkReq reqBody) {
-        return ResponseUtil.success(partnerSiteService.create(reqBody));
+        return Response.success(partnerSiteService.create(reqBody));
     }
 
     @DeleteMapping("/admin/links/del/{id}")
     public Response del(@PathVariable("id") long id) {
-        return ResponseUtil.success(partnerSiteService.del(id));
+        return Response.success(partnerSiteService.del(id));
     }
 
     @PutMapping("/admin/links/update")
     public Response update(@RequestBody LinkReq reqBody) {
-        return ResponseUtil.success(partnerSiteService.update(reqBody));
+        return Response.success(partnerSiteService.update(reqBody));
     }
 
     @GetMapping("/links")
@@ -60,13 +59,13 @@ public class LinksController {
                 sites.add(p);
             }
         }
-        return ResponseUtil.success(sites);
+        return Response.success(sites);
     }
 
     @GetMapping("/admin/links")
     public Response all(@RequestParam("page") int page,
                         @RequestParam("count") int count) {
-        return ResponseUtil.success(partnerSiteService.PartnerSitePages(page, count));
+        return Response.success(partnerSiteService.partnerSitePages(page, count));
     }
 
     @PostMapping("/apply")
@@ -74,10 +73,10 @@ public class LinksController {
                           @RequestParam("url") String url) {
         // TODO :: 弃用发送邮件的方式。
         if (name == null || name.replaceAll(" ", "").isEmpty()) {
-            return ResponseUtil.response(ResponseEnum.PARAMETERS_ERROR, null);
+            return Response.response(ResponseEnum.PARAMETERS_ERROR, null);
         }
         if (!RegexUtil.urlMatch(url)) {
-            return ResponseUtil.response(ResponseEnum.PARAMETERS_URL_ERROR, null);
+            return Response.response(ResponseEnum.PARAMETERS_URL_ERROR, null);
         }
         String applyTimeStr = redisUtil.get(request.getRemoteAddr() + "-Apply");
         int applyTime = 0;
@@ -93,7 +92,6 @@ public class LinksController {
         message.setText("name:" + name + "\nurl:" + url + "\n" + DateFormatUtil.getNow());
         Boolean send = mailService.send(message);
         redisUtil.setEx(request.getRemoteAddr() + "-Apply", applyTime + 1 + "", 2, TimeUnit.HOURS);
-        return send ? ResponseUtil.success("") : ResponseUtil.failure("");
-
+        return send ? Response.success("") : Response.failure("");
     }
 }

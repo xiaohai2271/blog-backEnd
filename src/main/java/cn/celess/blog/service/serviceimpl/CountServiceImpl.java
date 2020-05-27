@@ -29,7 +29,7 @@ public class CountServiceImpl implements CountService {
 
     @Override
     public long getCommentCount() {
-        return commentMapper.countByType(true);
+        return commentMapper.count();
     }
 
     @Override
@@ -45,11 +45,6 @@ public class CountServiceImpl implements CountService {
     @Override
     public long getTagsCount() {
         return tagMapper.count();
-    }
-
-    @Override
-    public long getLeaveMessageCount() {
-        return commentMapper.countByType(false);
     }
 
     @Override

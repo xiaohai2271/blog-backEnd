@@ -1,10 +1,8 @@
 package cn.celess.blog.service;
 
-import cn.celess.blog.entity.Category;
 import cn.celess.blog.entity.model.CategoryModel;
+import cn.celess.blog.entity.model.PageData;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author : xiaohai
@@ -19,14 +17,6 @@ public interface CategoryService {
      * @return 所增加的分类数据
      */
     CategoryModel create(String name);
-
-    /**
-     * 增加一个分类
-     *
-     * @param category 分类对象
-     * @return 所增加的分类数据
-     */
-    CategoryModel create(Category category);
 
     /**
      * 通过id删除分类
@@ -50,6 +40,6 @@ public interface CategoryService {
      *
      * @return 全部的分类数据
      */
-    List<CategoryModel> retrievePage();
+    PageData<CategoryModel> retrievePage(int page, int count);
 
 }

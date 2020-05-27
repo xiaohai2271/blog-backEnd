@@ -1,16 +1,12 @@
 package cn.celess.blog.service;
 
-import cn.celess.blog.entity.User;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
-import com.github.pagehelper.PageInfo;
-import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * @author : xiaohai
@@ -41,14 +37,6 @@ public interface UserService {
      * @return **
      */
     Object logout();
-
-    /**
-     * 获取用户头像的链接
-     *
-     * @param id 用户id
-     * @return 头像链接
-     */
-    String getAvatarImg(long id);
 
     /**
      * 更新用户数据
@@ -84,28 +72,12 @@ public interface UserService {
     String getUserRoleByEmail(String email);
 
     /**
-     * 通过邮箱获取用户的信息
-     *
-     * @param email 用户邮箱
-     * @return 用户信息
-     */
-    User getUserInfoByEmail(String email);
-
-    /**
      * 获取邮箱是否注册过
      *
      * @param email 用户邮箱
      * @return 注册状态
      */
     boolean isExistOfEmail(String email);
-
-    /**
-     * 获取用户的name 优先返回displayName 否则返回email
-     *
-     * @param id 用户id
-     * @return name
-     */
-    String getNameById(long id);
 
     /**
      * 发送重置密码邮件
@@ -157,7 +129,7 @@ public interface UserService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageInfo<UserModel> getUserList(Integer page, Integer count);
+    PageData<UserModel> getUserList(Integer page, Integer count);
 
     /**
      * 更改用户信息
@@ -177,10 +149,11 @@ public interface UserService {
 
     /**
      * 设置密码
-     * @param pwd
-     * @param newPwd
-     * @param confirmPwd
-     * @return
+     *
+     * @param pwd        pwd
+     * @param newPwd     newPwd
+     * @param confirmPwd confirmPwd
+     * @return UserModel
      */
     UserModel setPwd(String pwd, String newPwd, String confirmPwd);
 }

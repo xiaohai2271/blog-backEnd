@@ -4,7 +4,6 @@ import cn.celess.blog.entity.WebUpdate;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,6 +25,8 @@ public interface WebUpdateInfoMapper {
     WebUpdate findById(long id);
 
     List<WebUpdate> findAll();
+
+    List<WebUpdate> findAllNotDeleted();
 
     WebUpdate getLastestOne();
 }

@@ -2,69 +2,71 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.celess.blog.mapper.PartnerMapper">
     <resultMap id="partnerSiteResultMap" type="cn.celess.blog.entity.PartnerSite">
-        <id column="site_id" property="id"/>
-        <result column="site_name" property="name"/>
-        <result column="site_url" property="url"/>
-        <result column="is_open" property="open"/>
+        <id column="l_id" property="id"/>
+        <result column="l_name" property="name"/>
+        <result column="l_url" property="url"/>
+        <result column="l_is_open" property="open"/>
+        <result column="l_icon_path" property="iconPath"/>
+        <result column="l_desc" property="desc"/>
+        <result column="is_delete" property="delete"/>
     </resultMap>
 
-    <insert id="insert" parameterType="cn.celess.blog.entity.PartnerSite">
-        insert into links (site_name, is_open, site_url)
-        values (#{name}, #{open}, #{url})
-        <selectKey resultType="java.lang.Long" keyProperty="id">
-            SELECT LAST_INSERT_ID() AS id
-        </selectKey>
+    <insert id="insert" parameterType="cn.celess.blog.entity.PartnerSite" useGeneratedKeys="true" keyProperty="id">
+        insert into links (l_name, l_is_open, l_url, l_icon_path, l_desc, is_delete)
+        values (#{name}, #{open}, #{url}, #{iconPath}, #{desc}, false)
     </insert>
 
     <update id="update" parameterType="cn.celess.blog.entity.PartnerSite">
         update links set
-        <if test="name!=null">site_name=#{name},</if>
-        <if test="url!=null">site_url=#{url},</if>
-        <if test="open!=null">is_open=#{open}</if>
-        where site_id=#{id}
+        <if test="open!=null">l_is_open=#{open},</if>
+        <if test="iconPath!=null">l_icon_path=#{iconPath},</if>
+        <if test="desc!=null">l_desc=#{desc},</if>
+        <if test="url!=null">l_url=#{url},</if>
+        <if test="name!=null">l_name=#{name}</if>
+        where l_id=#{id}
     </update>
 
-    <delete id="delete">
-        delete
-        from links
-        where site_id = #{id}
-    </delete>
+    <update id="delete">
+        update links
+        set is_delete = true
+        where l_id = #{id}
+    </update>
 
     <select id="existsById" resultType="boolean">
-        SELECT EXISTS(SELECT * FROM links WHERE site_id = #{id})
+        SELECT EXISTS(SELECT * FROM links WHERE l_id = #{id})
     </select>
 
     <select id="existsByName" resultType="boolean">
-        SELECT EXISTS(SELECT * FROM links WHERE site_name = #{name})
+        SELECT EXISTS(SELECT * FROM links WHERE l_name = #{name})
 
     </select>
 
     <select id="existsByUrl" resultType="boolean">
-        SELECT EXISTS(SELECT * FROM links WHERE site_url = #{url})
+        SELECT EXISTS(SELECT * FROM links WHERE l_url = #{url})
 
     </select>
 
     <select id="findById" resultMap="partnerSiteResultMap">
         select *
         from links
-        where site_id = #{id}
+        where l_id = #{id}
     </select>
 
     <select id="findByName" resultMap="partnerSiteResultMap">
         select *
         from links
-        where site_name = #{name}
+        where l_name = #{name}
     </select>
 
     <select id="findByUrl" resultMap="partnerSiteResultMap">
         select *
         from links
-        where site_url = #{url}
+        where l_url = #{url}
     </select>
     <select id="getLastest" resultMap="partnerSiteResultMap">
         select *
         from links
-        order by site_id desc
+        order by l_id desc
         limit 1
     </select>
     <select id="findAll" resultMap="partnerSiteResultMap">

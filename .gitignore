@@ -1,5 +1,6 @@
 .idea/
 *.imi
+*.iml
 target/
 
 # 本地项目的私有文件

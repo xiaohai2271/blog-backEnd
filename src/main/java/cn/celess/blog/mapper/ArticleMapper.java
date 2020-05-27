@@ -1,7 +1,7 @@
 package cn.celess.blog.mapper;
 
 import cn.celess.blog.entity.Article;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,21 +21,15 @@ public interface ArticleMapper {
 
     int update(Article a);
 
-    int updateNextArticleId(long targetArticleID, long nextArticleID);
-
-    int updatePreArticleId(long targetArticleID, long preArticleID);
-
-    long getLastestArticleId();
-
     Article getLastestArticle();
 
     Article findArticleById(long id);
 
     boolean existsByTitle(String title);
 
-    boolean existsById(long id);
+    boolean isDeletedById(long id);
 
-    List<Article> findAllByAuthorId(long authorID);
+    List<Article> findAllByAuthorId(long authorId);
 
     List<Article> findAllByOpen(boolean isOpen);
 
@@ -43,15 +37,15 @@ public interface ArticleMapper {
 
     List<Article> findAllByCategoryId(long id);
 
+    List<Article> findAllByCategoryIdAndOpen(long id);
+
     List<Article> findAll();
 
-    Article getSimpleInfo(long id);
+    Article getPreArticle(Long id);
 
-    List<Article> getSimpleInfoByCategory(long categoryId);
+    Article getNextArticle(Long id);
 
-    List<Article> getSimpleInfoByTag(List<String> idList);
-
-    int setReadingNumber(long number, long id);
+    int updateReadingNumber(long id);
 
     long count();
 

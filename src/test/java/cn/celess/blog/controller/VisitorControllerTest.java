@@ -1,6 +1,7 @@
 package cn.celess.blog.controller;
 
 import cn.celess.blog.BaseTest;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.VisitorModel;
 import com.github.pagehelper.PageInfo;
 import net.sf.json.JSONObject;
@@ -31,13 +32,11 @@ public class VisitorControllerTest extends BaseTest {
                     JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
                     assertEquals(SUCCESS.getCode(), object.getInt(Code));
                     JSONObject resultJson = JSONObject.fromObject(object.getJSONObject(Result));
-                    PageInfo pageInfo = (PageInfo) JSONObject.toBean(resultJson, PageInfo.class);
-                    assertNotEquals(0, pageInfo.getTotal());
-                    assertNotEquals(0, pageInfo.getStartRow());
-                    assertNotEquals(0, pageInfo.getEndRow());
-                    assertEquals(1, pageInfo.getPageNum());
-                    assertEquals(10, pageInfo.getPageSize());
-                    for (Object ver : pageInfo.getList()) {
+                    PageData<VisitorModel> pageData = (PageData<VisitorModel>) JSONObject.toBean(resultJson, PageData.class);
+                    assertNotEquals(0, pageData.getTotal());
+                    assertEquals(1, pageData.getPageNum());
+                    assertEquals(10, pageData.getPageSize());
+                    for (Object ver : pageData.getList()) {
                         VisitorModel v = (VisitorModel) JSONObject.toBean(JSONObject.fromObject(ver), VisitorModel.class);
                         assertNotEquals(0, v.getId());
                         assertNotNull(v.getDate());

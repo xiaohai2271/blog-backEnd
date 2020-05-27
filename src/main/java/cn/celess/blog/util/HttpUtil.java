@@ -32,7 +32,7 @@ public class HttpUtil {
             try (
                     InputStream inputStream = urlConnection.getInputStream();
                     InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader)
             ) {
                 //将bufferReader的值给放到buffer里
                 String str = null;

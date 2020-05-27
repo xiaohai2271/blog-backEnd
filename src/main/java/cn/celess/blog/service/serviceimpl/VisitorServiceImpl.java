@@ -2,6 +2,7 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Visitor;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.VisitorModel;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.VisitorMapper;
@@ -45,12 +46,10 @@ public class VisitorServiceImpl implements VisitorService {
     }
 
     @Override
-    public PageInfo<VisitorModel> visitorPage(int page, int count, boolean showLocation) {
+    public PageData<VisitorModel> visitorPage(int page, int count, boolean showLocation) {
         PageHelper.startPage(page, count);
         List<Visitor> visitorList = visitorMapper.findAll();
-        PageInfo pageInfo = new PageInfo(visitorList);
-        pageInfo.setList(list2List(visitorList, showLocation));
-        return pageInfo;
+        return new PageData<VisitorModel>(new PageInfo<Visitor>(visitorList), list2List(visitorList, showLocation));
     }
 
     @Override

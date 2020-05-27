@@ -3,10 +3,11 @@ package cn.celess.blog.controller;
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Response;
+import cn.celess.blog.entity.Tag;
 import cn.celess.blog.entity.model.ArticleModel;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.mapper.ArticleMapper;
-import com.github.pagehelper.PageInfo;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,8 @@ public class ArticleControllerTest extends BaseTest {
         articleReq.setTitle("test-" + UUID.randomUUID().toString());
         articleReq.setMdContent("# test title");
         articleReq.setCategory("随笔");
-        articleReq.setTags("test,SpringMvc");
+        String[] tagList = {"tag", "category"};
+        articleReq.setTags(tagList);
         articleReq.setOpen(true);
         articleReq.setType(true);
         articleReq.setUrl("http://xxxx.com");
@@ -80,13 +82,11 @@ public class ArticleControllerTest extends BaseTest {
                         assertNotNull(articleModel.getCategory());
                         assertNotNull(articleModel.getPublishDateFormat());
                         assertNotNull(articleModel.getMdContent());
-                        assertNotNull(articleModel.getNextArticleId());
-                        assertNotNull(articleModel.getNextArticleTitle());
-                        assertNotNull(articleModel.getPreArticleId());
-                        assertNotNull(articleModel.getPreArticleTitle());
+                        assertNotNull(articleModel.getPreArticle());
+                        assertNull(articleModel.getNextArticle());
                         assertNotNull(articleModel.getOpen());
                         assertNotNull(articleModel.getReadingNumber());
-                        assertNotNull(articleModel.getAuthorName());
+                        assertNotNull(articleModel.getAuthor());
                         assertNotNull(articleModel.getUrl());
                     });
         } catch (Exception e) {
@@ -96,11 +96,11 @@ public class ArticleControllerTest extends BaseTest {
 
     @Test
     public void delete() {
-        long articleId = articleMapper.getLastestArticleId();
+        Article article = articleMapper.getLastestArticle();
 
         try {
             // 未登录删除文章
-            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + articleId)
+            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + article.getId())
             ).andDo(result -> {
                 assertEquals(HAVE_NOT_LOG_IN.getCode(),
                         JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)
@@ -108,14 +108,14 @@ public class ArticleControllerTest extends BaseTest {
             });
             // user 权限删除文章
             String token = userLogin();
-            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + articleId)
+            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + article.getId())
                     .header("Authorization", token))
                     .andDo(result -> assertEquals(PERMISSION_ERROR.getCode(),
                             JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code))
                     );
             // admin 权限删除文章
             token = adminLogin();
-            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + articleId)
+            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + article.getId())
                     .header("Authorization", token))
                     .andDo(result -> {
                         JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
@@ -140,8 +140,8 @@ public class ArticleControllerTest extends BaseTest {
         articleReq.setOpen(!article.getOpen());
         String tag1 = randomStr(4);
         String tag2 = randomStr(4);
-        String tag = "test," + tag1 + "," + tag2;
-        articleReq.setTags(tag);
+        String[] tagList = {"test", tag1, tag2};
+        articleReq.setTags(tagList);
         articleReq.setTitle("test-" + article.getTitle());
         try {
             // Admin 权限
@@ -160,15 +160,11 @@ public class ArticleControllerTest extends BaseTest {
                         assertEquals(articleReq.getTitle(), a.getTitle());
                         assertEquals(articleReq.getType(), a.getOriginal());
                         // Tag
-                        List<String> asList = Arrays.asList(a.getTags());
-                        assertTrue(asList.contains("test"));
-                        assertTrue(asList.contains(tag1));
-                        assertTrue(asList.contains(tag2));
+                        List<Tag> asList = a.getTags();
+                        assertEquals(3, asList.size());
                         assertEquals(articleReq.getOpen(), a.getOpen());
                         assertEquals(articleReq.getId(), a.getId());
                     });
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -207,17 +203,13 @@ public class ArticleControllerTest extends BaseTest {
                         assertNotNull(a.getMdContent());
                         assertNotNull(a.getUrl());
                         assertNotNull(a.getUpdateDateFormat());
-                        assertNotNull(a.getPreArticleId());
-                        assertNotNull(a.getPreArticleId());
-                        assertNotNull(a.getNextArticleId());
-                        assertNotNull(a.getNextArticleTitle());
+                        assertTrue(a.getPreArticle() != null || a.getNextArticle() != null);
                         assertNotNull(a.getReadingNumber());
-                        // assertNotNull(a.getOpen());
                         assertNotNull(a.getOriginal());
                         assertNotNull(a.getPublishDateFormat());
                         assertNotNull(a.getCategory());
                         assertNotNull(a.getTags());
-                        assertNotNull(a.getAuthorName());
+                        assertNotNull(a.getAuthor());
                     });
         } catch (Exception e) {
             e.printStackTrace();
@@ -242,14 +234,12 @@ public class ArticleControllerTest extends BaseTest {
                         assertNotNull(response.getResult());
                         // 判断pageInfo是否包装完全
                         JSONObject resultJson = JSONObject.fromObject(response.getResult());
-                        PageInfo pageInfo = (PageInfo) JSONObject.toBean(resultJson, PageInfo.class);
-                        assertNotEquals(0, pageInfo.getTotal());
-                        assertNotEquals(0, pageInfo.getStartRow());
-                        assertNotEquals(0, pageInfo.getEndRow());
-                        assertEquals(1, pageInfo.getPageNum());
-                        assertEquals(5, pageInfo.getPageSize());
+                        PageData<ArticleModel> pageData = (PageData<ArticleModel>) JSONObject.toBean(resultJson, PageData.class);
+                        assertNotEquals(0, pageData.getTotal());
+                        assertEquals(1, pageData.getPageNum());
+                        assertEquals(5, pageData.getPageSize());
                         // 内容完整
-                        for (Object arc : pageInfo.getList()) {
+                        for (Object arc : pageData.getList()) {
                             ArticleModel a = (ArticleModel) JSONObject.toBean(JSONObject.fromObject(arc), ArticleModel.class);
                             assertNotNull(a.getTitle());
                             assertNotNull(a.getId());
@@ -258,7 +248,9 @@ public class ArticleControllerTest extends BaseTest {
                             assertNotNull(a.getPublishDateFormat());
                             assertNotNull(a.getCategory());
                             assertNotNull(a.getTags());
-                            assertNotNull(a.getAuthorName());
+                            assertNotNull(a.getAuthor());
+                            assertNull(a.getOpen());
+                            assertNull(a.getMdContent());
                         }
                     });
         } catch (Exception e) {
@@ -299,14 +291,12 @@ public class ArticleControllerTest extends BaseTest {
                         assertEquals(SUCCESS.getCode(), adminLogin.getInt(Code));
                         assertNotNull(adminLogin.getString(Result));
                         // 判断pageInfo是否包装完全
-                        PageInfo pageInfo = (PageInfo) JSONObject.toBean(adminLogin.getJSONObject(Result), PageInfo.class);
-                        assertNotEquals(0, pageInfo.getTotal());
-                        assertNotEquals(0, pageInfo.getStartRow());
-                        assertNotEquals(0, pageInfo.getEndRow());
-                        assertEquals(1, pageInfo.getPageNum());
-                        assertEquals(10, pageInfo.getPageSize());
+                        PageData<ArticleModel> pageData = (PageData<ArticleModel>) JSONObject.toBean(adminLogin.getJSONObject(Result), PageData.class);
+                        assertNotEquals(0, pageData.getTotal());
+                        assertEquals(1, pageData.getPageNum());
+                        assertEquals(10, pageData.getPageSize());
                         // 内容完整
-                        for (Object arc : pageInfo.getList()) {
+                        for (Object arc : pageData.getList()) {
                             ArticleModel a = (ArticleModel) JSONObject.toBean(JSONObject.fromObject(arc), ArticleModel.class);
                             assertNotNull(a.getTitle());
                             assertNotNull(a.getId());
@@ -314,6 +304,9 @@ public class ArticleControllerTest extends BaseTest {
                             assertNotNull(a.getPublishDateFormat());
                             assertNotNull(a.getOpen());
                             assertNotNull(a.getReadingNumber());
+                            assertNotNull(a.getLikeCount());
+                            assertNotNull(a.getDislikeCount());
+                            assertNull(a.getMdContent());
                         }
                     });
         } catch (Exception e) {
@@ -338,13 +331,11 @@ public class ArticleControllerTest extends BaseTest {
                     .andDo(result -> {
                         JSONObject jsonObject = JSONObject.fromObject(result.getResponse().getContentAsString());
                         assertEquals(SUCCESS.getCode(), jsonObject.getInt(Code));
-                        PageInfo pageInfo = (PageInfo) JSONObject.toBean(jsonObject.getJSONObject(Result), PageInfo.class);
-                        assertNotEquals(0, pageInfo.getTotal());
-                        assertNotEquals(0, pageInfo.getStartRow());
-                        assertNotEquals(0, pageInfo.getEndRow());
-                        assertEquals(1, pageInfo.getPageNum());
-                        assertEquals(10, pageInfo.getPageSize());
-                        for (Object arc : pageInfo.getList()) {
+                        PageData<ArticleModel> pageData = (PageData<ArticleModel>) JSONObject.toBean(jsonObject.getJSONObject(Result), PageData.class);
+                        assertNotEquals(0, pageData.getTotal());
+                        assertEquals(1, pageData.getPageNum());
+                        assertEquals(10, pageData.getPageSize());
+                        for (Object arc : pageData.getList()) {
                             JSONObject jsonObject1 = JSONObject.fromObject(arc);
                             assertNotEquals(0, jsonObject1.getInt("id"));
                             assertNotNull(jsonObject1.getString("title"));
@@ -373,14 +364,12 @@ public class ArticleControllerTest extends BaseTest {
                     .andDo(result -> {
                         JSONObject jsonObject = JSONObject.fromObject(result.getResponse().getContentAsString());
                         assertEquals(SUCCESS.getCode(), jsonObject.getInt(Code));
-                        PageInfo pageInfo = (PageInfo) JSONObject.toBean(jsonObject.getJSONObject(Result), PageInfo.class);
-                        assertNotEquals(0, pageInfo.getTotal());
-                        assertNotEquals(0, pageInfo.getStartRow());
-                        assertNotEquals(0, pageInfo.getEndRow());
-                        assertEquals(1, pageInfo.getPageNum());
-                        assertEquals(10, pageInfo.getPageSize());
+                        PageData<ArticleModel> pageData = (PageData<ArticleModel>) JSONObject.toBean(jsonObject.getJSONObject(Result), PageData.class);
+                        assertNotEquals(0, pageData.getTotal());
+                        assertEquals(1, pageData.getPageNum());
+                        assertEquals(10, pageData.getPageSize());
 
-                        for (Object arc : pageInfo.getList()) {
+                        for (Object arc : pageData.getList()) {
                             JSONObject jsonObject1 = JSONObject.fromObject(arc);
                             assertNotEquals(0, jsonObject1.getInt("id"));
                             assertNotNull(jsonObject1.getString("title"));

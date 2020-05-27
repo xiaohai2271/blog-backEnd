@@ -3,11 +3,16 @@ package cn.celess.blog.service.serviceimpl;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Category;
+import cn.celess.blog.entity.model.ArticleModel;
 import cn.celess.blog.entity.model.CategoryModel;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.ArticleMapper;
 import cn.celess.blog.mapper.CategoryMapper;
 import cn.celess.blog.service.CategoryService;
+import cn.celess.blog.util.ModalTrans;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,45 +40,18 @@ public class CategoryServiceImpl implements CategoryService {
         }
         Category category = new Category();
         category.setName(name);
-        category.setArticles("");
         categoryMapper.insert(category);
-        return new CategoryModel(category);
-    }
-
-    @Override
-    public CategoryModel create(Category category) {
-        if (category == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
-        }
-        categoryMapper.insert(category);
-        return new CategoryModel(category);
+        return ModalTrans.category(category);
     }
 
     @Override
     public boolean delete(long id) {
         Category category = categoryMapper.findCategoryById(id);
-
         if (category == null) {
             throw new MyException(ResponseEnum.CATEGORY_NOT_EXIST);
         }
-        String[] articleArray = category.getArticles().split(",");
-        for (int i = 0; i < articleArray.length; i++) {
-            if (articleArray[i] == null || "".equals(articleArray[i])) {
-                continue;
-            }
-            long articleId = Long.parseLong(articleArray[i]);
-            Article article = articleMapper.findArticleById(articleId);
-            if (article == null) {
-                continue;
-            }
-            article.setCategoryId(-1L);
-            //一个 文章只对应一个分类，分类不存在则文章默认不可见
-            article.setOpen(false);
-            articleMapper.update(article);
-        }
         return categoryMapper.delete(id) == 1;
     }
-
 
     @Override
     public CategoryModel update(Long id, String name) {
@@ -83,13 +61,29 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryMapper.findCategoryById(id);
         category.setName(name);
         categoryMapper.update(category);
-        return new CategoryModel(category);
+        return ModalTrans.category(category);
     }
 
     @Override
-    public List<CategoryModel> retrievePage() {
-        List<CategoryModel> list = new ArrayList<>();
-        categoryMapper.findAll().forEach(e -> list.add(new CategoryModel(e)));
-        return list;
+    public PageData<CategoryModel> retrievePage(int page, int count) {
+        PageHelper.startPage(page, count);
+        List<Category> all = categoryMapper.findAll();
+        List<CategoryModel> modelList = new ArrayList<>();
+        all.forEach(e -> {
+            CategoryModel model = ModalTrans.category(e);
+            List<Article> allByCategoryId = articleMapper.findAllByCategoryId(e.getId());
+            List<ArticleModel> articleModelList = new ArrayList<>();
+            allByCategoryId.forEach(article -> {
+                ArticleModel articleModel = ModalTrans.article(article, true);
+                articleModel.setPreArticle(null);
+                articleModel.setNextArticle(null);
+                articleModel.setTags(null);
+                articleModelList.add(articleModel);
+            });
+            model.setArticles(articleModelList);
+            modelList.add(model);
+        });
+
+        return new PageData<CategoryModel>(new PageInfo<Category>(all), modelList);
     }
 }

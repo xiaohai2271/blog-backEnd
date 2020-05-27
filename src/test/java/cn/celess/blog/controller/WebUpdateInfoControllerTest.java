@@ -2,9 +2,9 @@ package cn.celess.blog.controller;
 
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.WebUpdate;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.WebUpdateModel;
 import cn.celess.blog.mapper.WebUpdateInfoMapper;
-import com.github.pagehelper.PageInfo;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -104,17 +104,15 @@ public class WebUpdateInfoControllerTest extends BaseTest {
             JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
             assertEquals(SUCCESS.getCode(), object.getInt(Code));
             assertNotNull(object.getJSONObject(Result));
-            PageInfo pageInfo = (PageInfo) JSONObject.toBean(object.getJSONObject(Result), PageInfo.class);
-            assertNotEquals(0, pageInfo.getEndRow());
-            assertNotEquals(0, pageInfo.getStartRow());
-            assertEquals(1, pageInfo.getPageNum());
-            assertEquals(10, pageInfo.getPageSize());
-            pageInfo.getList().forEach(o -> {
+            PageData<WebUpdateModel> pageData = (PageData<WebUpdateModel>) JSONObject.toBean(object.getJSONObject(Result), PageData.class);
+            assertEquals(1, pageData.getPageNum());
+            assertEquals(10, pageData.getPageSize());
+            for (Object o : pageData.getList()) {
                 WebUpdateModel model = (WebUpdateModel) JSONObject.toBean(JSONObject.fromObject(o), WebUpdateModel.class);
                 assertNotEquals(0, model.getId());
                 assertNotNull(model.getTime());
                 assertNotNull(model.getInfo());
-            });
+            }
         });
     }
 

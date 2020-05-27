@@ -2,6 +2,7 @@ package cn.celess.blog.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -10,6 +11,7 @@ import java.util.Date;
  * @date : 2019/03/28 14:52
  */
 @Data
+@NoArgsConstructor
 public class User {
     private Long id;
 
@@ -17,12 +19,6 @@ public class User {
      * 邮箱
      */
     private String email;
-
-    /**
-     * 用户唯一标识码
-     */
-    @JsonIgnore
-    private String uid;
 
     /**
      * 密码
@@ -46,15 +42,12 @@ public class User {
 
     private Date recentlyLandedDate;
 
-    /**
-     * 随机码 用户验证邮箱/找回密码
-     * 暂时废弃这一字段
-     */
-    private String emailVerifyId;
-
     private String role = "user";
 
-    public User() {
-    }
+    private int status;
 
+    public User(String email, String pwd) {
+        this.email = email;
+        this.pwd = pwd;
+    }
 }

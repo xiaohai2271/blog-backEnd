@@ -34,7 +34,7 @@ public interface CategoryMapper {
 
     String getNameById(long id);
 
-    Long getIDByName(String name);
+    Long getIdByName(String name);
 
     Category getLastestCategory();
 
