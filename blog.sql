@@ -139,7 +139,7 @@ where article.a_id = article_tag.a_id
 CREATE VIEW commentView
             (commentId, pagePath, content, date, status, pid, toAuthorId, toAuthorEmail, toAuthorDisplayName,
              toAuthorAvatar, fromAuthorId, fromAuthorEmail, fromAuthorDisplayName,
-             fromAuthorAvatar, isDelete)
+             fromAuthorAvatar)
 as
 select cuT.co_id               as commentId,
        cuT.co_page_path        as pagePath,
@@ -154,8 +154,7 @@ select cuT.co_id               as commentId,
        userFrom.u_id           as fromAuthorId,
        userFrom.u_email        as fromAuthorEmail,
        userFrom.u_display_name as fromAuthorDisplayName,
-       userFrom.u_avatar       as fromAuthorAvatar,
-       cuT.is_delete           as isDelete
+       userFrom.u_avatar       as fromAuthorAvatar
 from (select comment.co_id,
              comment.co_page_path,
              comment.co_content,
@@ -166,8 +165,7 @@ from (select comment.co_id,
              comment.co_to_author_id,
              userTo.u_email        as toEmail,
              userTo.u_display_name as toDisplayName,
-             userTo.u_avatar       as toAvatar,
-             comment.is_delete
+             userTo.u_avatar       as toAvatar
       from comment
                left join user userTo on (comment.co_to_author_id = userTo.u_id)
      ) as cuT,
