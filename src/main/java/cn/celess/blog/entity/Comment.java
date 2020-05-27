@@ -30,5 +30,5 @@ public class Comment {
      */
     private Long pid;
 
-    private boolean delete;
+    //    private boolean delete;
 }

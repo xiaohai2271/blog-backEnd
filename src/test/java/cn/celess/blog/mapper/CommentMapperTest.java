@@ -1,6 +1,7 @@
 package cn.celess.blog.mapper;
 
 import cn.celess.blog.BaseTest;
+import cn.celess.blog.enmu.CommentStatusEnum;
 import cn.celess.blog.entity.Comment;
 import cn.celess.blog.entity.User;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class CommentMapperTest extends BaseTest {
         Comment comment = generateComment();
         assertEquals(1, commentMapper.delete(comment.getId()));
         Comment commentById = commentMapper.findCommentById(comment.getId());
-        assertTrue(commentById.isDelete());
+        assertEquals(commentById.getStatus(), CommentStatusEnum.DELETED.getCode());
     }
 
     @Test
@@ -43,7 +44,7 @@ public class CommentMapperTest extends BaseTest {
         Comment comment = generateComment();
         assertTrue(commentMapper.deleteByPagePath(comment.getPagePath()) >= 1);
         Comment commentById = commentMapper.findCommentById(comment.getId());
-        assertTrue(commentById.isDelete());
+        assertEquals(commentById.getStatus(), CommentStatusEnum.DELETED.getCode());
     }
 
     @Test
@@ -91,7 +92,7 @@ public class CommentMapperTest extends BaseTest {
     @Test
     public void findAllByPagePathAndPid() {
         Comment comment = generateComment();
-        List<Comment> allByPagePathAndPid = commentMapper.findAllByPagePathAndPid(comment.getPagePath(), comment.getPid());
+        List<Comment> allByPagePathAndPid = commentMapper.findAllByPagePathAndPidAndNormal(comment.getPagePath(), comment.getPid());
         assertTrue(allByPagePathAndPid.size() >= 1);
         allByPagePathAndPid.forEach(comment1 -> {
             assertEquals(comment.getPagePath(), comment1.getPagePath());

@@ -1,5 +1,6 @@
 package cn.celess.blog.service.serviceimpl;
 
+import cn.celess.blog.enmu.CommentStatusEnum;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Comment;
 import cn.celess.blog.entity.User;
@@ -76,7 +77,7 @@ public class CommentServiceImpl implements CommentService {
         if (b == null) {
             throw new MyException(ResponseEnum.COMMENT_NOT_EXIST);
         }
-        if (b.isDelete()) {
+        if (b.getStatus() == CommentStatusEnum.DELETED.getCode()) {
             throw new MyException(ResponseEnum.DATA_IS_DELETED);
         }
         commentMapper.delete(id);
@@ -99,7 +100,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public PageData<CommentModel> retrievePage(String pagePath, int page, int count) {
         PageHelper.startPage(page, count);
-        List<Comment> list = commentMapper.findAllByPagePathAndPid(pagePath, -1);
+        List<Comment> list = commentMapper.findAllByPagePathAndPidAndNormal(pagePath, -1);
         return pageTrans(list);
     }
 
@@ -107,7 +108,12 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentModel> retrievePageByPid(long pid) {
         List<Comment> allByPagePath = commentMapper.findAllByPid(pid);
         List<CommentModel> commentModels = new ArrayList<>();
-        allByPagePath.forEach(comment -> commentModels.add(ModalTrans.comment(comment)));
+        allByPagePath.forEach(comment -> {
+            if (comment.getStatus() != CommentStatusEnum.DELETED.getCode()) {
+                commentModels.add(ModalTrans.comment(comment));
+            }
+        });
+
         return commentModels;
     }
 

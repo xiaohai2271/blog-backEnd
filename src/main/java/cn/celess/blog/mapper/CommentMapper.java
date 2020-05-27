@@ -36,7 +36,7 @@ public interface CommentMapper {
 
     List<Comment> findAllByPagePathAndFromUser(String pagePath, long userId);
 
-    List<Comment> findAllByPagePathAndPid(String pagePath, long pid);
+    List<Comment> findAllByPagePathAndPidAndNormal(String pagePath, long pid);
 
     long countByPagePath(String pagePath);
 

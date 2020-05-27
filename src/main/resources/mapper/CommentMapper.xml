@@ -10,7 +10,6 @@
         <result column="co_pid" property="pid"/>
         <result column="co_from_author_id" property="fromUser.id"/>
         <result column="co_to_author_id" property="toUser.id"/>
-        <result column="is_delete" property="delete"/>
     </resultMap>
 
     <resultMap id="commentViewResultMap" type="cn.celess.blog.entity.Comment">
@@ -22,7 +21,6 @@
         <result column="pid" property="pid"/>
         <result column="fromAuthorId" property="fromUser.id"/>
         <result column="toAuthorId" property="toUser.id"/>
-        <result column="isDelete" property="delete"/>
         <association property="fromUser" column="fromAuthorId" javaType="cn.celess.blog.entity.User">
             <id column="fromAuthorId" property="id"/>
             <result column="fromAuthorEmail" property="email"/>
@@ -51,13 +49,13 @@
 
     <update id="delete">
         update comment
-        set is_delete = true
+        set co_status = 3
         where co_id = #{id}
     </update>
 
     <update id="deleteByPagePath">
         update comment
-        set is_delete = true
+        set co_status = 3
         where co_page_path = #{path}
     </update>
 
@@ -83,10 +81,11 @@
         where pid = #{pid}
     </select>
 
-    <select id="findAllByPagePath" resultMap="commentViewResultMap">
+    <select id="findAllByPagePath" resultMap="commentViewResultMap" parameterType="string">
         select *
         from commentView
-        <if test="pagePath!= null ">
+        # 无奈之举
+        <if test="toString() != null ">
             where pagePath = #{pagePath}
         </if>
     </select>
@@ -95,20 +94,20 @@
         select *
         from commentView
         where
-        <if test="pagePath!= null ">
+        <if test="pagePath != null ">
             pagePath = #{pagePath} and
         </if>
         fromAuthorId = #{userId}
     </select>
 
-    <select id="findAllByPagePathAndPid" resultMap="commentViewResultMap">
+    <select id="findAllByPagePathAndPidAndNormal" resultMap="commentViewResultMap">
         select *
         from commentView
         where
-        <if test="pagePath!= null ">
+        <if test="pagePath != null ">
             pagePath = #{pagePath} and
         </if>
-        pid = #{pid}
+        pid = #{pid} and status = 0
     </select>
 
     <select id="countByPagePath" resultType="java.lang.Long">
@@ -127,7 +126,7 @@
     <select id="count" resultType="long">
         select count(*)
         from comment
-        where is_delete = false;
+        where co_status = 0;
     </select>
 
 </mapper>
