@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Author: 小海
@@ -99,7 +100,7 @@ public class SitemapGenerateUtil {
         urlList.put("https://www.celess.cn", DateFormatUtil.getForXmlDate(new Date()));
         urlList.put("https://www.celess.cn/links", DateFormatUtil.getForXmlDate(new Date()));
         urlList.put("https://www.celess.cn/leaveMsg", DateFormatUtil.getForXmlDate(new Date()));
-        List<Article> articles = articleMapper.findAll();
+        List<Article> articles = articleMapper.findAll().stream().filter(article -> article.getOpen()&&!article.isDeleted()).collect(Collectors.toList());
         articles.forEach(article -> {
             urlList.put("https://www.celess.cn/article/" + article.getId(), DateFormatUtil.getForXmlDate(
                     article.getUpdateDate() == null ? article.getPublishDate() : article.getUpdateDate()));
