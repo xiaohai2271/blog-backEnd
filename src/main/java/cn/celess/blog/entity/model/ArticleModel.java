@@ -82,4 +82,6 @@ public class ArticleModel {
      * 文章的状态  true：公开  false:不公开
      */
     private Boolean open;
+
+    private boolean deleted;
 }
