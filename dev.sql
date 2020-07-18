@@ -34,6 +34,8 @@ INSERT INTO `user` (`u_id`, `u_email`, `u_pwd`, `u_email_status`, `u_avatar`, `u
 VALUES (1, 'a@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, 'a@celess.cn_2.png', '禾几海不需要自我介绍',
         '2020-07-02 11:30:38', '禾几海', 'admin', 0),
        (2, 'b@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user',
+        0),
+       (3, 'zh56462271@qq.com', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user',
         0);
 
 
