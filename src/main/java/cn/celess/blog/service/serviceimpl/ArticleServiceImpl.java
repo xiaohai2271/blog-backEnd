@@ -145,7 +145,7 @@ public class ArticleServiceImpl implements ArticleService {
         //删除指定文章
         articleMapper.delete(articleId);
 
-        articleTagMapper.deleteByArticleId(articleId);
+        //articleTagMapper.deleteByArticleId(articleId);
 
         return true;
     }
