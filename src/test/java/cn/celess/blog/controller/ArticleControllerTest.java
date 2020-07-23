@@ -78,11 +78,14 @@ public class ArticleControllerTest extends BaseTest {
         assertFalse(article.isDeleted());
         MockHttpServletRequestBuilder delete = MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + article.getId());
         try {
+            Article finalArticle = article;
             getMockData(delete, adminLogin()).andDo(result -> {
-                JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-                assertEquals(SUCCESS.getCode(), object.getInt(Code));
+                Response<Boolean> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<Boolean>>() {
+                });
+                assertEquals(SUCCESS.getCode(), response.getCode());
                 // 断言删除成功
-                assertTrue(object.getBoolean(Result));
+                assertTrue(response.getResult());
+                assertTrue(articleMapper.isDeletedById(finalArticle.getId()));
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,27 +108,22 @@ public class ArticleControllerTest extends BaseTest {
         articleReq.setTags(tagList);
         articleReq.setTitle("test-" + article.getTitle());
         try {
-            // Admin 权限
-            mockMvc.perform(put("/admin/article/update")
-                    .content(JSONObject.fromObject(articleReq).toString())
-                    .contentType("application/json")
-                    .header("Authorization", adminLogin()))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        JSONObject jsonObject = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        assertEquals(SUCCESS.getCode(), jsonObject.getInt(Code));
-                        ArticleModel a = (ArticleModel) JSONObject.toBean(jsonObject.getJSONObject(Result), ArticleModel.class);
-                        assertEquals(articleReq.getCategory(), a.getCategory());
-                        assertEquals(articleReq.getUrl(), a.getUrl());
-                        assertEquals(articleReq.getMdContent(), a.getMdContent());
-                        assertEquals(articleReq.getTitle(), a.getTitle());
-                        assertEquals(articleReq.getType(), a.getOriginal());
-                        // Tag
-                        List<Tag> asList = a.getTags();
-                        assertEquals(3, asList.size());
-                        assertEquals(articleReq.getOpen(), a.getOpen());
-                        assertEquals(articleReq.getId(), a.getId());
-                    });
+            getMockData(put("/admin/article/update"), adminLogin(),articleReq).andDo(result -> {
+                Response<ArticleModel> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<ArticleModel>>() {
+                });
+                assertEquals(SUCCESS.getCode(), response.getCode());
+                ArticleModel a = response.getResult();
+                assertEquals(articleReq.getCategory(), a.getCategory());
+                assertEquals(articleReq.getUrl(), a.getUrl());
+                assertEquals(articleReq.getMdContent(), a.getMdContent());
+                assertEquals(articleReq.getTitle(), a.getTitle());
+                assertEquals(articleReq.getType(), a.getOriginal());
+                // Tag
+                List<Tag> asList = a.getTags();
+                assertEquals(3, asList.size());
+                assertEquals(articleReq.getOpen(), a.getOpen());
+                assertEquals(articleReq.getId(), a.getId());
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
