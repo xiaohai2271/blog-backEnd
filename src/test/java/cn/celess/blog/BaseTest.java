@@ -1,8 +1,11 @@
 package cn.celess.blog;
 
 
+import cn.celess.blog.entity.Response;
+import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +30,7 @@ import java.util.UUID;
 import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -45,6 +49,10 @@ public class BaseTest {
     protected final static String Result = "result";
     private static String userToken = null;
     private static String adminToken = null;
+    /**
+     * jackson 序列化/反序列化Json
+     */
+    protected final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private WebApplicationContext wac;
@@ -62,73 +70,125 @@ public class BaseTest {
         System.out.println("==========> 测试结束 <=========");
     }
 
-
+    /**
+     * 　admin 权限用户登录
+     *
+     * @return token
+     */
     protected String adminLogin() {
         if (adminToken != null) return adminToken;
-        try {
-            LoginReq req = new LoginReq();
-            req.setEmail("a@celess.cn");
-            req.setPassword("123456789");
-            req.setIsRememberMe(false);
-            JSONObject loginReq = JSONObject.fromObject(req);
-            String str = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(loginReq.toString()).contentType("application/json"))
-                    //                    .andDo(MockMvcResultHandlers.print())
-                    .andReturn().getResponse().getContentAsString();
-            adminToken = JSONObject.fromObject(str).getJSONObject(Result).getString("token");
-            assertNotNull(adminToken);
-            return adminToken;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        LoginReq req = new LoginReq();
+        req.setEmail("a@celess.cn");
+        req.setPassword("123456789");
+        req.setIsRememberMe(false);
+        adminToken = login(req);
+        assertNotNull(adminToken);
+        return adminToken;
     }
 
+    /**
+     * user 权限用户登录
+     *
+     * @return token
+     */
     protected String userLogin() {
         if (userToken != null) return userToken;
+        LoginReq req = new LoginReq();
+        req.setEmail("zh56462271@qq.com");
+        req.setPassword("123456789");
+        req.setIsRememberMe(false);
+        userToken = login(req);
+        assertNotNull(userToken);
+        return userToken;
+    }
+
+    /**
+     * 登录逻辑
+     *
+     * @param req 用户信息
+     * @return token | null
+     */
+    private String login(LoginReq req) {
+        String str = null;
         try {
-            LoginReq req = new LoginReq();
-            req.setEmail("zh56462271@qq.com");
-            req.setPassword("123456789");
-            req.setIsRememberMe(false);
-            JSONObject loginReq = JSONObject.fromObject(req);
-            String str = mockMvc.perform(MockMvcRequestBuilders.post("/login").content(loginReq.toString()).contentType("application/json"))
-                    //                    .andDo(MockMvcResultHandlers.print())
+            str = getMockData(post("/login"), null, req)
                     .andReturn().getResponse().getContentAsString();
-            userToken = JSONObject.fromObject(str).getJSONObject(Result).getString("token");
-            assertNotNull(userToken);
-            return userToken;
+            Response<UserModel> response = mapper.readValue(str, new TypeReference<Response<UserModel>>() {
+            });
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            String token = response.getResult().getToken();
+            assertNotNull(token);
+            return token;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 
     @Test
     public void test() {
-
+        // 测试登录
+        assertNotNull(userLogin());
+        assertNotNull(adminLogin());
+        try {
+            // 测试getMockData方法
+            assertNotNull(getMockData(get("/headerInfo")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * 产生指定长度的随机字符
+     *
+     * @param len
+     * @return
+     */
     protected String randomStr(int len) {
         return UUID.randomUUID().toString().replaceAll("-", "").substring(0, len);
     }
 
 
-    protected ResultActions getMockData(String url) throws Exception {
-        return getMockData(url, null, null);
+    /**
+     * 抽离的mock请求方法
+     *
+     * @param builder MockHttpServletRequestBuilder ：get(...)  post(...) ....
+     * @return 返回 ResultActions
+     * @throws Exception exc
+     */
+    protected ResultActions getMockData(MockHttpServletRequestBuilder builder) throws Exception {
+        return getMockData(builder, null, null);
     }
 
-    protected ResultActions getMockData(String url, String token) throws Exception {
-        return getMockData(url, token, null);
+    /**
+     * 抽离的mock请求方法 重载
+     *
+     * @param builder ..
+     * @param token   用户登录的token
+     * @return ..
+     * @throws Exception ..
+     */
+    protected ResultActions getMockData(MockHttpServletRequestBuilder builder, String token) throws Exception {
+        return getMockData(builder, token, null);
     }
 
-    protected ResultActions getMockData(String url, String token, Object content) throws Exception {
-        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(url);
+    /**
+     * 抽离的mock请求方法 重载
+     *
+     * @param builder ..
+     * @param token   ..
+     * @param content http中发送的APPLICATION_JSON的json数据
+     * @return ..
+     * @throws Exception ..
+     */
+    protected ResultActions getMockData(MockHttpServletRequestBuilder builder, String token, Object content) throws Exception {
+        //        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(url);
         if (token != null) {
-            mockHttpServletRequestBuilder.header("Authorization", token);
+            builder.header("Authorization", token);
         }
         if (content != null) {
-            mockHttpServletRequestBuilder.content(JSONObject.fromObject(content).toString()).contentType(MediaType.APPLICATION_JSON);
+            builder.content(mapper.writeValueAsString(content)).contentType(MediaType.APPLICATION_JSON);
         }
-        return mockMvc.perform(mockHttpServletRequestBuilder).andExpect(status().isOk());
+        return mockMvc.perform(builder).andExpect(status().isOk());
     }
 }

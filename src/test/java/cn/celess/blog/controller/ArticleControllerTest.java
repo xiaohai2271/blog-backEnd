@@ -262,20 +262,19 @@ public class ArticleControllerTest extends BaseTest {
 
     @Test
     public void adminArticles() {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            getMockData("/admin/articles?page=1&count=10").andExpect(result ->
+            getMockData(get("/admin/articles?page=1&count=10")).andExpect(result ->
                     assertEquals(HAVE_NOT_LOG_IN.getCode(), mapper.readValue(result.getResponse().getContentAsString(), Response.class).getCode())
             );
 
             // User权限登陆
-            getMockData("/admin/articles?page=1&count=10", userLogin()).andDo(result ->
+            getMockData(get("/admin/articles?page=1&count=10"), userLogin()).andDo(result ->
                     assertEquals(PERMISSION_ERROR.getCode(), mapper.readValue(result.getResponse().getContentAsString(), Response.class).getCode())
             );
             for (int i = 0; i < 2; i++) {
                 // admin权限登陆
                 int finalI = i;
-                getMockData("/admin/articles?page=1&count=10&deleted=" + (i == 1), adminLogin()).andDo(result -> {
+                getMockData(get("/admin/articles?page=1&count=10&deleted=" + (i == 1)), adminLogin()).andDo(result -> {
                     Response<PageData<ArticleModel>> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<PageData<ArticleModel>>>() {
                     });
                     assertEquals(SUCCESS.getCode(), response.getCode());
@@ -295,7 +294,7 @@ public class ArticleControllerTest extends BaseTest {
                         assertNotNull(a.getReadingNumber());
                         assertNotNull(a.getLikeCount());
                         assertNotNull(a.getDislikeCount());
-                        assertEquals((finalI == 1),a.isDeleted());
+                        assertEquals((finalI == 1), a.isDeleted());
                         assertNull(a.getMdContent());
                     }
                 });
