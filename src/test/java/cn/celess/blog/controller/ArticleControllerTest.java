@@ -9,10 +9,10 @@ import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.mapper.ArticleMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
@@ -31,7 +31,7 @@ public class ArticleControllerTest extends BaseTest {
     public void create() {
         ArticleReq articleReq = new ArticleReq();
         // 应该正常通过
-        articleReq.setTitle("test-" + UUID.randomUUID().toString());
+        articleReq.setTitle("test-" + randomStr());
         articleReq.setMdContent("# test title");
         articleReq.setCategory("随笔");
         String[] tagList = {"tag", "category"};
@@ -39,58 +39,30 @@ public class ArticleControllerTest extends BaseTest {
         articleReq.setOpen(true);
         articleReq.setType(true);
         articleReq.setUrl("http://xxxx.com");
-        JSONObject jsonObject = JSONObject.fromObject(articleReq);
+        MockHttpServletRequestBuilder post = post("/admin/article/create");
 
         try {
-            // 未登录
-            mockMvc.perform(post("/admin/article/create")
-                    .content(jsonObject.toString())
-                    .contentType("application/json"))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        assertEquals(HAVE_NOT_LOG_IN.getCode(),
-                                JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)
-                        );
-                    });
-            // User权限
-            String token = userLogin();
-            mockMvc.perform(post("/admin/article/create")
-                    .content(jsonObject.toString())
-                    .contentType("application/json")
-                    .header("Authorization", token))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        assertEquals(PERMISSION_ERROR.getCode(),
-                                JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)
-                        );
-                    });
-
-            // Admin权限
-            token = adminLogin();
-            mockMvc.perform(post("/admin/article/create")
-                    .content(jsonObject.toString())
-                    .contentType("application/json")
-                    .header("Authorization", token))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        assertEquals(SUCCESS.getCode(), object.getInt(Code));
-                        ArticleModel articleModel = (ArticleModel) JSONObject.toBean(object.getJSONObject(Result), ArticleModel.class);
-                        assertNotNull(articleModel.getId());
-                        assertNotNull(articleModel.getTitle());
-                        assertNotNull(articleModel.getSummary());
-                        assertNotNull(articleModel.getOriginal());
-                        assertNotNull(articleModel.getTags());
-                        assertNotNull(articleModel.getCategory());
-                        assertNotNull(articleModel.getPublishDateFormat());
-                        assertNotNull(articleModel.getMdContent());
-                        assertNotNull(articleModel.getPreArticle());
-                        assertNull(articleModel.getNextArticle());
-                        assertNotNull(articleModel.getOpen());
-                        assertNotNull(articleModel.getReadingNumber());
-                        assertNotNull(articleModel.getAuthor());
-                        assertNotNull(articleModel.getUrl());
-                    });
+            getMockData(post, adminLogin(), articleReq).andDo(result -> {
+                Response<ArticleModel> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<ArticleModel>>() {
+                });
+                assertEquals(SUCCESS.getCode(), response.getCode());
+                assertNotNull(response.getResult());
+                ArticleModel articleModel = response.getResult();
+                assertNotNull(articleModel.getId());
+                assertNotNull(articleModel.getTitle());
+                assertNotNull(articleModel.getSummary());
+                assertNotNull(articleModel.getOriginal());
+                assertNotNull(articleModel.getTags());
+                assertNotNull(articleModel.getCategory());
+                assertNotNull(articleModel.getPublishDateFormat());
+                assertNotNull(articleModel.getMdContent());
+                assertNotNull(articleModel.getPreArticle());
+                assertNull(articleModel.getNextArticle());
+                assertNotNull(articleModel.getOpen());
+                assertNotNull(articleModel.getReadingNumber());
+                assertNotNull(articleModel.getAuthor());
+                assertNotNull(articleModel.getUrl());
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
