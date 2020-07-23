@@ -130,6 +130,7 @@ public class BaseTest {
         // 测试登录
         assertNotNull(userLogin());
         assertNotNull(adminLogin());
+        assertNotEquals(userLogin(), adminLogin());
         try {
             // 测试getMockData方法
             assertNotNull(getMockData(get("/headerInfo")));
@@ -141,13 +142,21 @@ public class BaseTest {
     /**
      * 产生指定长度的随机字符
      *
-     * @param len
-     * @return
+     * @param len len
+     * @return str
      */
     protected String randomStr(int len) {
         return UUID.randomUUID().toString().replaceAll("-", "").substring(0, len);
     }
 
+    /**
+     * 产生指定长度的随机字符
+     *
+     * @return str
+     */
+    protected String randomStr() {
+        return UUID.randomUUID().toString();
+    }
 
     /**
      * 抽离的mock请求方法
