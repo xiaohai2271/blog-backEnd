@@ -154,7 +154,7 @@
     <select id="findAll" resultMap="articleViewResultMap">
         select *
         from articleView
-        where isDelete = false
+        order by articleId desc
     </select>
 
 

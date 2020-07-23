@@ -272,29 +272,34 @@ public class ArticleControllerTest extends BaseTest {
             getMockData("/admin/articles?page=1&count=10", userLogin()).andDo(result ->
                     assertEquals(PERMISSION_ERROR.getCode(), mapper.readValue(result.getResponse().getContentAsString(), Response.class).getCode())
             );
-            // admin权限登陆
-            getMockData("/admin/articles?page=1&count=10", adminLogin()).andDo(result -> {
-                Response<PageData<ArticleModel>> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<PageData<ArticleModel>>>(){});
-                assertEquals(SUCCESS.getCode(), response.getCode());
-                assertNotNull(response.getResult());
-                // 判断pageInfo是否包装完全
-                PageData<ArticleModel> pageData = response.getResult();
-                assertNotEquals(0, pageData.getTotal());
-                assertEquals(1, pageData.getPageNum());
-                assertEquals(10, pageData.getPageSize());
-                // 内容完整
-                for (ArticleModel a : pageData.getList()) {
-                    assertNotNull(a.getTitle());
-                    assertNotNull(a.getId());
-                    assertNotNull(a.getOriginal());
-                    assertNotNull(a.getPublishDateFormat());
-                    assertNotNull(a.getOpen());
-                    assertNotNull(a.getReadingNumber());
-                    assertNotNull(a.getLikeCount());
-                    assertNotNull(a.getDislikeCount());
-                    assertNull(a.getMdContent());
-                }
-            });
+            for (int i = 0; i < 2; i++) {
+                // admin权限登陆
+                int finalI = i;
+                getMockData("/admin/articles?page=1&count=10&deleted=" + (i == 1), adminLogin()).andDo(result -> {
+                    Response<PageData<ArticleModel>> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<PageData<ArticleModel>>>() {
+                    });
+                    assertEquals(SUCCESS.getCode(), response.getCode());
+                    assertNotNull(response.getResult());
+                    // 判断pageInfo是否包装完全
+                    PageData<ArticleModel> pageData = response.getResult();
+                    assertNotEquals(0, pageData.getTotal());
+                    assertEquals(1, pageData.getPageNum());
+                    assertEquals(10, pageData.getPageSize());
+                    // 内容完整
+                    for (ArticleModel a : pageData.getList()) {
+                        assertNotNull(a.getTitle());
+                        assertNotNull(a.getId());
+                        assertNotNull(a.getOriginal());
+                        assertNotNull(a.getPublishDateFormat());
+                        assertNotNull(a.getOpen());
+                        assertNotNull(a.getReadingNumber());
+                        assertNotNull(a.getLikeCount());
+                        assertNotNull(a.getDislikeCount());
+                        assertEquals((finalI == 1),a.isDeleted());
+                        assertNull(a.getMdContent());
+                    }
+                });
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
