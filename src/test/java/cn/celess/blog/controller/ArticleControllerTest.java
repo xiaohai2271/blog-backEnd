@@ -8,6 +8,8 @@ import cn.celess.blog.entity.model.ArticleModel;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.mapper.ArticleMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -260,55 +262,39 @@ public class ArticleControllerTest extends BaseTest {
 
     @Test
     public void adminArticles() {
-        String token;
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            // 未登录
-            mockMvc.perform(get("/admin/articles?page=1&count=10"))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        assertEquals(HAVE_NOT_LOG_IN.getCode(),
-                                JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)
-                        );
-                    });
+            getMockData("/admin/articles?page=1&count=10").andExpect(result ->
+                    assertEquals(HAVE_NOT_LOG_IN.getCode(), mapper.readValue(result.getResponse().getContentAsString(), Response.class).getCode())
+            );
 
             // User权限登陆
-            token = userLogin();
-            mockMvc.perform(get("/admin/articles?page=1&count=10")
-                    .header("Authorization", token))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        assertEquals(PERMISSION_ERROR.getCode(), object.getInt(Code));
-                    });
-
-            token = adminLogin();
+            getMockData("/admin/articles?page=1&count=10", userLogin()).andDo(result ->
+                    assertEquals(PERMISSION_ERROR.getCode(), mapper.readValue(result.getResponse().getContentAsString(), Response.class).getCode())
+            );
             // admin权限登陆
-            mockMvc.perform(get("/admin/articles?page=1&count=10")
-                    .header("Authorization", token))
-                    .andExpect(status().isOk())
-                    .andDo(result -> {
-                        JSONObject adminLogin = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        assertEquals(SUCCESS.getCode(), adminLogin.getInt(Code));
-                        assertNotNull(adminLogin.getString(Result));
-                        // 判断pageInfo是否包装完全
-                        PageData<ArticleModel> pageData = (PageData<ArticleModel>) JSONObject.toBean(adminLogin.getJSONObject(Result), PageData.class);
-                        assertNotEquals(0, pageData.getTotal());
-                        assertEquals(1, pageData.getPageNum());
-                        assertEquals(10, pageData.getPageSize());
-                        // 内容完整
-                        for (Object arc : pageData.getList()) {
-                            ArticleModel a = (ArticleModel) JSONObject.toBean(JSONObject.fromObject(arc), ArticleModel.class);
-                            assertNotNull(a.getTitle());
-                            assertNotNull(a.getId());
-                            assertNotNull(a.getOriginal());
-                            assertNotNull(a.getPublishDateFormat());
-                            assertNotNull(a.getOpen());
-                            assertNotNull(a.getReadingNumber());
-                            assertNotNull(a.getLikeCount());
-                            assertNotNull(a.getDislikeCount());
-                            assertNull(a.getMdContent());
-                        }
-                    });
+            getMockData("/admin/articles?page=1&count=10", adminLogin()).andDo(result -> {
+                Response<PageData<ArticleModel>> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<PageData<ArticleModel>>>(){});
+                assertEquals(SUCCESS.getCode(), response.getCode());
+                assertNotNull(response.getResult());
+                // 判断pageInfo是否包装完全
+                PageData<ArticleModel> pageData = response.getResult();
+                assertNotEquals(0, pageData.getTotal());
+                assertEquals(1, pageData.getPageNum());
+                assertEquals(10, pageData.getPageSize());
+                // 内容完整
+                for (ArticleModel a : pageData.getList()) {
+                    assertNotNull(a.getTitle());
+                    assertNotNull(a.getId());
+                    assertNotNull(a.getOriginal());
+                    assertNotNull(a.getPublishDateFormat());
+                    assertNotNull(a.getOpen());
+                    assertNotNull(a.getReadingNumber());
+                    assertNotNull(a.getLikeCount());
+                    assertNotNull(a.getDislikeCount());
+                    assertNull(a.getMdContent());
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
