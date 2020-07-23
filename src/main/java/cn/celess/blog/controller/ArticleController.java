@@ -9,6 +9,7 @@ import cn.celess.blog.service.ArticleService;
 import cn.celess.blog.util.RedisUserUtil;
 import cn.celess.blog.util.SitemapGenerateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,8 @@ public class ArticleController {
     SitemapGenerateUtil sitemapGenerateUtil;
     @Autowired
     RedisUserUtil redisUserUtil;
+    @Value("${spring.profiles.active}")
+    private String activeModel;
 
     /**
      * 新建一篇文章
@@ -37,7 +40,9 @@ public class ArticleController {
     @PostMapping("/admin/article/create")
     public Response create(@RequestBody ArticleReq body) {
         ArticleModel articleModel = articleService.create(body);
-        sitemapGenerateUtil.createSitemap();
+        if ("prod".equals(activeModel)) {
+            sitemapGenerateUtil.createSitemap();
+        }
         return Response.success(articleModel);
     }
 
@@ -50,7 +55,9 @@ public class ArticleController {
     @DeleteMapping("/admin/article/del")
     public Response delete(@RequestParam("articleID") long articleId) {
         boolean delete = articleService.delete(articleId);
-        sitemapGenerateUtil.createSitemap();
+        if ("prod".equals(activeModel)) {
+            sitemapGenerateUtil.createSitemap();
+        }
         return Response.success(delete);
     }
 
@@ -63,7 +70,9 @@ public class ArticleController {
     @PutMapping("/admin/article/update")
     public Response update(@RequestBody ArticleReq body) {
         ArticleModel update = articleService.update(body);
-        sitemapGenerateUtil.createSitemap();
+        if ("prod".equals(activeModel)) {
+            sitemapGenerateUtil.createSitemap();
+        }
         return Response.success(update);
     }
 

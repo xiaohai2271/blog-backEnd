@@ -70,33 +70,20 @@ public class ArticleControllerTest extends BaseTest {
 
     @Test
     public void delete() {
-        Article article = articleMapper.getLastestArticle();
-
+        Article article;
+        do {
+            article = articleMapper.getLastestArticle();
+            create();
+        } while (article.isDeleted());
+        assertFalse(article.isDeleted());
+        MockHttpServletRequestBuilder delete = MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + article.getId());
         try {
-            // 未登录删除文章
-            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + article.getId())
-            ).andDo(result -> {
-                assertEquals(HAVE_NOT_LOG_IN.getCode(),
-                        JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)
-                );
+            getMockData(delete, adminLogin()).andDo(result -> {
+                JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
+                assertEquals(SUCCESS.getCode(), object.getInt(Code));
+                // 断言删除成功
+                assertTrue(object.getBoolean(Result));
             });
-            // user 权限删除文章
-            String token = userLogin();
-            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + article.getId())
-                    .header("Authorization", token))
-                    .andDo(result -> assertEquals(PERMISSION_ERROR.getCode(),
-                            JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code))
-                    );
-            // admin 权限删除文章
-            token = adminLogin();
-            mockMvc.perform(MockMvcRequestBuilders.delete("/admin/article/del?articleID=" + article.getId())
-                    .header("Authorization", token))
-                    .andDo(result -> {
-                        JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        assertEquals(SUCCESS.getCode(), object.getInt(Code));
-                        // 断言删除成功
-                        assertTrue(object.getBoolean(Result));
-                    });
         } catch (Exception e) {
             e.printStackTrace();
         }
