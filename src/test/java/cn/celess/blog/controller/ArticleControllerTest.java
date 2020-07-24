@@ -5,7 +5,6 @@ import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.Tag;
 import cn.celess.blog.entity.model.ArticleModel;
-import cn.celess.blog.entity.model.CategoryModel;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.mapper.ArticleMapper;
