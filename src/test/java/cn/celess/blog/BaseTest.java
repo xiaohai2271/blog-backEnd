@@ -210,6 +210,12 @@ public class BaseTest {
         return mockMvc.perform(builder).andExpect(status().isOk());
     }
 
+    /**
+     *  根据json 信息反序列化成Response对象
+     * @param json json
+     * @param <T> 泛型
+     * @return Response对象
+     */
     protected <T> Response<T> getResponse(String json) {
         Response<T> response = null;
         try {
@@ -223,6 +229,12 @@ public class BaseTest {
         return response;
     }
 
+    /**
+     *  根据json 信息反序列化成Response对象
+     * @param result MvcResult
+     * @param <T> 泛型
+     * @return Response对象
+     */
     protected <T> Response<T> getResponse(MvcResult result) {
         try {
             return getResponse(result.getResponse().getContentAsString());
