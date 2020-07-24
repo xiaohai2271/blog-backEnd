@@ -10,6 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -18,13 +20,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
@@ -43,6 +47,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @ActiveProfiles("test")
 public class BaseTest {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected MockMvc mockMvc;
     protected final static String Code = "code";
@@ -120,8 +126,10 @@ public class BaseTest {
             assertNotNull(token);
             return token;
         } catch (Exception e) {
+            logger.error("测试登录错误");
             e.printStackTrace();
         }
+        assertNotNull(str);
         return null;
     }
 
@@ -133,6 +141,7 @@ public class BaseTest {
         try {
             // 测试getMockData方法
             assertNotNull(getMockData(get("/headerInfo")));
+            getMockData((get("/headerInfo"))).andDo(result -> assertNotNull(getResponse(result)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -190,5 +199,28 @@ public class BaseTest {
             builder.content(mapper.writeValueAsString(content)).contentType(MediaType.APPLICATION_JSON);
         }
         return mockMvc.perform(builder).andExpect(status().isOk());
+    }
+
+    protected <T> Response<T> getResponse(String json) {
+        Response<T> response = null;
+        try {
+            response = mapper.readValue(json, new TypeReference<Response<T>>() {
+            });
+        } catch (IOException e) {
+            logger.error("接续json Response对象错误，json:[{}]", json);
+            e.printStackTrace();
+        }
+        assertNotNull(response);
+        return response;
+    }
+
+    protected <T> Response<T> getResponse(MvcResult result) {
+        try {
+            return getResponse(result.getResponse().getContentAsString());
+        } catch (UnsupportedEncodingException e) {
+            logger.error("接续json Response对象错误，result:[{}]", result);
+            e.printStackTrace();
+        }
+        return null;
     }
 }
