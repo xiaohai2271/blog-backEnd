@@ -6,7 +6,6 @@ import cn.celess.blog.entity.Comment;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.CommentModel;
-import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.CommentReq;
 import cn.celess.blog.mapper.ArticleMapper;
 import cn.celess.blog.mapper.CommentMapper;
@@ -30,8 +29,6 @@ public class CommentControllerTest extends BaseTest {
     @Autowired
     CommentMapper commentMapper;
     private static final TypeReference<?> COMMENT_MODEL_TYPE = new TypeReference<Response<CommentModel>>() {
-    };
-    private static final TypeReference<?> COMMENT_MODEL_PAGE_TYPE = new TypeReference<Response<PageData<CommentModel>>>() {
     };
 
     @Test
