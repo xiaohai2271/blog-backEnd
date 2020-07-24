@@ -53,8 +53,6 @@ public class BaseTest {
     protected MockMvc mockMvc;
     protected final static String Code = "code";
     protected final static String Result = "result";
-    private static String userToken = null;
-    private static String adminToken = null;
     /**
      * jackson 序列化/反序列化Json
      */
@@ -82,14 +80,13 @@ public class BaseTest {
      * @return token
      */
     protected String adminLogin() {
-        if (adminToken != null) return adminToken;
         LoginReq req = new LoginReq();
         req.setEmail("a@celess.cn");
         req.setPassword("123456789");
-        req.setIsRememberMe(false);
-        adminToken = login(req);
-        assertNotNull(adminToken);
-        return adminToken;
+        req.setIsRememberMe(true);
+        String token = login(req);
+        assertNotNull(token);
+        return token;
     }
 
     /**
@@ -98,14 +95,13 @@ public class BaseTest {
      * @return token
      */
     protected String userLogin() {
-        if (userToken != null) return userToken;
         LoginReq req = new LoginReq();
         req.setEmail("zh56462271@qq.com");
         req.setPassword("123456789");
-        req.setIsRememberMe(false);
-        userToken = login(req);
-        assertNotNull(userToken);
-        return userToken;
+        req.setIsRememberMe(true);
+        String token = login(req);
+        assertNotNull(token);
+        return token;
     }
 
     /**
