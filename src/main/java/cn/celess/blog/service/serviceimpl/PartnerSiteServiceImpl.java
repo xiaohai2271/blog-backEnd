@@ -52,6 +52,12 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
             reqBody.setUrl("http://" + reqBody.getUrl());
         }
         BeanUtils.copyProperties(reqBody, partnerSite);
+        if (reqBody.getIconPath() == null) {
+            partnerSite.setIconPath("");
+        }
+        if (reqBody.getDesc() == null) {
+            partnerSite.setDesc("");
+        }
         partnerMapper.insert(partnerSite);
         return partnerSite;
     }
