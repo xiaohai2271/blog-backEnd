@@ -48,18 +48,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class BaseTest {
 
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected MockMvc mockMvc;
     protected final static String Code = "code";
     protected final static String Result = "result";
-    private static String userToken = null;
-    private static String adminToken = null;
     /**
      * jackson 序列化/反序列化Json
      */
     protected final ObjectMapper mapper = new ObjectMapper();
-
+    protected static final TypeReference<?> BOOLEAN_TYPE = new TypeReference<Response<Boolean>>() {
+    };
+    protected static final TypeReference<?> STRING_TYPE = new TypeReference<Response<String>>() {
+    };
+    protected static final TypeReference<?> OBJECT_TYPE = new TypeReference<Response<String>>() {
+    };
     @Autowired
     private WebApplicationContext wac;
     protected MockHttpSession session;
@@ -82,14 +86,13 @@ public class BaseTest {
      * @return token
      */
     protected String adminLogin() {
-        if (adminToken != null) return adminToken;
         LoginReq req = new LoginReq();
         req.setEmail("a@celess.cn");
         req.setPassword("123456789");
-        req.setIsRememberMe(false);
-        adminToken = login(req);
-        assertNotNull(adminToken);
-        return adminToken;
+        req.setIsRememberMe(true);
+        String token = login(req);
+        assertNotNull(token);
+        return token;
     }
 
     /**
@@ -98,14 +101,13 @@ public class BaseTest {
      * @return token
      */
     protected String userLogin() {
-        if (userToken != null) return userToken;
         LoginReq req = new LoginReq();
         req.setEmail("zh56462271@qq.com");
         req.setPassword("123456789");
-        req.setIsRememberMe(false);
-        userToken = login(req);
-        assertNotNull(userToken);
-        return userToken;
+        req.setIsRememberMe(true);
+        String token = login(req);
+        assertNotNull(token);
+        return token;
     }
 
     /**
@@ -138,6 +140,7 @@ public class BaseTest {
         // 测试登录
         assertNotNull(userLogin());
         assertNotNull(adminLogin());
+        assertNotEquals(userLogin(), adminLogin());
         try {
             // 测试getMockData方法
             assertNotNull(getMockData(get("/headerInfo")));
@@ -150,13 +153,21 @@ public class BaseTest {
     /**
      * 产生指定长度的随机字符
      *
-     * @param len
-     * @return
+     * @param len len
+     * @return str
      */
     protected String randomStr(int len) {
         return UUID.randomUUID().toString().replaceAll("-", "").substring(0, len);
     }
 
+    /**
+     * 产生指定长度的随机字符
+     *
+     * @return str
+     */
+    protected String randomStr() {
+        return UUID.randomUUID().toString();
+    }
 
     /**
      * 抽离的mock请求方法
@@ -201,26 +212,50 @@ public class BaseTest {
         return mockMvc.perform(builder).andExpect(status().isOk());
     }
 
+
     protected <T> Response<T> getResponse(String json) {
+        return getResponse(json, OBJECT_TYPE);
+    }
+
+    protected <T> Response<T> getResponse(MvcResult result) {
+        return getResponse(result, OBJECT_TYPE);
+    }
+
+    /**
+     * 根据json 信息反序列化成Response对象
+     *
+     * @param json json
+     * @param <T>  泛型
+     * @return Response对象
+     */
+    protected <T> Response<T> getResponse(String json, TypeReference<?> responseType) {
         Response<T> response = null;
+        System.out.println(responseType.getType());
         try {
-            response = mapper.readValue(json, new TypeReference<Response<T>>() {
-            });
+            response = mapper.readValue(json, responseType);
         } catch (IOException e) {
-            logger.error("接续json Response对象错误，json:[{}]", json);
+            logger.error("解析json Response对象错误，json:[{}]", json);
             e.printStackTrace();
         }
         assertNotNull(response);
         return response;
     }
 
-    protected <T> Response<T> getResponse(MvcResult result) {
+    /**
+     * 根据json 信息反序列化成Response对象
+     *
+     * @param result MvcResult
+     * @param <T>    泛型
+     * @return Response对象
+     */
+    protected <T> Response<T> getResponse(MvcResult result, TypeReference<?> responseType) {
         try {
-            return getResponse(result.getResponse().getContentAsString());
+            return getResponse(result.getResponse().getContentAsString(), responseType);
         } catch (UnsupportedEncodingException e) {
-            logger.error("接续json Response对象错误，result:[{}]", result);
+            logger.error("解析json Response对象错误，result:[{}]", result);
             e.printStackTrace();
         }
         return null;
     }
+
 }
