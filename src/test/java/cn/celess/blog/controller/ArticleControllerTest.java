@@ -5,9 +5,11 @@ import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.Tag;
 import cn.celess.blog.entity.model.ArticleModel;
+import cn.celess.blog.entity.model.CategoryModel;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.mapper.ArticleMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -23,6 +25,10 @@ import static cn.celess.blog.enmu.ResponseEnum.*;
 public class ArticleControllerTest extends BaseTest {
     @Autowired
     ArticleMapper articleMapper;
+    private static final TypeReference<?> ARTICLE_MODEL_TYPE = new TypeReference<Response<ArticleModel>>() {
+    };
+    private static final TypeReference<?> ARTICLE_MODEL_PAGE_TYPE = new TypeReference<Response<PageData<ArticleModel>>>() {
+    };
 
     @Test
     public void create() {
@@ -40,7 +46,7 @@ public class ArticleControllerTest extends BaseTest {
 
         try {
             getMockData(post, adminLogin(), articleReq).andDo(result -> {
-                Response<ArticleModel> response = getResponse(result);
+                Response<ArticleModel> response = getResponse(result, ARTICLE_MODEL_TYPE);
                 assertEquals(SUCCESS.getCode(), response.getCode());
                 assertNotNull(response.getResult());
                 ArticleModel articleModel = response.getResult();
@@ -76,7 +82,7 @@ public class ArticleControllerTest extends BaseTest {
         try {
             Article finalArticle = article;
             getMockData(delete, adminLogin()).andDo(result -> {
-                Response<Boolean> response = getResponse(result);
+                Response<Boolean> response = getResponse(result, BOOLEAN_TYPE);
                 assertEquals(SUCCESS.getCode(), response.getCode());
                 // 断言删除成功
                 assertTrue(response.getResult());
@@ -104,7 +110,7 @@ public class ArticleControllerTest extends BaseTest {
         articleReq.setTitle("test-" + article.getTitle());
         try {
             getMockData(put("/admin/article/update"), adminLogin(), articleReq).andDo(result -> {
-                Response<ArticleModel> response = getResponse(result);
+                Response<ArticleModel> response = getResponse(result, ARTICLE_MODEL_TYPE);
                 assertEquals(SUCCESS.getCode(), response.getCode());
                 ArticleModel a = response.getResult();
                 assertEquals(articleReq.getCategory(), a.getCategory());
@@ -132,11 +138,11 @@ public class ArticleControllerTest extends BaseTest {
 
             // 文章不存在
             getMockData(MockMvcRequestBuilders.get("/article/articleID/-1"))
-                    .andDo(result -> assertEquals(ARTICLE_NOT_EXIST.getCode(), getResponse(result).getCode()));
+                    .andDo(result -> assertEquals(ARTICLE_NOT_EXIST.getCode(), getResponse(result, STRING_TYPE).getCode()));
 
             // 正常情况
             getMockData(MockMvcRequestBuilders.get("/article/articleID/" + articleID + "?update=false")).andDo(result -> {
-                Response<ArticleModel> response = getResponse(result);
+                Response<ArticleModel> response = getResponse(result, ARTICLE_MODEL_TYPE);
                 // 断言获取数据成功
                 assertEquals(SUCCESS.getCode(), response.getCode());
                 assertNotNull(response.getResult());
@@ -167,7 +173,7 @@ public class ArticleControllerTest extends BaseTest {
             // 测试不带参数访问
             getMockData(MockMvcRequestBuilders.get("/articles"));
             getMockData(MockMvcRequestBuilders.get("/articles?page=1&count=5")).andDo(result -> {
-                Response<PageData<ArticleModel>> response = getResponse(result);
+                Response<PageData<ArticleModel>> response = getResponse(result, ARTICLE_MODEL_PAGE_TYPE);
                 // 断言获取数据成功
                 assertEquals(SUCCESS.getCode(), response.getCode());
                 // 结果集非空
@@ -200,18 +206,18 @@ public class ArticleControllerTest extends BaseTest {
     public void adminArticles() {
         try {
             getMockData(get("/admin/articles?page=1&count=10")).andExpect(result ->
-                    assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode())
+                    assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result, STRING_TYPE).getCode())
             );
 
             // User权限登陆
             getMockData(get("/admin/articles?page=1&count=10"), userLogin()).andDo(result ->
-                    assertEquals(PERMISSION_ERROR.getCode(), getResponse(result).getCode())
+                    assertEquals(PERMISSION_ERROR.getCode(), getResponse(result, STRING_TYPE).getCode())
             );
             for (int i = 0; i < 2; i++) {
                 // admin权限登陆
                 int finalI = i;
                 getMockData(get("/admin/articles?page=1&count=10&deleted=" + (i == 1)), adminLogin()).andDo(result -> {
-                    Response<PageData<ArticleModel>> response = getResponse(result);
+                    Response<PageData<ArticleModel>> response = getResponse(result, ARTICLE_MODEL_PAGE_TYPE);
                     assertEquals(SUCCESS.getCode(), response.getCode());
                     assertNotNull(response.getResult());
                     // 判断pageInfo是否包装完全
@@ -245,12 +251,12 @@ public class ArticleControllerTest extends BaseTest {
             // 分类不存在
             String categoryName = "NoSuchCategory";
             getMockData(MockMvcRequestBuilders.get("/articles/category/" + categoryName + "?page=1&count=10"))
-                    .andDo(result -> assertEquals(CATEGORY_NOT_EXIST.getCode(), getResponse(result).getCode()));
+                    .andDo(result -> assertEquals(CATEGORY_NOT_EXIST.getCode(), getResponse(result, STRING_TYPE).getCode()));
             // 正常查询
             categoryName = "linux";
             getMockData(MockMvcRequestBuilders.get("/articles/category/" + categoryName + "?page=1&count=10"))
                     .andDo(result -> {
-                        Response<PageData<ArticleModel>> response = getResponse(result);
+                        Response<PageData<ArticleModel>> response = getResponse(result, ARTICLE_MODEL_PAGE_TYPE);
                         assertEquals(SUCCESS.getCode(), response.getCode());
                         PageData<ArticleModel> pageData = response.getResult();
                         assertNotEquals(0, pageData.getTotal());
@@ -273,12 +279,12 @@ public class ArticleControllerTest extends BaseTest {
             // 分类不存在
             String tagName = "NoSuchTag";
             getMockData(MockMvcRequestBuilders.get("/articles/tag/" + tagName + "?page=1&count=10"))
-                    .andDo(result -> assertEquals(TAG_NOT_EXIST.getCode(), getResponse(result).getCode()));
+                    .andDo(result -> assertEquals(TAG_NOT_EXIST.getCode(), getResponse(result, STRING_TYPE).getCode()));
             // 正常查询
             tagName = "linux";
             getMockData(MockMvcRequestBuilders.get("/articles/tag/" + tagName + "?page=1&count=10"))
                     .andDo(result -> {
-                        Response<PageData<ArticleModel>> response = getResponse(result);
+                        Response<PageData<ArticleModel>> response = getResponse(result, ARTICLE_MODEL_PAGE_TYPE);
                         assertEquals(SUCCESS.getCode(), response.getCode());
                         PageData<ArticleModel> pageData = response.getResult();
                         assertNotEquals(0, pageData.getTotal());

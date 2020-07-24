@@ -48,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class BaseTest {
 
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected MockMvc mockMvc;
@@ -57,7 +58,12 @@ public class BaseTest {
      * jackson 序列化/反序列化Json
      */
     protected final ObjectMapper mapper = new ObjectMapper();
-
+    protected static final TypeReference<?> BOOLEAN_TYPE = new TypeReference<Response<Boolean>>() {
+    };
+    protected static final TypeReference<?> STRING_TYPE = new TypeReference<Response<String>>() {
+    };
+    protected static final TypeReference<?> OBJECT_TYPE = new TypeReference<Response<String>>() {
+    };
     @Autowired
     private WebApplicationContext wac;
     protected MockHttpSession session;
@@ -206,19 +212,29 @@ public class BaseTest {
         return mockMvc.perform(builder).andExpect(status().isOk());
     }
 
+
+    protected <T> Response<T> getResponse(String json) {
+        return getResponse(json, OBJECT_TYPE);
+    }
+
+    protected <T> Response<T> getResponse(MvcResult result) {
+        return getResponse(result, OBJECT_TYPE);
+    }
+
     /**
-     *  根据json 信息反序列化成Response对象
+     * 根据json 信息反序列化成Response对象
+     *
      * @param json json
-     * @param <T> 泛型
+     * @param <T>  泛型
      * @return Response对象
      */
-    protected <T> Response<T> getResponse(String json) {
+    protected <T> Response<T> getResponse(String json, TypeReference<?> responseType) {
         Response<T> response = null;
+        System.out.println(responseType.getType());
         try {
-            response = mapper.readValue(json, new TypeReference<Response<T>>() {
-            });
+            response = mapper.readValue(json, responseType);
         } catch (IOException e) {
-            logger.error("接续json Response对象错误，json:[{}]", json);
+            logger.error("解析json Response对象错误，json:[{}]", json);
             e.printStackTrace();
         }
         assertNotNull(response);
@@ -226,18 +242,20 @@ public class BaseTest {
     }
 
     /**
-     *  根据json 信息反序列化成Response对象
+     * 根据json 信息反序列化成Response对象
+     *
      * @param result MvcResult
-     * @param <T> 泛型
+     * @param <T>    泛型
      * @return Response对象
      */
-    protected <T> Response<T> getResponse(MvcResult result) {
+    protected <T> Response<T> getResponse(MvcResult result, TypeReference<?> responseType) {
         try {
-            return getResponse(result.getResponse().getContentAsString());
+            return getResponse(result.getResponse().getContentAsString(), responseType);
         } catch (UnsupportedEncodingException e) {
-            logger.error("接续json Response对象错误，result:[{}]", result);
+            logger.error("解析json Response对象错误，result:[{}]", result);
             e.printStackTrace();
         }
         return null;
     }
+
 }
