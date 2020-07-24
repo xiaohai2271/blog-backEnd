@@ -62,7 +62,7 @@ public class BaseTest {
     };
     protected static final TypeReference<?> STRING_TYPE = new TypeReference<Response<String>>() {
     };
-    protected static final TypeReference<?> OBJECT_TYPE = new TypeReference<Response<String>>() {
+    protected static final TypeReference<?> OBJECT_TYPE = new TypeReference<Response<Object>>() {
     };
     @Autowired
     private WebApplicationContext wac;
@@ -144,7 +144,7 @@ public class BaseTest {
         try {
             // 测试getMockData方法
             assertNotNull(getMockData(get("/headerInfo")));
-            getMockData((get("/headerInfo"))).andDo(result -> assertNotNull(getResponse(result)));
+            getMockData((get("/headerInfo"))).andDo(result -> assertNotNull(getResponse(result, OBJECT_TYPE)));
         } catch (Exception e) {
             e.printStackTrace();
         }
