@@ -8,8 +8,6 @@ import cn.celess.blog.entity.model.ArticleModel;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.mapper.ArticleMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-import net.sf.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -20,7 +18,6 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static cn.celess.blog.enmu.ResponseEnum.*;
 
 public class ArticleControllerTest extends BaseTest {
@@ -43,8 +40,7 @@ public class ArticleControllerTest extends BaseTest {
 
         try {
             getMockData(post, adminLogin(), articleReq).andDo(result -> {
-                Response<ArticleModel> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<ArticleModel>>() {
-                });
+                Response<ArticleModel> response = getResponse(result);
                 assertEquals(SUCCESS.getCode(), response.getCode());
                 assertNotNull(response.getResult());
                 ArticleModel articleModel = response.getResult();
@@ -80,8 +76,7 @@ public class ArticleControllerTest extends BaseTest {
         try {
             Article finalArticle = article;
             getMockData(delete, adminLogin()).andDo(result -> {
-                Response<Boolean> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<Boolean>>() {
-                });
+                Response<Boolean> response = getResponse(result);
                 assertEquals(SUCCESS.getCode(), response.getCode());
                 // 断言删除成功
                 assertTrue(response.getResult());
@@ -108,9 +103,8 @@ public class ArticleControllerTest extends BaseTest {
         articleReq.setTags(tagList);
         articleReq.setTitle("test-" + article.getTitle());
         try {
-            getMockData(put("/admin/article/update"), adminLogin(),articleReq).andDo(result -> {
-                Response<ArticleModel> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<ArticleModel>>() {
-                });
+            getMockData(put("/admin/article/update"), adminLogin(), articleReq).andDo(result -> {
+                Response<ArticleModel> response = getResponse(result);
                 assertEquals(SUCCESS.getCode(), response.getCode());
                 ArticleModel a = response.getResult();
                 assertEquals(articleReq.getCategory(), a.getCategory());
@@ -133,43 +127,35 @@ public class ArticleControllerTest extends BaseTest {
     public void retrieveOneById() {
         try {
             long articleID = 3;
-            mockMvc.perform(MockMvcRequestBuilders.get("/article/articleID/" + articleID))
-                    .andExpect(status().is(200));
-            mockMvc.perform(MockMvcRequestBuilders.get("/article/articleID/" + articleID + "?update=true"))
-                    .andExpect(status().is(200));
+            getMockData(MockMvcRequestBuilders.get("/article/articleID/" + articleID));
+            getMockData(MockMvcRequestBuilders.get("/article/articleID/" + articleID + "?update=true"));
 
             // 文章不存在
-            mockMvc.perform(MockMvcRequestBuilders.get("/article/articleID/-1"))
-                    .andExpect(status().is(200))
-                    .andDo(result -> {
-                        JSONObject jsonObject = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        assertEquals(ARTICLE_NOT_EXIST.getCode(), jsonObject.getInt(Code));
-                    });
+            getMockData(MockMvcRequestBuilders.get("/article/articleID/-1"))
+                    .andDo(result -> assertEquals(ARTICLE_NOT_EXIST.getCode(), getResponse(result).getCode()));
 
             // 正常情况
-            mockMvc.perform(MockMvcRequestBuilders.get("/article/articleID/" + articleID + "?update=false"))
-                    .andExpect(status().is(200))
-                    .andDo(result -> {
-                        JSONObject articleJson = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        // 断言获取数据成功
-                        assertEquals(SUCCESS.getCode(), articleJson.getInt(Code));
-                        assertNotNull(articleJson.getJSONObject(Result));
+            getMockData(MockMvcRequestBuilders.get("/article/articleID/" + articleID + "?update=false")).andDo(result -> {
+                Response<ArticleModel> response = getResponse(result);
+                // 断言获取数据成功
+                assertEquals(SUCCESS.getCode(), response.getCode());
+                assertNotNull(response.getResult());
 
-                        ArticleModel a = (ArticleModel) JSONObject.toBean(articleJson.getJSONObject(Result), ArticleModel.class);
-                        assertNotNull(a.getTitle());
-                        assertNotNull(a.getId());
-                        assertNotNull(a.getSummary());
-                        assertNotNull(a.getMdContent());
-                        assertNotNull(a.getUrl());
-                        assertNotNull(a.getUpdateDateFormat());
-                        assertTrue(a.getPreArticle() != null || a.getNextArticle() != null);
-                        assertNotNull(a.getReadingNumber());
-                        assertNotNull(a.getOriginal());
-                        assertNotNull(a.getPublishDateFormat());
-                        assertNotNull(a.getCategory());
-                        assertNotNull(a.getTags());
-                        assertNotNull(a.getAuthor());
-                    });
+                ArticleModel a = response.getResult();
+                assertNotNull(a.getTitle());
+                assertNotNull(a.getId());
+                assertNotNull(a.getSummary());
+                assertNotNull(a.getMdContent());
+                assertNotNull(a.getUrl());
+                assertNotNull(a.getUpdateDateFormat());
+                assertTrue(a.getPreArticle() != null || a.getNextArticle() != null);
+                assertNotNull(a.getReadingNumber());
+                assertNotNull(a.getOriginal());
+                assertNotNull(a.getPublishDateFormat());
+                assertNotNull(a.getCategory());
+                assertNotNull(a.getTags());
+                assertNotNull(a.getAuthor());
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -179,39 +165,32 @@ public class ArticleControllerTest extends BaseTest {
     public void articles() {
         try {
             // 测试不带参数访问
-            mockMvc.perform(MockMvcRequestBuilders.get("/articles"))
-                    .andExpect(status().is(200));
-
-            mockMvc.perform(MockMvcRequestBuilders.get("/articles?page=1&count=5"))
-                    .andExpect(status().is(200))
-                    .andDo(result -> {
-                        JSONObject articlesJSON = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        Response response = (Response) JSONObject.toBean(articlesJSON, Response.class);
-                        // 断言获取数据成功
-                        assertEquals(SUCCESS.getCode(), response.getCode());
-                        // 结果集非空
-                        assertNotNull(response.getResult());
-                        // 判断pageInfo是否包装完全
-                        JSONObject resultJson = JSONObject.fromObject(response.getResult());
-                        PageData<ArticleModel> pageData = (PageData<ArticleModel>) JSONObject.toBean(resultJson, PageData.class);
-                        assertNotEquals(0, pageData.getTotal());
-                        assertEquals(1, pageData.getPageNum());
-                        assertEquals(5, pageData.getPageSize());
-                        // 内容完整
-                        for (Object arc : pageData.getList()) {
-                            ArticleModel a = (ArticleModel) JSONObject.toBean(JSONObject.fromObject(arc), ArticleModel.class);
-                            assertNotNull(a.getTitle());
-                            assertNotNull(a.getId());
-                            assertNotNull(a.getSummary());
-                            assertNotNull(a.getOriginal());
-                            assertNotNull(a.getPublishDateFormat());
-                            assertNotNull(a.getCategory());
-                            assertNotNull(a.getTags());
-                            assertNotNull(a.getAuthor());
-                            assertNull(a.getOpen());
-                            assertNull(a.getMdContent());
-                        }
-                    });
+            getMockData(MockMvcRequestBuilders.get("/articles"));
+            getMockData(MockMvcRequestBuilders.get("/articles?page=1&count=5")).andDo(result -> {
+                Response<PageData<ArticleModel>> response = getResponse(result);
+                // 断言获取数据成功
+                assertEquals(SUCCESS.getCode(), response.getCode());
+                // 结果集非空
+                assertNotNull(response.getResult());
+                // 判断pageInfo是否包装完全
+                PageData<ArticleModel> pageData = response.getResult();
+                assertNotEquals(0, pageData.getTotal());
+                assertEquals(1, pageData.getPageNum());
+                assertEquals(5, pageData.getPageSize());
+                // 内容完整
+                for (ArticleModel a : pageData.getList()) {
+                    assertNotNull(a.getTitle());
+                    assertNotNull(a.getId());
+                    assertNotNull(a.getSummary());
+                    assertNotNull(a.getOriginal());
+                    assertNotNull(a.getPublishDateFormat());
+                    assertNotNull(a.getCategory());
+                    assertNotNull(a.getTags());
+                    assertNotNull(a.getAuthor());
+                    assertNull(a.getOpen());
+                    assertNull(a.getMdContent());
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -221,19 +200,18 @@ public class ArticleControllerTest extends BaseTest {
     public void adminArticles() {
         try {
             getMockData(get("/admin/articles?page=1&count=10")).andExpect(result ->
-                    assertEquals(HAVE_NOT_LOG_IN.getCode(), mapper.readValue(result.getResponse().getContentAsString(), Response.class).getCode())
+                    assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode())
             );
 
             // User权限登陆
             getMockData(get("/admin/articles?page=1&count=10"), userLogin()).andDo(result ->
-                    assertEquals(PERMISSION_ERROR.getCode(), mapper.readValue(result.getResponse().getContentAsString(), Response.class).getCode())
+                    assertEquals(PERMISSION_ERROR.getCode(), getResponse(result).getCode())
             );
             for (int i = 0; i < 2; i++) {
                 // admin权限登陆
                 int finalI = i;
                 getMockData(get("/admin/articles?page=1&count=10&deleted=" + (i == 1)), adminLogin()).andDo(result -> {
-                    Response<PageData<ArticleModel>> response = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Response<PageData<ArticleModel>>>() {
-                    });
+                    Response<PageData<ArticleModel>> response = getResponse(result);
                     assertEquals(SUCCESS.getCode(), response.getCode());
                     assertNotNull(response.getResult());
                     // 判断pageInfo是否包装完全
@@ -266,27 +244,22 @@ public class ArticleControllerTest extends BaseTest {
         try {
             // 分类不存在
             String categoryName = "NoSuchCategory";
-            mockMvc.perform(MockMvcRequestBuilders.get("/articles/category/" + categoryName + "?page=1&count=10"))
-                    .andExpect(status().is(200))
-                    .andDo(result -> {
-                        assertEquals(CATEGORY_NOT_EXIST.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code));
-                    });
+            getMockData(MockMvcRequestBuilders.get("/articles/category/" + categoryName + "?page=1&count=10"))
+                    .andDo(result -> assertEquals(CATEGORY_NOT_EXIST.getCode(), getResponse(result).getCode()));
             // 正常查询
             categoryName = "linux";
-            mockMvc.perform(MockMvcRequestBuilders.get("/articles/category/" + categoryName + "?page=1&count=10"))
-                    .andExpect(status().is(200))
+            getMockData(MockMvcRequestBuilders.get("/articles/category/" + categoryName + "?page=1&count=10"))
                     .andDo(result -> {
-                        JSONObject jsonObject = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        assertEquals(SUCCESS.getCode(), jsonObject.getInt(Code));
-                        PageData<ArticleModel> pageData = (PageData<ArticleModel>) JSONObject.toBean(jsonObject.getJSONObject(Result), PageData.class);
+                        Response<PageData<ArticleModel>> response = getResponse(result);
+                        assertEquals(SUCCESS.getCode(), response.getCode());
+                        PageData<ArticleModel> pageData = response.getResult();
                         assertNotEquals(0, pageData.getTotal());
                         assertEquals(1, pageData.getPageNum());
                         assertEquals(10, pageData.getPageSize());
-                        for (Object arc : pageData.getList()) {
-                            JSONObject jsonObject1 = JSONObject.fromObject(arc);
-                            assertNotEquals(0, jsonObject1.getInt("id"));
-                            assertNotNull(jsonObject1.getString("title"));
-                            assertNotNull(jsonObject1.getString("summary"));
+                        for (ArticleModel arc : pageData.getList()) {
+                            assertNotEquals(0, arc.getId().longValue());
+                            assertNotNull(arc.getTitle());
+                            assertNotNull(arc.getSummary());
                         }
                     });
         } catch (Exception e) {
@@ -299,28 +272,23 @@ public class ArticleControllerTest extends BaseTest {
         try {
             // 分类不存在
             String tagName = "NoSuchTag";
-            mockMvc.perform(MockMvcRequestBuilders.get("/articles/tag/" + tagName + "?page=1&count=10"))
-                    .andExpect(status().is(200))
-                    .andDo(result -> {
-                        assertEquals(TAG_NOT_EXIST.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code));
-                    });
+            getMockData(MockMvcRequestBuilders.get("/articles/tag/" + tagName + "?page=1&count=10"))
+                    .andDo(result -> assertEquals(TAG_NOT_EXIST.getCode(), getResponse(result).getCode()));
             // 正常查询
             tagName = "linux";
-            mockMvc.perform(MockMvcRequestBuilders.get("/articles/tag/" + tagName + "?page=1&count=10"))
-                    .andExpect(status().is(200))
+            getMockData(MockMvcRequestBuilders.get("/articles/tag/" + tagName + "?page=1&count=10"))
                     .andDo(result -> {
-                        JSONObject jsonObject = JSONObject.fromObject(result.getResponse().getContentAsString());
-                        assertEquals(SUCCESS.getCode(), jsonObject.getInt(Code));
-                        PageData<ArticleModel> pageData = (PageData<ArticleModel>) JSONObject.toBean(jsonObject.getJSONObject(Result), PageData.class);
+                        Response<PageData<ArticleModel>> response = getResponse(result);
+                        assertEquals(SUCCESS.getCode(), response.getCode());
+                        PageData<ArticleModel> pageData = response.getResult();
                         assertNotEquals(0, pageData.getTotal());
                         assertEquals(1, pageData.getPageNum());
                         assertEquals(10, pageData.getPageSize());
 
-                        for (Object arc : pageData.getList()) {
-                            JSONObject jsonObject1 = JSONObject.fromObject(arc);
-                            assertNotEquals(0, jsonObject1.getInt("id"));
-                            assertNotNull(jsonObject1.getString("title"));
-                            assertNotNull(jsonObject1.getString("summary"));
+                        for (ArticleModel arc : pageData.getList()) {
+                            assertNotEquals(0, arc.getId().longValue());
+                            assertNotNull(arc.getTitle());
+                            assertNotNull(arc.getSummary());
                         }
                     });
         } catch (Exception e) {
