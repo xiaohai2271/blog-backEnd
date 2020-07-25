@@ -54,6 +54,8 @@ public class BaseTest {
     protected MockMvc mockMvc;
     protected final static String Code = "code";
     protected final static String Result = "result";
+    protected final static String USERE_MAIL = "zh56462271@qq.com";
+    protected final static String ADMIN_EMAIL = "a@celess.cn";
     /**
      * jackson 序列化/反序列化Json
      */
@@ -87,7 +89,7 @@ public class BaseTest {
      */
     protected String adminLogin() {
         LoginReq req = new LoginReq();
-        req.setEmail("a@celess.cn");
+        req.setEmail(ADMIN_EMAIL);
         req.setPassword("123456789");
         req.setIsRememberMe(true);
         String token = login(req);
@@ -102,7 +104,7 @@ public class BaseTest {
      */
     protected String userLogin() {
         LoginReq req = new LoginReq();
-        req.setEmail("zh56462271@qq.com");
+        req.setEmail(USERE_MAIL);
         req.setPassword("123456789");
         req.setIsRememberMe(true);
         String token = login(req);
@@ -116,7 +118,7 @@ public class BaseTest {
      * @param req 用户信息
      * @return token | null
      */
-    private String login(LoginReq req) {
+    protected String login(LoginReq req) {
         String str = null;
         try {
             str = getMockData(post("/login"), null, req)
@@ -208,6 +210,7 @@ public class BaseTest {
         }
         if (content != null) {
             builder.content(mapper.writeValueAsString(content)).contentType(MediaType.APPLICATION_JSON);
+            logger.debug("param::json->{}", mapper.writeValueAsString(content));
         }
         return mockMvc.perform(builder).andExpect(status().isOk());
     }
@@ -230,7 +233,6 @@ public class BaseTest {
      */
     protected <T> Response<T> getResponse(String json, TypeReference<?> responseType) {
         Response<T> response = null;
-        System.out.println(responseType.getType());
         try {
             response = mapper.readValue(json, responseType);
         } catch (IOException e) {
