@@ -3,6 +3,7 @@ package cn.celess.blog.controller;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.PartnerSite;
 import cn.celess.blog.entity.Response;
+import cn.celess.blog.entity.request.LinkApplyReq;
 import cn.celess.blog.entity.request.LinkReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.service.MailService;
@@ -69,29 +70,7 @@ public class LinksController {
     }
 
     @PostMapping("/apply")
-    public Response apply(@RequestParam("name") String name,
-                          @RequestParam("url") String url) {
-        // TODO :: 弃用发送邮件的方式。
-        if (name == null || name.replaceAll(" ", "").isEmpty()) {
-            return Response.response(ResponseEnum.PARAMETERS_ERROR, null);
-        }
-        if (!RegexUtil.urlMatch(url)) {
-            return Response.response(ResponseEnum.PARAMETERS_URL_ERROR, null);
-        }
-        String applyTimeStr = redisUtil.get(request.getRemoteAddr() + "-Apply");
-        int applyTime = 0;
-        if (applyTimeStr != null) {
-            applyTime = Integer.parseInt(applyTimeStr);
-        }
-        if (applyTime == 10) {
-            throw new MyException(ResponseEnum.FAILURE.getCode(), "申请次数已达10次，请2小时后重试");
-        }
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setSubject("友链申请：" + name);
-        message.setTo("a@celess.cn");
-        message.setText("name:" + name + "\nurl:" + url + "\n" + DateFormatUtil.getNow());
-        Boolean send = mailService.send(message);
-        redisUtil.setEx(request.getRemoteAddr() + "-Apply", applyTime + 1 + "", 2, TimeUnit.HOURS);
-        return send ? Response.success("") : Response.failure("");
+    public Response apply(@RequestBody() LinkApplyReq linkApplyReq) {
+        return Response.success(partnerSiteService.apply(linkApplyReq));
     }
 }

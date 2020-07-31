@@ -3,6 +3,7 @@ package cn.celess.blog.service.serviceimpl;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.PartnerSite;
 import cn.celess.blog.entity.model.PageData;
+import cn.celess.blog.entity.request.LinkApplyReq;
 import cn.celess.blog.entity.request.LinkReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.PartnerMapper;
@@ -10,6 +11,7 @@ import cn.celess.blog.service.PartnerSiteService;
 import cn.celess.blog.util.RegexUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,5 +110,14 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
         return all;
     }
 
-
+    @Override
+    public PartnerSite apply(LinkApplyReq linkApplyReq) {
+        if (StringUtils.isEmpty(linkApplyReq.getName())
+                || StringUtils.isEmpty(linkApplyReq.getUrl())
+                || StringUtils.isEmpty(linkApplyReq.getEmail())
+                || StringUtils.isEmpty(linkApplyReq.getLinkUrl())) {
+            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+        }
+        return null;
+    }
 }
