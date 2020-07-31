@@ -105,10 +105,21 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
         if (!reqBody.getUrl().contains("http://") && !reqBody.getUrl().contains("https://")) {
             reqBody.setUrl("http://" + reqBody.getUrl());
         }
+        if (reqBody.isOpen() != partnerSite.getOpen() && !partnerSite.getNotification() && !StringUtils.isEmpty(partnerSite.getEmail())) {
+            SimpleMailMessage smm = new SimpleMailMessage();
+            smm.setTo(partnerSite.getEmail());
+            smm.setText("您的友链申请，已通过");
+            smm.setSubject("友链申请通过");
+            smm.setSentDate(new Date());
+            mailService.send(smm);
+            partnerSite.setNotification(true);
+        }
+        BeanUtils.copyProperties(reqBody, partnerSite);
+        partnerMapper.update(partnerSite);
         partnerSite.setName(reqBody.getName());
         partnerSite.setUrl(reqBody.getUrl());
         partnerSite.setOpen(reqBody.isOpen());
-        partnerMapper.update(partnerSite);
+
         return partnerSite;
     }
 
@@ -160,11 +171,15 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
         if (resp.contains(SITE_URL)) {
             //包含站点
             BeanUtils.copyProperties(linkApplyReq, ps);
+            ps.setNotification(false);
             ps.setOpen(false);
-            partnerMapper.insert(ps);
+            boolean exists = partnerMapper.existsByUrl(linkApplyReq.getUrl());
+            if (!exists) {
+                partnerMapper.insert(ps);
+            }
             SimpleMailMessage smm = new SimpleMailMessage();
             smm.setSubject("友链申请");
-            smm.setText("有一条友链申请，[\n" + linkApplyReq.toString() + "\n]");
+            smm.setText("有一条友链申请" + (exists ? "，已存在的友链链接" : "") + "，[\n" + linkApplyReq.toString() + "\n]");
             smm.setTo(SITE_EMAIL);
             smm.setSentDate(new Date());
             mailService.send(smm);
