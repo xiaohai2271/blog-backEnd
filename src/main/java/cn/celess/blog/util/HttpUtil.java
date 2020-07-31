@@ -1,10 +1,15 @@
 package cn.celess.blog.util;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Objects;
 
 /**
@@ -62,4 +67,20 @@ public class HttpUtil {
         }
     }
 
+
+    public static String getAfterRendering(String url) {
+        try (final WebClient webClient = new WebClient(BrowserVersion.CHROME)) {
+            webClient.getOptions().setCssEnabled(false);
+            webClient.getOptions().setJavaScriptEnabled(true);
+            webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
+            webClient.getOptions().setDownloadImages(false);
+            webClient.getOptions().setActiveXNative(false);
+            webClient.setAjaxController(new NicelyResynchronizingAjaxController());
+            final HtmlPage page = webClient.getPage(url);
+            return page.asXml();
+        } catch (IOException e) {
+            return null;
+        }
+    }
 }
