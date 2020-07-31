@@ -25,6 +25,10 @@ public class PartnerSite {
 
     private Boolean delete = false;
 
+    private String email;
+
+    private Boolean notification;
+
     public PartnerSite() {
     }
 

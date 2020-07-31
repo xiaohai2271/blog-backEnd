@@ -58,6 +58,7 @@ public enum ResponseEnum {
     DATA_HAS_EXIST(7020, "数据已存在"),
 
     //其他
+    APPLY_LINK_NO_ADD_THIS_SITE(7200, "暂未在您的网站中抓取到本站链接"),
 
     //提交更新之前，没有获取数据/,
     DID_NOT_GET_THE_DATA(8020, "非法访问"),

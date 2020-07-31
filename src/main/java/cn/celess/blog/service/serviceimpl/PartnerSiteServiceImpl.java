@@ -7,15 +7,20 @@ import cn.celess.blog.entity.request.LinkApplyReq;
 import cn.celess.blog.entity.request.LinkReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.PartnerMapper;
+import cn.celess.blog.service.MailService;
 import cn.celess.blog.service.PartnerSiteService;
+import cn.celess.blog.util.HttpUtil;
 import cn.celess.blog.util.RegexUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.Email;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,6 +31,11 @@ import java.util.List;
 public class PartnerSiteServiceImpl implements PartnerSiteService {
     @Autowired
     PartnerMapper partnerMapper;
+    @Autowired
+    MailService mailService;
+    private static final String SITE_NAME = "小海博客";
+    private static final String SITE_URL = "celess.cn";
+    private static final String SITE_EMAIL = "a@celess.cn";
 
     @Override
     public PartnerSite create(LinkReq reqBody) {
@@ -117,6 +127,32 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
                 || StringUtils.isEmpty(linkApplyReq.getEmail())
                 || StringUtils.isEmpty(linkApplyReq.getLinkUrl())) {
             throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+        }
+        if (RegexUtil.emailMatch(linkApplyReq.getEmail())) {
+            throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
+        }
+        if (RegexUtil.urlMatch(linkApplyReq.getLinkUrl()) || RegexUtil.urlMatch(linkApplyReq.getUrl())
+                || (!StringUtils.isEmpty(linkApplyReq.getIconPath()) && RegexUtil.urlMatch(linkApplyReq.getIconPath()))) {
+            throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
+        }
+        if (StringUtils.isEmpty(linkApplyReq.getIconPath())) {
+            linkApplyReq.setIconPath("");
+        }
+        String resp = HttpUtil.getAfterRendering(linkApplyReq.getLinkUrl());
+        assert resp != null;
+        if (resp.contains(SITE_URL)) {
+            PartnerSite ps = new PartnerSite();
+            BeanUtils.copyProperties(linkApplyReq, ps);
+            ps.setOpen(false);
+            partnerMapper.insert(ps);
+            SimpleMailMessage smm = new SimpleMailMessage();
+            smm.setSubject("友链申请");
+            smm.setText("有一条友链申请，[\n" + linkApplyReq.toString() + "\n]");
+            smm.setTo(SITE_EMAIL);
+            smm.setSentDate(new Date());
+            mailService.send(smm);
+        } else {
+            throw new MyException(ResponseEnum.APPLY_LINK_NO_ADD_THIS_SITE);
         }
         return null;
     }
