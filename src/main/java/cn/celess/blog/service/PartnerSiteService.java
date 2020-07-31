@@ -60,4 +60,6 @@ public interface PartnerSiteService {
      * @return linkApplyReq
      */
     PartnerSite apply(LinkApplyReq linkApplyReq);
+
+    Object reapply(String key);
 }

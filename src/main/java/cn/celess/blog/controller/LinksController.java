@@ -73,4 +73,9 @@ public class LinksController {
     public Response apply(@RequestBody() LinkApplyReq linkApplyReq) {
         return Response.success(partnerSiteService.apply(linkApplyReq));
     }
+
+    @PostMapping("/reapply")
+    public Response reapply(@RequestParam("key") String key) {
+        return Response.success(partnerSiteService.reapply(key));
+    }
 }

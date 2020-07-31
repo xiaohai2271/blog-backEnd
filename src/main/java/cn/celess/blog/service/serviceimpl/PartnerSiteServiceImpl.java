@@ -10,6 +10,7 @@ import cn.celess.blog.mapper.PartnerMapper;
 import cn.celess.blog.service.MailService;
 import cn.celess.blog.service.PartnerSiteService;
 import cn.celess.blog.util.HttpUtil;
+import cn.celess.blog.util.JwtUtil;
 import cn.celess.blog.util.RedisUtil;
 import cn.celess.blog.util.RegexUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -152,7 +153,9 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
         }
         // 抓取页面
         String resp = HttpUtil.getAfterRendering(linkApplyReq.getLinkUrl());
-        assert resp != null;
+        if (resp == null) {
+            throw new MyException(ResponseEnum.CANNOT_GET_DATA);
+        }
         PartnerSite ps = new PartnerSite();
         if (resp.contains(SITE_URL)) {
             //包含站点
@@ -182,5 +185,28 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
             throw new MyException(ResponseEnum.APPLY_LINK_NO_ADD_THIS_SITE, null, uuid);
         }
         return ps;
+    }
+
+    @SneakyThrows
+    @Override
+    public Object reapply(String key) {
+        if (!redisUtil.hasKey(key)) {
+            throw new MyException(ResponseEnum.DATA_EXPIRED);
+        }
+        String s = redisUtil.get(key);
+        ObjectMapper mapper = new ObjectMapper();
+        LinkApplyReq linkApplyReq = mapper.readValue(s, LinkApplyReq.class);
+        if (linkApplyReq == null) {
+            throw new MyException(ResponseEnum.DATA_NOT_EXIST);
+        }
+        SimpleMailMessage smm = new SimpleMailMessage();
+        smm.setSubject("友链申请");
+        smm.setText("有一条未抓取到信息的友链申请，[\n" + linkApplyReq.toString() + "\n]");
+        smm.setTo(SITE_EMAIL);
+        smm.setSentDate(new Date());
+        mailService.send(smm);
+        redisUtil.delete(key);
+        redisUtil.delete(linkApplyReq.getUrl());
+        return "success";
     }
 }
