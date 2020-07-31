@@ -29,6 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 import java.util.UUID;
 
 import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
@@ -63,6 +64,8 @@ public class BaseTest {
     protected static final TypeReference<?> STRING_TYPE = new TypeReference<Response<String>>() {
     };
     protected static final TypeReference<?> OBJECT_TYPE = new TypeReference<Response<String>>() {
+    };
+    protected static final TypeReference<?> MAP_OBJECT_TYPE = new TypeReference<Response<Map<String, Object>>>() {
     };
     @Autowired
     private WebApplicationContext wac;
