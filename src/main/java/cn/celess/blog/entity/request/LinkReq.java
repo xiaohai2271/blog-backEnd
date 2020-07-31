@@ -14,4 +14,6 @@ public class LinkReq {
     private String iconPath;
     private String desc;
     private boolean open;
+    private String email;
+    private boolean notification;
 }
