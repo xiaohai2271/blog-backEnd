@@ -27,7 +27,7 @@ public class PartnerSite {
 
     private String email;
 
-    private Boolean notification;
+    private Boolean notification = true;
 
     public PartnerSite() {
     }
