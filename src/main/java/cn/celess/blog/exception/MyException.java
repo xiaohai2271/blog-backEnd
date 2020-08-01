@@ -1,13 +1,16 @@
 package cn.celess.blog.exception;
 
 import cn.celess.blog.enmu.ResponseEnum;
+import lombok.Data;
 
 /**
  * @author : xiaohai
  * @date : 2019/03/28 16:56
  */
+@Data
 public class MyException extends RuntimeException {
     private int code;
+    private Object result;
 
     public MyException(int code, String msg) {
         super(msg);
@@ -24,11 +27,9 @@ public class MyException extends RuntimeException {
         this.code = e.getCode();
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
+    public MyException(ResponseEnum e, String msg, Object result) {
+        super(e.getMsg());
+        this.code = e.getCode();
+        this.result = result;
     }
 }

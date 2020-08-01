@@ -135,8 +135,6 @@ public class CommonController {
      * FUCK !!!
      *
      * @param file 文件
-     * @return
-     * @throws IOException
      */
     @PostMapping("/imgUpload")
     public void upload(HttpServletRequest request, HttpServletResponse response, @RequestParam("editormd-image-file") MultipartFile file) throws IOException {
@@ -158,6 +156,7 @@ public class CommonController {
             return;
         }
         String fileName = file.getOriginalFilename();
+        assert fileName != null;
         String mime = fileName.substring(fileName.lastIndexOf("."));
         if (".png".equals(mime.toLowerCase()) || ".jpg".equals(mime.toLowerCase()) ||
                 ".jpeg".equals(mime.toLowerCase()) || ".bmp".equals(mime.toLowerCase())) {
@@ -178,11 +177,7 @@ public class CommonController {
     public Response bingPic() {
 
         JSONObject imageObj;
-        try {
-            imageObj = JSONObject.fromObject(HttpUtil.get("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"));
-        } catch (IOException e) {
-            return Response.failure(null);
-        }
+        imageObj = JSONObject.fromObject(HttpUtil.get("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"));
         JSONArray jsonArray = imageObj.getJSONArray("images");
         String imageName = jsonArray.getJSONObject(0).getString("url");
         return Response.success("https://cn.bing.com" + imageName);
