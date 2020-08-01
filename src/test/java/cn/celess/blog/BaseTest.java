@@ -4,8 +4,11 @@ package cn.celess.blog;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
+import cn.celess.blog.service.MailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -29,6 +33,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.UUID;
 
@@ -259,6 +264,56 @@ public class BaseTest {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    /**
+     * 修改 mailService 的实现类
+     *
+     * @param service       service 类
+     * @param mailFiledName service 中自动注入的mailService字段名
+     */
+    protected void mockEmailServiceInstance(Object service, String mailFiledName) {
+        Field mailServiceField;
+        try {
+            mailServiceField = service.getClass().getDeclaredField(mailFiledName);
+            mailServiceField.setAccessible(true);
+            mailServiceField.set(service, new TestMailServiceImpl());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Slf4j
+    protected static class TestMailServiceImpl implements MailService {
+
+        @Override
+        public Boolean AsyncSend(SimpleMailMessage message) {
+            log.debug("异步邮件请求,SimpleMailMessage:[{}]", getJson(message));
+            return true;
+        }
+
+        @Override
+        public Boolean send(SimpleMailMessage message) {
+            log.debug("邮件请求,SimpleMailMessage:[{}]", getJson(message));
+            return true;
+        }
+
+        /**
+         * 转json
+         *
+         * @param o
+         * @return
+         */
+        private String getJson(Object o) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                return mapper.writeValueAsString(o);
+            } catch (JsonProcessingException e) {
+                return null;
+            }
+        }
     }
 
 }
