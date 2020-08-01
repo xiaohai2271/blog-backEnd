@@ -15,11 +15,10 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -88,15 +87,17 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("lastUpdateTime", DateFormatUtil.get(webUpdateInfoMapper.getLastestOne().getUpdateTime()));
         jsonObject.put("lastUpdateInfo", webUpdateInfoMapper.getLastestOne().getUpdateInfo());
-        JSONArray array = JSONArray.fromObject(HttpUtil.get("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1"));
-        JSONObject object = array.getJSONObject(0);
-        JSONObject commit = object.getJSONObject("commit");
-        jsonObject.put("lastCommit", commit.getString("message"));
-        jsonObject.put("committerAuthor", commit.getJSONObject("committer").getString("name"));
-        SimpleDateFormat sdf = new SimpleDateFormat();
-        Instant parse = Instant.parse(commit.getJSONObject("committer").getString("date"));
-        jsonObject.put("committerDate", DateFormatUtil.get(Date.from(parse)));
-        jsonObject.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/" + object.getString("sha"));
+        String str = HttpUtil.get("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1");
+        if (!StringUtils.isEmpty(str)) {
+            JSONArray array = JSONArray.fromObject(str);
+            JSONObject object = array.getJSONObject(0);
+            JSONObject commit = object.getJSONObject("commit");
+            jsonObject.put("lastCommit", commit.getString("message"));
+            jsonObject.put("committerAuthor", commit.getJSONObject("committer").getString("name"));
+            Instant parse = Instant.parse(commit.getJSONObject("committer").getString("date"));
+            jsonObject.put("committerDate", DateFormatUtil.get(Date.from(parse)));
+            jsonObject.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/" + object.getString("sha"));
+        }
         return jsonObject;
     }
 
