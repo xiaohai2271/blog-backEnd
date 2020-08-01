@@ -55,11 +55,18 @@ public interface PartnerSiteService {
     List<PartnerSite> findAll();
 
     /**
-     *  申请友链
-     * @param linkApplyReq  linkApplyReq
+     * 申请友链
+     *
+     * @param linkApplyReq linkApplyReq
      * @return linkApplyReq
      */
     PartnerSite apply(LinkApplyReq linkApplyReq);
 
-    Object reapply(String key);
+    /**
+     * 重写申请友链
+     *
+     * @param key key
+     * @return msg
+     */
+    String reapply(String key);
 }

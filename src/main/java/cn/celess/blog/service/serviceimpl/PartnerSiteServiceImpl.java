@@ -176,6 +176,8 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
             boolean exists = partnerMapper.existsByUrl(linkApplyReq.getUrl());
             if (!exists) {
                 partnerMapper.insert(ps);
+            } else {
+                ps.setId(partnerMapper.findByUrl(linkApplyReq.getUrl()).getId());
             }
             SimpleMailMessage smm = new SimpleMailMessage();
             smm.setSubject("友链申请");
@@ -204,7 +206,7 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
 
     @SneakyThrows
     @Override
-    public Object reapply(String key) {
+    public String reapply(String key) {
         if (!redisUtil.hasKey(key)) {
             throw new MyException(ResponseEnum.DATA_EXPIRED);
         }
