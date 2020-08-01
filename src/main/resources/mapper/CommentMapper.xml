@@ -84,7 +84,6 @@
     <select id="findAllByPagePath" resultMap="commentViewResultMap" parameterType="string">
         select *
         from commentView
-        # 无奈之举
         <if test="toString() != null ">
             where pagePath = #{pagePath}
         </if>

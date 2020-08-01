@@ -22,10 +22,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.security.krb5.internal.PAData;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -145,7 +147,7 @@ public class ArticleServiceImpl implements ArticleService {
         //删除指定文章
         articleMapper.delete(articleId);
 
-        articleTagMapper.deleteByArticleId(articleId);
+        //articleTagMapper.deleteByArticleId(articleId);
 
         return true;
     }
@@ -273,21 +275,24 @@ public class ArticleServiceImpl implements ArticleService {
 
     /**
      * @param count 数目
-     * @param page  页面 默认减1
+     * @param page  页面
      * @return PageInfo
      */
     @Override
-    public PageData<ArticleModel> adminArticles(int count, int page) {
-        PageHelper.startPage(page, count, "articleId desc");
+    public PageData<ArticleModel> adminArticles(int count, int page, boolean deleted) {
         List<Article> articleList = articleMapper.findAll();
-        PageData<ArticleModel> pageData = new PageData<ArticleModel>(new PageInfo<Article>(articleList));
-        List<ArticleModel> articleModelList = new ArrayList<>();
-        articleList.forEach(article -> {
-            ArticleModel articleModel = ModalTrans.article(article);
-            articleModel.setMdContent(null);
-            articleModelList.add(articleModel);
-        });
-        pageData.setList(articleModelList);
+
+        PageData<ArticleModel> pageData = new PageData<>(null, 0, count, page);
+        List<Article> collect = articleList.stream().filter(article -> article.isDeleted() == deleted).collect(Collectors.toList());
+        pageData.setTotal(collect.size());
+        List<ArticleModel> articleModels = collect.stream()
+                .peek(article -> article.setMdContent(null))
+                .map(ModalTrans::article)
+                .skip((page - 1) * count)
+                .limit(count)
+                .collect(Collectors.toList());
+        pageData.setList(articleModels);
+
         return pageData;
     }
 

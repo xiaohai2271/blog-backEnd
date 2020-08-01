@@ -35,7 +35,7 @@ public class PartnerMapperTest extends BaseTest {
         partnerSite.setIconPath(randomStr(5));
         partnerSite.setDesc(randomStr(5));
         partnerSite.setOpen(false);
-        partnerSite.setUrl("www.celess.cn?random=" + randomStr(4));
+        partnerSite.setUrl("www.celess.cn/?random=" + randomStr(4));
         assertEquals(1, partnerMapper.update(partnerSite));
     }
 

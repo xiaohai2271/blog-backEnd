@@ -1,6 +1,30 @@
-CREATE DATABASE `t_blog`;
+CREATE DATABASE if not exists `blog`;
 
-USE t_blog;
+USE blog;
+
+CREATE TABLE `user`
+(
+    `u_id`                   int         not null primary key auto_increment,
+    `u_email`                varchar(50) not null,
+    `u_pwd`                  varchar(40) not null comment '密码',
+    `u_email_status`         boolean                                default false comment '邮箱验证状态',
+    `u_avatar`               varchar(255)                           default null comment '用户头像',
+    `u_desc`                 tinytext COLLATE utf8mb4_unicode_ci    default null comment '用户的描述',
+    `u_recently_landed_time` datetime                               default null comment '最近的登录时间',
+    `u_display_name`         varchar(30) COLLATE utf8mb4_unicode_ci default null comment '展示的昵称',
+    `u_role`                 varchar(40) not null                   default 'user' comment '权限组',
+    `status`                 tinyint(1)  not null                   default 0 comment '账户状态',
+    unique key `uni_user_id` (`u_id`),
+    unique key `uni_user_email` (`u_email`)
+) comment '用户表';
+
+CREATE TABLE `tag_category`
+(
+    `t_id`        bigint(20) primary key auto_increment,
+    `t_name`      varchar(255) not null,
+    `is_category` boolean      not null default true,
+    `is_delete`   boolean      not null default false comment '该数据是否被删除'
+) comment '标签和分类表';
 
 CREATE TABLE `article`
 (
@@ -14,29 +38,24 @@ CREATE TABLE `article`
     `a_reading_number` int                                              default 0 comment '文章阅读数',
     `a_like`           int                                              default 0 comment '文章点赞数',
     `a_dislike`        int                                              default 0 comment '文章不喜欢数',
-    `a_category_id`    int                                     not null comment '文章分类id',
+    `a_category_id`    bigint                                  not null comment '文章分类id',
     `a_publish_date`   datetime                                         default CURRENT_TIMESTAMP comment '文章发布时间',
     `a_update_date`    datetime                                         default null comment '文章的更新时间',
     `a_is_open`        boolean                                          default true comment '文章是否可见',
-    `is_delete`        boolean                                 not null default false comment '该数据是否被删除'
+    `is_delete`        boolean                                 not null default false comment '该数据是否被删除',
+    foreign key (a_category_id) references tag_category (t_id),
+    foreign key (a_author_id) references user (u_id)
 ) DEFAULT CHARSET = utf8mb4
   COLLATE utf8mb4_general_ci,comment '文章表';
 
 CREATE TABLE `article_tag`
 (
-    `at_id`     bigint(20) primary key auto_increment,
-    `a_id`      bigint(20) not null comment '文章id',
-    `t_id`      bigint     not null comment 'tag/category 的id',
-    `is_delete` boolean    not null default false comment '该数据是否被删除'
+    `at_id` bigint(20) primary key auto_increment,
+    `a_id`  bigint(20) not null comment '文章id',
+    `t_id`  bigint     not null comment 'tag/category 的id',
+    foreign key (a_id) references article (a_id),
+    foreign key (t_id) references tag_category (t_id)
 ) comment '文章标签表';
-
-CREATE TABLE `tag_category`
-(
-    `t_id`        bigint(20) primary key auto_increment,
-    `t_name`      varchar(255) not null,
-    `is_category` boolean      not null default true,
-    `is_delete`   boolean      not null default false comment '该数据是否被删除'
-) comment '标签和分类表';
 
 CREATE TABLE `comment`
 (
@@ -53,13 +72,15 @@ CREATE TABLE `comment`
 
 CREATE TABLE `links`
 (
-    `l_id`        bigint(20) primary key auto_increment,
-    `l_name`      varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友站名称',
-    `l_is_open`   boolean                                          default true comment '是否公开',
-    `l_url`       varchar(255)                            not null comment '首页地址',
-    `l_icon_path` varchar(255)                            not null comment '友链的icon地址',
-    `l_desc`      varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友链的说明描述',
-    `is_delete`   boolean                                 not null default false comment '该数据是否被删除'
+    `l_id`           bigint(20) primary key auto_increment,
+    `l_name`         varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友站名称',
+    `l_is_open`      boolean                                          default true comment '是否公开',
+    `l_url`          varchar(255) unique                     not null comment '首页地址',
+    `l_icon_path`    varchar(255)                            not null comment '友链的icon地址',
+    `l_desc`         varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友链的说明描述',
+    `is_delete`      boolean                                 not null default false comment '该数据是否被删除',
+    `l_email`        varchar(255) comment '网站管理员的邮箱',
+    `l_notification` boolean                                          default false comment '是否通知了'
 ) comment '友站表';
 
 CREATE TABLE `visitor`
@@ -78,23 +99,6 @@ CREATE TABLE `web_update`
     `wu_time`   datetime                                not null comment '更新时间',
     `is_delete` boolean                                 not null default false comment '该数据是否被删除'
 ) comment '更新内容表';
-
-CREATE TABLE `user`
-(
-    `u_id`                   int         not null primary key auto_increment,
-    `u_email`                varchar(50) not null,
-    `u_pwd`                  varchar(40) not null comment '密码',
-    `u_email_status`         boolean                                default false comment '邮箱验证状态',
-    `u_avatar`               varchar(255)                           default null comment '用户头像',
-    `u_desc`                 tinytext COLLATE utf8mb4_unicode_ci    default null comment '用户的描述',
-    `u_recently_landed_time` datetime                               default null comment '最近的登录时间',
-    `u_display_name`         varchar(30) COLLATE utf8mb4_unicode_ci default null comment '展示的昵称',
-    `u_role`                 varchar(40) not null                   default 'user' comment '权限组',
-    `status`                 tinyint(1)  not null                   default 0 comment '账户状态',
-    unique key `uni_user_id` (`u_id`),
-    unique key `uni_user_email` (`u_email`)
-) comment '用户表';
-
 
 CREATE VIEW articleView
             (articleId, title, summary, mdContent, url, isOriginal, readingCount, likeCount, dislikeCount,

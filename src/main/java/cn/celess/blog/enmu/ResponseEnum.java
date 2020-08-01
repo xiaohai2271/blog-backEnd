@@ -33,6 +33,7 @@ public enum ResponseEnum {
     PWD_SAME(3601, "新密码与原密码相同"),
     PWD_NOT_SAME(3602, "新密码与原密码不相同"),
     LOGIN_EXPIRED(3700, "登陆过期"),
+    LOGOUT(3710, "账户已注销"),
     PWD_WRONG(3800, "密码不正确"),
 
     JWT_EXPIRED(3810, "Token过期"),
@@ -57,6 +58,9 @@ public enum ResponseEnum {
     DATA_HAS_EXIST(7020, "数据已存在"),
 
     //其他
+    APPLY_LINK_NO_ADD_THIS_SITE(7200, "暂未在您的网站中抓取到本站链接"),
+    DATA_EXPIRED(7300, "数据过期"),
+    CANNOT_GET_DATA(7400, "暂无法获取到数据"),
 
     //提交更新之前，没有获取数据/,
     DID_NOT_GET_THE_DATA(8020, "非法访问"),

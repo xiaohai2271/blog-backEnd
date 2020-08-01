@@ -37,4 +37,6 @@ public class UserModel {
     private String role = "user";
 
     private String token;
+
+    private int status;
 }

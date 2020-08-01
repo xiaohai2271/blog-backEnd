@@ -75,10 +75,8 @@ public class ArticleTagMapperTest extends BaseTest {
     @Test
     public void deleteMultiById() {
         ArticleTag articleTag = new ArticleTag();
-        Article article = new Article();
-        article.setId(-1L);
-        Tag tag = new Tag();
-        tag.setId(1L);
+        Article article = articleMapper.getLastestArticle();
+        Tag tag = tagMapper.getLastestTag();
         articleTag.setArticle(article);
         articleTag.setTag(tag);
 
@@ -89,7 +87,7 @@ public class ArticleTagMapperTest extends BaseTest {
         articleTagMapper.insert(articleTag);
         articleTagMapper.insert(articleTag);
 
-        List<ArticleTag> allByArticleId = articleTagMapper.findAllByArticleId(-1L);
+        List<ArticleTag> allByArticleId = articleTagMapper.findAllByArticleId(article.getId());
         assertTrue(allByArticleId.size() >= 6);
         int lines = articleTagMapper.deleteMultiById(allByArticleId);
         assertTrue(lines >= 6);

@@ -21,4 +21,5 @@ public class TagModel {
 
     private List<ArticleModel> articles;
 
+    private boolean deleted;
 }

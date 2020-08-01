@@ -21,4 +21,6 @@ public class WebUpdateModel {
         this.info = info;
         this.time = time;
     }
+
+    private boolean deleted;
 }

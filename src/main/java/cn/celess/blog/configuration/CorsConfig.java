@@ -26,7 +26,7 @@ public class CorsConfig {
         config.addAllowedOrigin("https://celess.cn");
         config.addAllowedOrigin("https://www.celess.cn");
         // 本地调试时的跨域
-        if ("dev".equals(activeModel)) {
+        if (!"prod".equals(activeModel)) {
             config.addAllowedOrigin("http://localhost:4200");
             config.addAllowedOrigin("http://127.0.0.1:4200");
         }

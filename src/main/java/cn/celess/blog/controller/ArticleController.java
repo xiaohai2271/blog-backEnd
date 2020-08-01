@@ -3,6 +3,7 @@ package cn.celess.blog.controller;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.model.ArticleModel;
+import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.service.ArticleService;
 import cn.celess.blog.util.RedisUserUtil;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -110,8 +113,9 @@ public class ArticleController {
      */
     @GetMapping("/admin/articles")
     public Response adminArticles(@RequestParam(name = "page", defaultValue = "1") int page,
-                                  @RequestParam(name = "count", defaultValue = "10") int count) {
-        return Response.success(articleService.adminArticles(count, page));
+                                  @RequestParam(name = "count", defaultValue = "10") int count,
+                                  @RequestParam(name = "deleted", defaultValue = "false") boolean deleted) {
+        return Response.success(articleService.adminArticles(count, page, deleted));
     }
 
     /**

@@ -11,15 +11,15 @@ import java.io.Serializable;
  * @date : 2019/03/28 15:24
  */
 @Data
-public class Response implements Serializable {
+public class Response<T> implements Serializable {
     private int code;
     private String msg;
-    private Object result;
+    private T result;
 
     public Response() {
     }
 
-    public Response(int code, String msg, Object result) {
+    public Response(int code, String msg, T result) {
         this.code = code;
         this.msg = msg;
         this.result = result;

@@ -88,19 +88,15 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("lastUpdateTime", DateFormatUtil.get(webUpdateInfoMapper.getLastestOne().getUpdateTime()));
         jsonObject.put("lastUpdateInfo", webUpdateInfoMapper.getLastestOne().getUpdateInfo());
-        try {
-            JSONArray array = JSONArray.fromObject(HttpUtil.get("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1"));
-            JSONObject object = array.getJSONObject(0);
-            JSONObject commit = object.getJSONObject("commit");
-            jsonObject.put("lastCommit", commit.getString("message"));
-            jsonObject.put("committerAuthor", commit.getJSONObject("committer").getString("name"));
-            SimpleDateFormat sdf = new SimpleDateFormat();
-            Instant parse = Instant.parse(commit.getJSONObject("committer").getString("date"));
-            jsonObject.put("committerDate", DateFormatUtil.get(Date.from(parse)));
-            jsonObject.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/" + object.getString("sha"));
-        } catch (IOException e) {
-            log.info("网络请求失败{}", e.getMessage());
-        }
+        JSONArray array = JSONArray.fromObject(HttpUtil.get("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1"));
+        JSONObject object = array.getJSONObject(0);
+        JSONObject commit = object.getJSONObject("commit");
+        jsonObject.put("lastCommit", commit.getString("message"));
+        jsonObject.put("committerAuthor", commit.getJSONObject("committer").getString("name"));
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        Instant parse = Instant.parse(commit.getJSONObject("committer").getString("date"));
+        jsonObject.put("committerDate", DateFormatUtil.get(Date.from(parse)));
+        jsonObject.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/" + object.getString("sha"));
         return jsonObject;
     }
 

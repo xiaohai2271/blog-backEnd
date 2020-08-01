@@ -20,4 +20,5 @@ public class CategoryModel {
     private String name;
 
     private List<ArticleModel> articles;
+    private boolean deleted;
 }
