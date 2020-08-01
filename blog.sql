@@ -75,7 +75,7 @@ CREATE TABLE `links`
     `l_id`           bigint(20) primary key auto_increment,
     `l_name`         varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友站名称',
     `l_is_open`      boolean                                          default true comment '是否公开',
-    `l_url`          varchar(255)                            not null comment '首页地址',
+    `l_url`          varchar(255) unique                     not null comment '首页地址',
     `l_icon_path`    varchar(255)                            not null comment '友链的icon地址',
     `l_desc`         varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友链的说明描述',
     `is_delete`      boolean                                 not null default false comment '该数据是否被删除',
