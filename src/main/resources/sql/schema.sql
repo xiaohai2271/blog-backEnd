@@ -1,6 +1,14 @@
-CREATE DATABASE if not exists `blog`;
+drop view if exists articleView;
+drop view if exists commentView;
+drop table if exists article_tag;
+drop table if exists comment;
+drop table if exists article;
+drop table if exists user;
+drop table if exists tag_category;
+drop table if exists links;
+drop table if exists visitor;
+drop table if exists web_update;
 
-USE blog;
 
 CREATE TABLE `user`
 (
