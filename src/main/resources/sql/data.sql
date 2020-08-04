@@ -139,8 +139,8 @@ VALUES (1, 3, 7),
 
 INSERT INTO `comment` (`co_id`, `co_page_path`, `co_content`, `co_date`, `co_status`, `co_pid`, `co_from_author_id`,
                        `co_to_author_id`)
-VALUES (1, '/a', 'test comment', '2020-05-22 23:57:17', 0, -1, 1, -1),
-       (2, '/a', 'test comment', '2020-05-22 23:57:31', 0, -1, 1, 1);
+VALUES (1, '/a', 'test comment', '2020-05-22 23:57:17', 0, -1, 1, null),
+       (2, '/a', 'test comment', '2020-05-22 23:57:31', 0, -1, 1, null);
 
 
 

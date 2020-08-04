@@ -74,7 +74,9 @@ CREATE TABLE `comment`
     `co_status`         tinyint                         not null default 0 comment '评论的状态',
     `co_pid`            bigint                          not null default -1 comment '评论/留言的父id',
     `co_from_author_id` int                             not null comment '留言者id',
-    `co_to_author_id`   int                                      default null comment '父评论的作者id'
+    `co_to_author_id`   int                                      default null comment '父评论的作者id',
+    foreign key (co_from_author_id) references user (u_id),
+    foreign key (co_to_author_id) references user (u_id)
 ) DEFAULT CHARSET = utf8mb4
   COLLATE utf8mb4_general_ci,comment '评论/留言表';
 
