@@ -1,11 +1,10 @@
  # 小海博客后端管理系统
 ![Build](https://github.com/xiaohai2271/blog-backEnd/workflows/Build/badge.svg)![Test](https://github.com/xiaohai2271/blog-backEnd/workflows/Test/badge.svg) ![GitHub](https://img.shields.io/github/license/xiaohai2271/blog-backEnd) [![Website](https://img.shields.io/website?up_message=%E5%B0%8F%E6%B5%B7%E5%8D%9A%E5%AE%A2&url=https%3A%2F%2Fwww.celess.cn)](https://www.celess.cn)
-  ## 基于Springboot的后端博客管理系统
+
+> 基于Springboot的后端博客管理系统
 
 
-
-
-  ### 主要使用的技术
+## 🎈主要使用的技术
 
 |    使用的技术    |    名称    |     版本      |
 | :--------------: | :--------: | :-----------: |
@@ -20,7 +19,11 @@
 | 缓存（线上环境） |   redis    |     3.0.6     |
 |数据库|mysql|5.7|
 
-  ### 接口文档
+## 🔨如何构建
+详情参照[Build](./doc/Build.md)文档
 
-   项目采用swagger2，接口文档自动生成，具体为 http://ip:port/doc.html
 
+## 📒接口文档
+项目采用swagger2，接口文档自动生成，具体为 http://ip:port/doc.html
+
+或者参照[离线API文档](./doc/API.md)
