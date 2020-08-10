@@ -36,3 +36,6 @@
 项目采用swagger2，接口文档自动生成，具体为 http://ip:port/doc.html
 
 或者参照[离线API文档](./doc/API.md)
+
+## ☀授权协议
+[MIT](./LICENSE)
