@@ -7,6 +7,7 @@ import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
 import cn.celess.blog.mapper.UserMapper;
+import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.MD5Util;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -24,13 +25,14 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static cn.celess.blog.enmu.ResponseEnum.*;
 
 public class UserControllerTest extends BaseTest {
 
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    UserService userService;
 
     @Test
     public void login() throws Exception {
@@ -99,6 +101,10 @@ public class UserControllerTest extends BaseTest {
         connection.setRequestMethod("GET");
         InputStream inputStream = connection.getInputStream();
         assertNotNull(inputStream);
+
+        // mock 实现类
+        mockInjectInstance(userService, "qiniuService", new TestQiNiuServiceImpl());
+
         MockMultipartFile file = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE, inputStream);
         mockMvc.perform(multipart("/user/imgUpload").file(file)).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)));
         mockMvc.perform(multipart("/user/imgUpload").file(file).header("Authorization", userLogin())).andDo(result -> {

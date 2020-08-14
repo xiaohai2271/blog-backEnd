@@ -182,7 +182,8 @@ public class LinksControllerTest extends BaseTest {
     @Test
     public void apply() {
         // 做service 层的测试
-        mockEmailServiceInstance(partnerSiteService, "mailService");
+        //        mockEmailServiceInstance(partnerSiteService, "mailService");
+        mockInjectInstance(partnerSiteService, "mailService", new TestMailServiceImpl());
         LinkApplyReq req = new LinkApplyReq();
         req.setName(randomStr(4));
         req.setUrl("https://" + randomStr(4) + ".celess.cn");
@@ -224,7 +225,7 @@ public class LinksControllerTest extends BaseTest {
 
     @Test
     public void reapply() {
-        mockEmailServiceInstance(partnerSiteService, "mailService");
+        //mockEmailServiceInstance(partnerSiteService, "mailService");
         try {
             partnerSiteService.reapply(randomStr());
             throw new AssertionError();

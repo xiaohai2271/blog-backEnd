@@ -2,12 +2,15 @@ package cn.celess.blog;
 
 
 import cn.celess.blog.entity.Response;
+import cn.celess.blog.entity.model.QiniuResponse;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.service.MailService;
+import cn.celess.blog.service.QiniuService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qiniu.storage.model.FileInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -32,6 +35,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -273,12 +277,12 @@ public class BaseTest {
      * @param service       service 类
      * @param mailFiledName service 中自动注入的mailService字段名
      */
-    protected void mockEmailServiceInstance(Object service, String mailFiledName) {
-        Field mailServiceField;
+    protected void mockInjectInstance(Object service, String mailFiledName, Object impl) {
+        Field field;
         try {
-            mailServiceField = service.getClass().getDeclaredField(mailFiledName);
-            mailServiceField.setAccessible(true);
-            mailServiceField.set(service, new TestMailServiceImpl());
+            field = service.getClass().getDeclaredField(mailFiledName);
+            field.setAccessible(true);
+            field.set(service, impl);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -286,7 +290,7 @@ public class BaseTest {
 
 
     @Slf4j
-    protected static class TestMailServiceImpl implements MailService {
+    public static class TestMailServiceImpl implements MailService {
 
         @Override
         public Boolean AsyncSend(SimpleMailMessage message) {
@@ -313,6 +317,27 @@ public class BaseTest {
             } catch (JsonProcessingException e) {
                 return null;
             }
+        }
+    }
+
+    @Slf4j
+    public static class TestQiNiuServiceImpl implements QiniuService {
+        @Override
+        public QiniuResponse uploadFile(InputStream is, String fileName) {
+            QiniuResponse response = new QiniuResponse();
+            log.debug("上传文件请求，[fileName:{}]", fileName);
+
+            response.key = "key";
+            response.bucket = "bucket";
+            response.hash = "hash";
+            response.fsize = 1;
+            return response;
+        }
+
+        @Override
+        public FileInfo[] getFileList() {
+            log.debug("获取文件列表请求");
+            return new FileInfo[0];
         }
     }
 
