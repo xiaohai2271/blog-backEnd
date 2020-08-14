@@ -26,7 +26,7 @@ public class DruidConfig {
     @Bean
     public DruidDataSource druidDataSource() {
         DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setDriverClassName(driverClassName);
         // 数据库基本信息
         dataSource.setUrl(dbUrl);
         dataSource.setUsername(username);
