@@ -23,7 +23,7 @@ public class RedisServerMock {
      */
     @PostConstruct
     public void startRedis() throws IOException {
-        redisServer = new RedisServer(6379);
+        redisServer = new RedisServer(6380);
         redisServer.start();
     }
 
