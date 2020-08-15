@@ -283,6 +283,7 @@ public class BaseTest {
     protected void mockInjectInstance(Object service, String mailFiledName, Object impl) {
         Field field;
         try {
+            assertNotNull(service);
             field = service.getClass().getDeclaredField(mailFiledName);
             field.setAccessible(true);
             field.set(service, impl);

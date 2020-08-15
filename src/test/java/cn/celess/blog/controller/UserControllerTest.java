@@ -48,6 +48,7 @@ public class UserControllerTest extends BaseTest {
     };
     private static final TypeReference<?> USER_MODEL_LIST_TYPE = new TypeReference<Response<List<Map<String, Object>>>>() {
     };
+    @Autowired
     UserService userService;
 
 
@@ -90,7 +91,7 @@ public class UserControllerTest extends BaseTest {
 
     @Test
     public void getUserInfo() throws Exception {
-        getMockData(get("/user/userInfo"), userLogin()).andDo(result -> {
+        getMockData(get("/user/userInfo"), adminLogin()).andDo(result -> {
             Response<UserModel> response = getResponse(result, USER_MODEL_TYPE);
             assertEquals(SUCCESS.getCode(), response.getCode());
             UserModel u = response.getResult();
