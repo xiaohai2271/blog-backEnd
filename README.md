@@ -11,8 +11,8 @@
 [![GitHub](https://img.shields.io/github/license/xiaohai2271/blog-backEnd)](https://github.com/xiaohai2271/blog-backEnd)
 [![Website](https://img.shields.io/website?up_message=%E5%B0%8F%E6%B5%B7%E5%8D%9A%E5%AE%A2&url=https%3A%2F%2Fwww.celess.cn)](https://www.celess.cn)
 
-</div>
 
+> 请配合前端项目一起食用 [https://github.com/xiaohai2271/blog-frontEnd](https://github.com/xiaohai2271/blog-frontEnd)
 ## 🎈主要使用的技术
 
 |    使用的技术    |    名称    |     版本      |
