@@ -1,7 +1,7 @@
 package cn.celess.blog;
 
-import redis.embedded.RedisServer;
 import org.springframework.stereotype.Component;
+import redis.embedded.RedisServer;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

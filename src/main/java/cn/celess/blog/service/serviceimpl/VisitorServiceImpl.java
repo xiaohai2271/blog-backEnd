@@ -15,7 +15,6 @@ import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.stereotype.Service;
@@ -26,6 +25,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -67,8 +68,9 @@ public class VisitorServiceImpl implements VisitorService {
         visitor.setUa(request.getHeader("User-Agent"));
         //记录当日的访问
         String dayVisitCount = redisUtil.get("dayVisitCount");
-        long secondsLeftToday = 86400 - DateUtils.getFragmentInSeconds(Calendar.getInstance(), Calendar.DATE);
-        Date date = new Date(Calendar.YEAR);
+
+        LocalDateTime midnight = LocalDateTime.now().plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        long secondsLeftToday = ChronoUnit.SECONDS.between(LocalDateTime.now(), midnight);
         if (dayVisitCount == null) {
             redisUtil.setEx("dayVisitCount", "1", secondsLeftToday, TimeUnit.SECONDS);
         } else {

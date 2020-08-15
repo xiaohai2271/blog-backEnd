@@ -1,36 +1,42 @@
 package cn.celess.blog.controller;
 
 import cn.celess.blog.BaseTest;
+import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.Tag;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.TagModel;
 import cn.celess.blog.mapper.TagMapper;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.Map;
 
+import static cn.celess.blog.enmu.ResponseEnum.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static cn.celess.blog.enmu.ResponseEnum.*;
 
 public class TagControllerTest extends BaseTest {
     @Autowired
     TagMapper tagMapper;
+    private static final TypeReference<?> TAG_MODEL_TYPE = new TypeReference<Response<TagModel>>() {
+
+    };
+    private static final TypeReference<?> TAG_MODEL_PAGE_TYPE = new TypeReference<Response<PageData<TagModel>>>() {
+    };
+    private static final TypeReference<?> TAG_NAC_LIST_TYPE = new TypeReference<Response<List<Map<String, Object>>>>() {
+    };
 
     @Test
     public void addOne() throws Exception {
         String name = randomStr(4);
-        mockMvc.perform(post("/admin/tag/create?name=" + name)).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)));
-        mockMvc.perform(post("/admin/tag/create?name=" + name).header("authorization", userLogin())).andDo(result -> assertEquals(PERMISSION_ERROR.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)));
-        mockMvc.perform(post("/admin/tag/create?name=" + name).header("authorization", adminLogin())).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            JSONObject resJson = object.getJSONObject(Result);
-            TagModel tag = (TagModel) JSONObject.toBean(resJson, TagModel.class);
+        getMockData(post("/admin/tag/create?name=" + name)).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result, STRING_TYPE).getCode()));
+        getMockData(post("/admin/tag/create?name=" + name), userLogin()).andDo(result -> assertEquals(PERMISSION_ERROR.getCode(), getResponse(result, STRING_TYPE).getCode()));
+        getMockData(post("/admin/tag/create?name=" + name), adminLogin()).andDo(result -> {
+            Response<TagModel> response = getResponse(result, TAG_MODEL_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            TagModel tag = response.getResult();
             assertNotNull(tag.getId());
             assertEquals(name, tag.getName());
         });
@@ -42,16 +48,14 @@ public class TagControllerTest extends BaseTest {
     public void delOne() throws Exception {
         Tag lastestTag = tagMapper.getLastestTag();
         assertNotNull(lastestTag.getId());
-        String token = adminLogin();
-        mockMvc.perform(delete("/admin/tag/del?id=" + lastestTag.getId()).header("Authorization", token)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            assertTrue(object.getBoolean(Result));
+        getMockData(delete("/admin/tag/del?id=" + lastestTag.getId()), adminLogin()).andDo(result -> {
+            Response<Boolean> response = getResponse(result, BOOLEAN_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            assertTrue(response.getResult());
         });
         long id = lastestTag.getId() * 2;
-        mockMvc.perform(delete("/admin/tag/del?id=" + id).header("Authorization", token)).andDo(result ->
-                assertEquals(TAG_NOT_EXIST.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code))
-        );
+        getMockData(delete("/admin/tag/del?id=" + id), adminLogin())
+                .andDo(result -> assertEquals(TAG_NOT_EXIST.getCode(), getResponse(result, STRING_TYPE).getCode()));
 
     }
 
@@ -59,12 +63,12 @@ public class TagControllerTest extends BaseTest {
     public void updateOne() throws Exception {
         Tag tag = tagMapper.getLastestTag();
         assertNotNull(tag.getId());
-        String name = UUID.randomUUID().toString().substring(0, 4);
-        mockMvc.perform(put("/admin/tag/update?id=" + tag.getId() + "&name=" + name).header("Authorization", adminLogin())).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            assertNotNull(object.getJSONObject(Result));
-            TagModel t = (TagModel) JSONObject.toBean(object.getJSONObject(Result), TagModel.class);
+        String name = randomStr(4);
+        getMockData(put("/admin/tag/update?id=" + tag.getId() + "&name=" + name), adminLogin()).andDo(result -> {
+            Response<TagModel> response = getResponse(result, TAG_MODEL_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            assertNotNull(response.getResult());
+            TagModel t = response.getResult();
             assertEquals(name, t.getName());
             assertEquals(tag.getId(), t.getId());
         });
@@ -73,40 +77,33 @@ public class TagControllerTest extends BaseTest {
 
     @Test
     public void getPage() throws Exception {
-        mockMvc.perform(get("/tags?page=1&count=5"))
-                .andExpect(status().is(200))
-                .andDo(result -> {
-                    JSONObject articlesJSON = JSONObject.fromObject(result.getResponse().getContentAsString());
-                    // 断言获取数据成功
-                    assertEquals(SUCCESS.getCode(), articlesJSON.getInt(Code));
-                    // 结果集非空
-                    assertNotNull(articlesJSON.getJSONObject(Result));
-                    // 判断pageInfo是否包装完全
-                    JSONObject resultJson = JSONObject.fromObject(articlesJSON.getJSONObject(Result));
-                    PageData<TagModel> pageData = (PageData<TagModel>) JSONObject.toBean(resultJson, PageData.class);
-                    assertNotEquals(0, pageData.getTotal());
-                    assertEquals(1, pageData.getPageNum());
-                    assertEquals(5, pageData.getPageSize());
-                    // 内容完整
-                    for (Object tag : pageData.getList()) {
-                        TagModel t = (TagModel) JSONObject.toBean(JSONObject.fromObject(tag), TagModel.class);
-                        assertNotNull(t.getId());
-                        assertNotNull(t.getName());
-                    }
-                });
+        getMockData(get("/tags?page=1&count=5")).andDo(result -> {
+            Response<PageData<TagModel>> response = getResponse(result, TAG_MODEL_PAGE_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            // 结果集非空
+            assertNotNull(response.getResult());
+            // 判断pageInfo是否包装完全
+            PageData<TagModel> pageData = response.getResult();
+            assertNotEquals(0, pageData.getTotal());
+            assertEquals(1, pageData.getPageNum());
+            assertEquals(5, pageData.getPageSize());
+            // 内容完整
+            for (TagModel t : pageData.getList()) {
+                assertNotNull(t.getId());
+                assertNotNull(t.getName());
+            }
+        });
     }
 
     @Test
     public void getTagNameAndCount() throws Exception {
-        mockMvc.perform(get("/tags/nac")).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            JSONArray jsonArray = object.getJSONArray(Result);
-            assertNotNull(jsonArray);
-            jsonArray.forEach(o -> {
-                JSONObject json = JSONObject.fromObject(o);
-                assertTrue(json.containsKey("size"));
-                assertTrue(json.containsKey("name"));
+        getMockData(get("/tags/nac")).andDo(result -> {
+            Response<List<Map<String, Object>>> response = getResponse(result, TAG_NAC_LIST_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            assertNotNull(response.getResult());
+            response.getResult().forEach(o -> {
+                assertNotNull(o.get("name"));
+                assertNotNull(o.get("size"));
             });
         });
     }

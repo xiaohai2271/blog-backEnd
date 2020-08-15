@@ -5,7 +5,7 @@ import cn.celess.blog.entity.Response;
 import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.JwtUtil;
 import cn.celess.blog.util.RedisUtil;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +84,7 @@ public class AuthenticationFilter implements HandlerInterceptor {
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
         try {
             logger.info("鉴权失败，[code:{},msg:{},path:{}]", e.getCode(), e.getMsg(), request.getRequestURI() + "?" + request.getQueryString());
-            response.getWriter().println(JSONObject.fromObject(Response.response(e, null)));
+            response.getWriter().println(new ObjectMapper().writeValueAsString(Response.response(e, null)));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

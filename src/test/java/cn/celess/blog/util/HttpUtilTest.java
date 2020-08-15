@@ -1,13 +1,9 @@
 package cn.celess.blog.util;
 
 import cn.celess.blog.BaseTest;
-import cn.celess.blog.enmu.ResponseEnum;
-import cn.celess.blog.entity.Response;
 import org.junit.Test;
 
-import java.util.Map;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 public class HttpUtilTest extends BaseTest {
 

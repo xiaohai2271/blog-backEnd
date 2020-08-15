@@ -17,8 +17,6 @@ import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.*;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +26,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.beans.Transient;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -312,14 +308,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Object deleteUser(Integer[] id) {
-        JSONArray status = new JSONArray();
+        List<Map<String, Object>> status = new ArrayList<>();
         if (id == null || id.length == 0) {
             return null;
         }
         for (Integer integer : id) {
             String role = userMapper.getRoleById(integer);
             int deleteResult = 0;
-            JSONObject deleteStatus = new JSONObject();
+            Map<String, Object> deleteStatus = new HashMap<>(3);
             deleteStatus.put("id", integer);
             // 管理员账户不可删
             if ("admin".equals(role)) {

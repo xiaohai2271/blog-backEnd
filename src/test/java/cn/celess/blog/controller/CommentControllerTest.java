@@ -3,21 +3,22 @@ package cn.celess.blog.controller;
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.Article;
 import cn.celess.blog.entity.Comment;
+import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.CommentModel;
 import cn.celess.blog.entity.request.CommentReq;
 import cn.celess.blog.mapper.ArticleMapper;
 import cn.celess.blog.mapper.CommentMapper;
 import cn.celess.blog.mapper.UserMapper;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 
-import java.util.UUID;
+import java.util.List;
 
+import static cn.celess.blog.enmu.ResponseEnum.DATA_IS_DELETED;
+import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
 import static org.junit.Assert.*;
-import static cn.celess.blog.enmu.ResponseEnum.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 public class CommentControllerTest extends BaseTest {
@@ -27,46 +28,40 @@ public class CommentControllerTest extends BaseTest {
     UserMapper userMapper;
     @Autowired
     CommentMapper commentMapper;
+    private static final TypeReference<?> COMMENT_MODEL_TYPE = new TypeReference<Response<CommentModel>>() {
+    };
 
     @Test
     public void addOne() throws Exception {
         Article article = articleMapper.getLastestArticle();
         CommentReq commentReq = new CommentReq();
         commentReq.setPagePath("/article/" + article.getId());
-        commentReq.setContent(UUID.randomUUID().toString());
-        commentReq.setPid(-1L);
-        commentReq.setToUserId(-1L);
-        String token = userLogin();
-        mockMvc.perform(post("/user/comment/create")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JSONObject.fromObject(commentReq).toString())
-                .header("Authorization", token)
-        ).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            CommentModel model = (CommentModel) JSONObject.toBean(object.getJSONObject(Result), CommentModel.class);
+        commentReq.setContent(randomStr());
+        List<User> all = userMapper.findAll();
+        commentReq.setPid(1L);
+        commentReq.setToUserId(2l);
+        getMockData(post("/user/comment/create"), userLogin(), commentReq).andDo(result -> {
+            Response<CommentModel> response = getResponse(result, COMMENT_MODEL_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            CommentModel model = response.getResult();
             assertNotEquals(0, model.getId());
             assertEquals(commentReq.getPid(), model.getPid().longValue());
-            assertEquals(-1, model.getPid().longValue());
+            assertEquals(1, model.getPid().longValue());
             assertEquals(commentReq.getContent(), model.getContent());
             assertNotNull(model.getDate());
             assertNotNull(model.getFromUser());
-            assertNull(model.getToUser());
+            assertNotNull(model.getToUser());
         });
 
 
         commentReq.setPagePath("/article/" + article.getId());
-        commentReq.setContent(UUID.randomUUID().toString());
+        commentReq.setContent(randomStr());
         commentReq.setPid(-1L);
         commentReq.setToUserId(2);
-        mockMvc.perform(post("/user/comment/create")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JSONObject.fromObject(commentReq).toString())
-                .header("Authorization", token)
-        ).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            CommentModel model = (CommentModel) JSONObject.toBean(object.getJSONObject(Result), CommentModel.class);
+        getMockData(post("/user/comment/create"), userLogin(), commentReq).andDo(result -> {
+            Response<CommentModel> response = getResponse(result, COMMENT_MODEL_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            CommentModel model = response.getResult();
             // 响应数据的完整性
             assertNotEquals(0, model.getId());
             assertEquals(commentReq.getPid(), model.getPid().longValue());
@@ -79,20 +74,16 @@ public class CommentControllerTest extends BaseTest {
         });
 
         // 测试二级回复
-        Comment lastestComment = commentMapper.getLastestComment();
+        Comment latestComment = commentMapper.getLastestComment();
         commentReq.setPagePath("/article/" + article.getId());
-        commentReq.setContent(UUID.randomUUID().toString());
-        commentReq.setPid(lastestComment.getId());
-        mockMvc.perform(post("/user/comment/create")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(JSONObject.fromObject(commentReq).toString())
-                .header("Authorization", token)
-        ).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            CommentModel model = (CommentModel) JSONObject.toBean(object.getJSONObject(Result), CommentModel.class);
+        commentReq.setContent(randomStr());
+        commentReq.setPid(latestComment.getId());
+        getMockData(post("/user/comment/create"), userLogin(), commentReq).andDo(result -> {
+            Response<CommentModel> response = getResponse(result, COMMENT_MODEL_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            CommentModel model = response.getResult();
             // 重新获取父评论信息
-            Comment pCommon = commentMapper.findCommentById(lastestComment.getId());
+            Comment pCommon = commentMapper.findCommentById(latestComment.getId());
             assertEquals(pCommon.getId(), model.getPid());
         });
     }
@@ -116,16 +107,13 @@ public class CommentControllerTest extends BaseTest {
         // 接口测试
         long id = comment.getId();
         assertNotEquals(0, id);
-        String token = userLogin();
-        mockMvc.perform(delete("/user/comment/del?id=" + id).header("Authorization", token)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            assertTrue(object.getBoolean(Result));
+        getMockData(delete("/user/comment/del?id=" + id), userLogin()).andDo(result -> {
+            Response<Boolean> response = getResponse(result, BOOLEAN_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            assertTrue(response.getResult());
         });
-        mockMvc.perform(delete("/user/comment/del?id=" + id).header("Authorization", token)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(DATA_IS_DELETED.getCode(), object.getInt(Code));
-        });
+        getMockData(delete("/user/comment/del?id=" + id), userLogin())
+                .andDo(result -> assertEquals(DATA_IS_DELETED.getCode(), getResponse(result, COMMENT_MODEL_TYPE).getCode()));
     }
 
     @Test
@@ -133,16 +121,12 @@ public class CommentControllerTest extends BaseTest {
         Comment comment = commentMapper.getLastestComment();
         CommentReq commentReq = new CommentReq();
         commentReq.setId(comment.getId());
-        commentReq.setContent(UUID.randomUUID().toString());
+        commentReq.setContent(randomStr());
         // 不合法数据 setResponseId
-        mockMvc.perform(put("/user/comment/update")
-                .content(JSONObject.fromObject(commentReq).toString())
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .header("Authorization", userLogin())
-        ).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            CommentModel c = (CommentModel) JSONObject.toBean(object.getJSONObject(Result), CommentModel.class);
+        getMockData(put("/user/comment/update"), userLogin(), commentReq).andDo(result -> {
+            Response<CommentModel> response = getResponse(result, COMMENT_MODEL_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            CommentModel c = response.getResult();
             assertEquals(commentReq.getContent(), c.getContent());
         });
     }

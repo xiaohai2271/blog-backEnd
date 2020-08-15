@@ -5,9 +5,7 @@ import cn.celess.blog.entity.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -111,7 +109,7 @@ public class ArticleTagMapperTest extends BaseTest {
     }
 
     private ArticleTag generateArticle() {
-        String randomText = UUID.randomUUID().toString();
+        String randomText = randomStr();
 
         Article article = new Article();
         Category category = new Category();
