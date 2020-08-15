@@ -9,8 +9,8 @@ import cn.celess.blog.service.QiniuService;
 import cn.celess.blog.util.HttpUtil;
 import cn.celess.blog.util.RedisUtil;
 import cn.celess.blog.util.VeriCodeUtil;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,7 +140,8 @@ public class CommonController {
      */
     @PostMapping("/imgUpload")
     public void upload(HttpServletRequest request, HttpServletResponse response, @RequestParam("editormd-image-file") MultipartFile file) throws IOException {
-        JSONObject jsonObject = new JSONObject();
+        Map<String, Object> map = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
         String uploadTimesStr = redisUtil.get(request.getRemoteAddr() + "-ImgUploadTimes");
         int uploadTimes = 0;
         if (uploadTimesStr != null) {
@@ -150,11 +151,11 @@ public class CommonController {
             throw new MyException(ResponseEnum.FAILURE.getCode(), "上传次数已达10次，请2小时后在上传");
         }
         request.setCharacterEncoding("utf-8");
-        response.setContentType("text/html");
+        response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         if (file.isEmpty()) {
-            jsonObject.put("success", 0);
-            jsonObject.put("message", "上传失败，请选择文件");
-            response.getWriter().println(jsonObject.toString());
+            map.put("success", 0);
+            map.put("message", "上传失败，请选择文件");
+            response.getWriter().println(mapper.writeValueAsString(map));
             return;
         }
         String fileName = file.getOriginalFilename();
@@ -162,29 +163,28 @@ public class CommonController {
         if (".png".equals(mime.toLowerCase()) || ".jpg".equals(mime.toLowerCase()) ||
                 ".jpeg".equals(mime.toLowerCase()) || ".bmp".equals(mime.toLowerCase())) {
             QiniuResponse qiniuResponse = qiniuService.uploadFile(file.getInputStream(), "img_" + System.currentTimeMillis() + mime);
-            jsonObject.put("success", 1);
-            jsonObject.put("message", "上传成功");
-            jsonObject.put("url", "http://cdn.celess.cn/" + qiniuResponse.key);
-            response.getWriter().println(jsonObject.toString());
+            map.put("success", 1);
+            map.put("message", "上传成功");
+            map.put("url", "http://cdn.celess.cn/" + qiniuResponse.key);
+            response.getWriter().println(mapper.writeValueAsString(map));
             redisUtil.setEx(request.getRemoteAddr() + "-ImgUploadTimes", uploadTimes + 1 + "", 2, TimeUnit.HOURS);
             return;
         }
-        jsonObject.put("success", 0);
-        jsonObject.put("message", "上传失败，请上传图片文件");
-        response.getWriter().println(jsonObject.toString());
+        map.put("success", 0);
+        map.put("message", "上传失败，请上传图片文件");
+        response.getWriter().println(mapper.writeValueAsString(map));
     }
 
     @GetMapping("/bingPic")
     public Response bingPic() {
-
-        JSONObject imageObj;
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root;
         try {
-            imageObj = JSONObject.fromObject(HttpUtil.get("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"));
+            root = mapper.readTree(HttpUtil.get("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"));
         } catch (IOException e) {
             return Response.failure(null);
         }
-        JSONArray jsonArray = imageObj.getJSONArray("images");
-        String imageName = jsonArray.getJSONObject(0).getString("url");
-        return Response.success("https://cn.bing.com" + imageName);
+        JsonNode images = root.get("images").elements().next();
+        return Response.success("https://cn.bing.com" + images.get("url").asText());
     }
 }

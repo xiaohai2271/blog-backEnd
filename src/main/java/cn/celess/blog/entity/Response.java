@@ -1,8 +1,9 @@
 package cn.celess.blog.entity;
 
 import cn.celess.blog.enmu.ResponseEnum;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import net.sf.json.JSONObject;
+import lombok.SneakyThrows;
 
 import java.io.Serializable;
 
@@ -56,9 +57,9 @@ public class Response<T> implements Serializable {
         return new Response(r.getCode(), r.getMsg(), result);
     }
 
+    @SneakyThrows
     @Override
     public String toString() {
-        JSONObject jsonObject = JSONObject.fromObject(this);
-        return jsonObject.toString();
+        return new ObjectMapper().writeValueAsString(this);
     }
 }

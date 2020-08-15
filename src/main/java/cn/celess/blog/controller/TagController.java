@@ -3,12 +3,13 @@ package cn.celess.blog.controller;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.model.TagModel;
 import cn.celess.blog.service.TagService;
-import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : xiaohai
@@ -44,13 +45,13 @@ public class TagController {
 
     @GetMapping("/tags/nac")
     public Response getTagNameAndCount() {
-        List<JSONObject> nameAndCount = new ArrayList<>();
+        List<Map<String, Object>> nameAndCount = new ArrayList<>();
         List<TagModel> all = tagService.findAll();
         for (TagModel t : all) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("name", t.getName());
-            jsonObject.put("size", t.getArticles().size());
-            nameAndCount.add(jsonObject);
+            Map<String, Object> map = new HashMap<>(2);
+            map.put("name", t.getName());
+            map.put("size", t.getArticles().size());
+            nameAndCount.add(map);
         }
         return Response.success(nameAndCount);
     }
