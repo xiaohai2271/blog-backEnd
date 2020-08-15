@@ -68,7 +68,7 @@ public class LinksControllerTest extends BaseTest {
         partnerSite.setOpen(true);
         partnerSite.setDesc("");
         partnerSite.setIconPath("");
-        partnerSite.setUrl("https://www.celess.cn");
+        partnerSite.setUrl("https://" + randomStr(4) + ".celess.cn");
         mapper.insert(partnerSite);
         PartnerSite latest = mapper.getLastest();
         assertNotNull(latest.getId());
