@@ -3,7 +3,8 @@ package cn.celess.blog.util;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.User;
 import cn.celess.blog.exception.MyException;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,24 +32,27 @@ public class RedisUserUtil {
         return user;
     }
 
+    @SneakyThrows
     public User getWithOutExc() {
         String token = request.getHeader("Authorization");
         if (token == null || token.isEmpty()) {
             return null;
         }
         String email = jwtUtil.getUsernameFromToken(token);
-        return (User) JSONObject.toBean(JSONObject.fromObject(redisUtil.get(email + "-login")), User.class);
+        return new ObjectMapper().readValue(redisUtil.get(email + "-login"), User.class);
     }
 
+    @SneakyThrows
     public User set(User user) {
         Long expire = redisUtil.getExpire(user.getEmail() + "-login");
-        redisUtil.setEx(user.getEmail() + "-login", JSONObject.fromObject(user).toString(),
+        redisUtil.setEx(user.getEmail() + "-login", new ObjectMapper().writeValueAsString(user),
                 expire > 0 ? expire : JwtUtil.EXPIRATION_SHORT_TIME, TimeUnit.MILLISECONDS);
         return user;
     }
 
+    @SneakyThrows
     public User set(User user, boolean isRemember) {
-        redisUtil.setEx(user.getEmail() + "-login", JSONObject.fromObject(user).toString(),
+        redisUtil.setEx(user.getEmail() + "-login", new ObjectMapper().writeValueAsString(user),
                 isRemember ? JwtUtil.EXPIRATION_LONG_TIME : JwtUtil.EXPIRATION_SHORT_TIME, TimeUnit.MILLISECONDS);
         request.getSession().setAttribute("email", user.getEmail());
         return user;
