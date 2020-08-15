@@ -32,7 +32,7 @@ public class LinksControllerTest extends BaseTest {
         LinkReq linkReq = new LinkReq();
         linkReq.setName(randomStr(4));
         linkReq.setOpen(false);
-        linkReq.setUrl("https://example.com");
+        linkReq.setUrl("https://" + randomStr(4) + "example.com");
         getMockData(post("/admin/links/create"), adminLogin(), linkReq).andDo(result -> {
             Response<PartnerSite> response = getResponse(result, LINK_MODEL_TYPE);
             assertEquals(SUCCESS.getCode(), response.getCode());
@@ -46,12 +46,12 @@ public class LinksControllerTest extends BaseTest {
         // https/http
         linkReq.setName(randomStr(4));
         linkReq.setOpen(false);
-        linkReq.setUrl("example.com");
+        linkReq.setUrl(randomStr(4) + ".example.com");
         getMockData(post("/admin/links/create"), adminLogin(), linkReq).andDo(result -> {
             Response<PartnerSite> response = getResponse(result, LINK_MODEL_TYPE);
             assertEquals(SUCCESS.getCode(), response.getCode());
             PartnerSite site = response.getResult();
-            assertEquals("http://example.com", site.getUrl());
+            assertEquals("http://" + linkReq.getUrl(), site.getUrl());
         });
 
         // 测试已存在的数据
@@ -95,7 +95,7 @@ public class LinksControllerTest extends BaseTest {
         partnerSite.setDesc("");
         partnerSite.setIconPath("");
         partnerSite.setDelete(false);
-        partnerSite.setUrl("https://www.celess.cn");
+        partnerSite.setUrl("https://" + randomStr(5) + ".celess.cn");
         mapper.insert(partnerSite);
         // 查数据
         PartnerSite latest = mapper.getLastest();
