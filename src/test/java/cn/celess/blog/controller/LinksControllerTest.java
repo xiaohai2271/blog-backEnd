@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.UUID;
 
 import static cn.celess.blog.enmu.ResponseEnum.*;
 import static org.junit.Assert.*;
@@ -45,7 +44,7 @@ public class LinksControllerTest extends BaseTest {
         });
 
         // https/http
-        linkReq.setName(UUID.randomUUID().toString().substring(0, 4));
+        linkReq.setName(randomStr(4));
         linkReq.setOpen(false);
         linkReq.setUrl("example.com");
         getMockData(post("/admin/links/create"), adminLogin(), linkReq).andDo(result -> {
@@ -105,7 +104,7 @@ public class LinksControllerTest extends BaseTest {
         LinkReq linkReq = new LinkReq();
         linkReq.setUrl(latest.getUrl());
         linkReq.setOpen(!latest.getOpen());
-        linkReq.setName(UUID.randomUUID().toString().substring(0, 4));
+        linkReq.setName(randomStr(4));
         linkReq.setId(latest.getId());
 
         getMockData(put("/admin/links/update"), adminLogin(), linkReq).andDo(result -> {

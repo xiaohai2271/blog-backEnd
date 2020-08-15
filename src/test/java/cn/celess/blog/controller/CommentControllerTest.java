@@ -14,7 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
+import java.util.List;
 
 import static cn.celess.blog.enmu.ResponseEnum.DATA_IS_DELETED;
 import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
@@ -36,25 +36,26 @@ public class CommentControllerTest extends BaseTest {
         Article article = articleMapper.getLastestArticle();
         CommentReq commentReq = new CommentReq();
         commentReq.setPagePath("/article/" + article.getId());
-        commentReq.setContent(UUID.randomUUID().toString());
-        commentReq.setPid(-1L);
-        commentReq.setToUserId(-1L);
+        commentReq.setContent(randomStr());
+        List<User> all = userMapper.findAll();
+        commentReq.setPid(1L);
+        commentReq.setToUserId(2l);
         getMockData(post("/user/comment/create"), userLogin(), commentReq).andDo(result -> {
             Response<CommentModel> response = getResponse(result, COMMENT_MODEL_TYPE);
             assertEquals(SUCCESS.getCode(), response.getCode());
             CommentModel model = response.getResult();
             assertNotEquals(0, model.getId());
             assertEquals(commentReq.getPid(), model.getPid().longValue());
-            assertEquals(-1, model.getPid().longValue());
+            assertEquals(1, model.getPid().longValue());
             assertEquals(commentReq.getContent(), model.getContent());
             assertNotNull(model.getDate());
             assertNotNull(model.getFromUser());
-            assertNull(model.getToUser());
+            assertNotNull(model.getToUser());
         });
 
 
         commentReq.setPagePath("/article/" + article.getId());
-        commentReq.setContent(UUID.randomUUID().toString());
+        commentReq.setContent(randomStr());
         commentReq.setPid(-1L);
         commentReq.setToUserId(2);
         getMockData(post("/user/comment/create"), userLogin(), commentReq).andDo(result -> {
@@ -75,7 +76,7 @@ public class CommentControllerTest extends BaseTest {
         // 测试二级回复
         Comment latestComment = commentMapper.getLastestComment();
         commentReq.setPagePath("/article/" + article.getId());
-        commentReq.setContent(UUID.randomUUID().toString());
+        commentReq.setContent(randomStr());
         commentReq.setPid(latestComment.getId());
         getMockData(post("/user/comment/create"), userLogin(), commentReq).andDo(result -> {
             Response<CommentModel> response = getResponse(result, COMMENT_MODEL_TYPE);
@@ -120,7 +121,7 @@ public class CommentControllerTest extends BaseTest {
         Comment comment = commentMapper.getLastestComment();
         CommentReq commentReq = new CommentReq();
         commentReq.setId(comment.getId());
-        commentReq.setContent(UUID.randomUUID().toString());
+        commentReq.setContent(randomStr());
         // 不合法数据 setResponseId
         getMockData(put("/user/comment/update"), userLogin(), commentReq).andDo(result -> {
             Response<CommentModel> response = getResponse(result, COMMENT_MODEL_TYPE);

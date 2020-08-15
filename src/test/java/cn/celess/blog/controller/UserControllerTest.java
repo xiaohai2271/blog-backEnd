@@ -68,8 +68,8 @@ public class UserControllerTest extends BaseTest {
 
     @Test
     public void updateInfo() throws Exception {
-        String desc = UUID.randomUUID().toString().substring(0, 4);
-        String disPlayName = UUID.randomUUID().toString().substring(0, 4);
+        String desc = randomStr(4);
+        String disPlayName = randomStr(4);
         getMockData(put("/user/userInfo/update?desc=" + desc + "&displayName=" + disPlayName), userLogin()).andDo(result -> {
             Response<UserModel> response = getResponse(result, USER_MODEL_TYPE);
             assertEquals(SUCCESS.getCode(), response.getCode());
@@ -157,7 +157,7 @@ public class UserControllerTest extends BaseTest {
     public void multipleDelete() throws Exception {
         List<User> userList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            String s = UUID.randomUUID().toString();
+            String s = randomStr();
             String email = s.substring(s.length() - 4) + "@celess.cn";
             String pwd = MD5Util.getMD5("123456789");
             User user = new User(email, pwd);
@@ -202,7 +202,7 @@ public class UserControllerTest extends BaseTest {
         userReq.setEmailStatus(new Random().nextBoolean());
         userReq.setRole("admin");
         userReq.setDisplayName(randomStr(4));
-        userReq.setEmail(randomStr().substring(0, 5) + "@celess.cn");
+        userReq.setEmail(randomStr(5) + "@celess.cn");
         getMockData(put("/admin/user"), adminLogin(), userReq).andDo(result -> {
             Response<UserModel> response = getResponse(result, USER_MODEL_TYPE);
             assertEquals(SUCCESS.getCode(), response.getCode());
