@@ -10,9 +10,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static cn.celess.blog.enmu.ResponseEnum.*;
 
 public class CategoryControllerTest extends BaseTest {
 

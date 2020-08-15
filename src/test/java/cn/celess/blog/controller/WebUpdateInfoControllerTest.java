@@ -14,7 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Date;
 import java.util.List;
 
-import static cn.celess.blog.enmu.ResponseEnum.*;
+import static cn.celess.blog.enmu.ResponseEnum.DATA_NOT_EXIST;
+import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 

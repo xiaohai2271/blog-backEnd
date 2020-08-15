@@ -8,24 +8,13 @@ import cn.celess.blog.entity.request.LinkApplyReq;
 import cn.celess.blog.entity.request.LinkReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.PartnerMapper;
+import cn.celess.blog.service.PartnerSiteService;
 import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import cn.celess.blog.service.MailService;
-import cn.celess.blog.service.PartnerSiteService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.json.JSONObject;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.mail.SimpleMailMessage;
-
-import java.lang.reflect.Field;
-import java.util.UUID;
 
 import static cn.celess.blog.enmu.ResponseEnum.*;
 import static org.junit.Assert.*;
@@ -228,7 +217,7 @@ public class LinksControllerTest extends BaseTest {
         req.setEmail(randomStr(4) + "@celess.cn");
         req.setLinkUrl("https://bing.com");
         req.setUrl(req.getLinkUrl());
-        String uuid = null;
+        String uuid;
         try {
             partnerSiteService.apply(req);
             // err here

@@ -23,14 +23,16 @@ import org.springframework.util.MultiValueMap;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static cn.celess.blog.enmu.ResponseEnum.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static cn.celess.blog.enmu.ResponseEnum.*;
 
 
 public class UserControllerTest extends BaseTest {

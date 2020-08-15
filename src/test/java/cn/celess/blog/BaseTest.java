@@ -33,7 +33,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -64,6 +63,8 @@ public class BaseTest {
     protected MockMvc mockMvc;
     protected final static String Code = "code";
     protected final static String Result = "result";
+    protected final static String USERE_MAIL = "zh56462271@qq.com";
+    protected final static String ADMIN_EMAIL = "a@celess.cn";
 
     /**
      * jackson 序列化/反序列化Json

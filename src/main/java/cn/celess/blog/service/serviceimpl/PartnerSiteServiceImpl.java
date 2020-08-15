@@ -10,7 +10,6 @@ import cn.celess.blog.mapper.PartnerMapper;
 import cn.celess.blog.service.MailService;
 import cn.celess.blog.service.PartnerSiteService;
 import cn.celess.blog.util.HttpUtil;
-import cn.celess.blog.util.JwtUtil;
 import cn.celess.blog.util.RedisUtil;
 import cn.celess.blog.util.RegexUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;

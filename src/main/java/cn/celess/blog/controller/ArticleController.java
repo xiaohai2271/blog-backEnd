@@ -3,7 +3,6 @@ package cn.celess.blog.controller;
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.model.ArticleModel;
-import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.request.ArticleReq;
 import cn.celess.blog.service.ArticleService;
 import cn.celess.blog.util.RedisUserUtil;
@@ -13,8 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai

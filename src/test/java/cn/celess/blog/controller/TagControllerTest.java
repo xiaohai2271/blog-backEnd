@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Map;
 
+import static cn.celess.blog.enmu.ResponseEnum.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static cn.celess.blog.enmu.ResponseEnum.*;
 
 public class TagControllerTest extends BaseTest {
     @Autowired
