@@ -10,6 +10,7 @@ import cn.celess.blog.service.WebUpdateInfoService;
 import cn.celess.blog.util.DateFormatUtil;
 import cn.celess.blog.util.HttpUtil;
 import cn.celess.blog.util.ModalTrans;
+import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageHelper;
@@ -88,15 +89,18 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
         map.put("lastUpdateInfo", webUpdateInfoMapper.getLastestOne().getUpdateInfo());
         try {
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(HttpUtil.get("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1"));
-            Iterator<JsonNode> elements = root.elements();
-            JsonNode next = elements.next();
-            JsonNode commit = next.get("commit");
-            map.put("lastCommit", commit.get("message"));
-            map.put("committerAuthor", commit.get("committer").get("name"));
-            Instant parse = Instant.parse(commit.get("committer").get("date").asText());
-            map.put("committerDate", DateFormatUtil.get(Date.from(parse)));
-            map.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/" + next.get("sha").asText());
+            String respStr = HttpUtil.get("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1");
+            if (!StringUtils.isEmpty(respStr)) {
+                JsonNode root = mapper.readTree(respStr);
+                Iterator<JsonNode> elements = root.elements();
+                JsonNode next = elements.next();
+                JsonNode commit = next.get("commit");
+                map.put("lastCommit", commit.get("message"));
+                map.put("committerAuthor", commit.get("committer").get("name"));
+                Instant parse = Instant.parse(commit.get("committer").get("date").asText());
+                map.put("committerDate", DateFormatUtil.get(Date.from(parse)));
+                map.put("commitUrl", "https://github.com/xiaohai2271/blog-frontEnd/tree/" + next.get("sha").asText());
+            }
         } catch (IOException e) {
             log.info("网络请求失败{}", e.getMessage());
         }
