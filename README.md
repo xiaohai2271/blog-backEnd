@@ -1,11 +1,19 @@
- # 小海博客后端管理系统
-![Build Staus](https://github.com/xiaohai2271/blog-backEnd/workflows/Blog%20backEnd%20CI/badge.svg?branch=master&event=push) ![coverage report](https://gitlab.com/xiaohai2271/blog-backEnd/badges/master/coverage.svg) ![GitHub](https://img.shields.io/github/license/xiaohai2271/blog-backEnd) [![Website](https://img.shields.io/website?up_message=%E5%B0%8F%E6%B5%B7%E5%8D%9A%E5%AE%A2&url=https%3A%2F%2Fwww.celess.cn)](https://www.celess.cn)
-  ## 基于Springboot的后端博客管理系统
+<h1 align="center">
+小海博客后端管理系统
+</h1>
 
+<div align="center">
 
+基于Springboot的后端博客管理系统
 
+[![Build](https://github.com/xiaohai2271/blog-backEnd/workflows/Build/badge.svg)](https://github.com/xiaohai2271/blog-backEnd)
+[![Test](https://github.com/xiaohai2271/blog-backEnd/workflows/Test/badge.svg)](https://github.com/xiaohai2271/blog-backEnd)
+[![GitHub](https://img.shields.io/github/license/xiaohai2271/blog-backEnd)](https://github.com/xiaohai2271/blog-backEnd)
+[![Website](https://img.shields.io/website?up_message=%E5%B0%8F%E6%B5%B7%E5%8D%9A%E5%AE%A2&url=https%3A%2F%2Fwww.celess.cn)](https://www.celess.cn)
 
-  ### 主要使用的技术
+</div>
+
+## 🎈主要使用的技术
 
 |    使用的技术    |    名称    |     版本      |
 | :--------------: | :--------: | :-----------: |
@@ -18,18 +26,16 @@
 |     接口文档     |  Swagger   |     2.6.1     |
 |   数据库连接池   |   druid    |    1.1.14     |
 | 缓存（线上环境） |   redis    |     3.0.6     |
-|数据库|mysql|5.7|
+|    数据库     |mysql          |5.7            |
 
-  ### 接口文档
+## 🔨如何构建
+详情参照[Build](./doc/Build.md)文档
 
-   项目采用swagger2，接口文档自动生成，具体为 http://ip:端口/swagger-ui.html
 
-  ###  📝TODO
+## 📒接口文档
+项目采用swagger2，接口文档自动生成，具体为 http://ip:port/doc.html
 
-  - [x] 密码重置
-  - [x] 信息修改
-  - [ ] 接入qq登录
+或者参照[离线API文档](./doc/API.md)
 
-  ### 📌FIXME
-
-  - [ ] `/write` 图片上传的跨域问题
+## ☀授权协议
+[MIT](./LICENSE)

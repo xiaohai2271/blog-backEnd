@@ -39,8 +39,9 @@ public class ExceptionHandle {
     public Response handle(Exception e) {
         //自定义错误
         if (e instanceof MyException) {
-            logger.debug("返回了自定义的exception,[code={},msg={}]", ((MyException) e).getCode(), e.getMessage());
-            return new Response(((MyException) e).getCode(), e.getMessage(), null);
+            MyException exception = (MyException) e;
+            logger.debug("返回了自定义的exception,[code={},msg={},result={}]", exception.getCode(), e.getMessage(), exception.getResult());
+            return new Response(exception.getCode(), e.getMessage(), exception.getResult());
         }
         //请求路径不支持该方法
         if (e instanceof HttpRequestMethodNotSupportedException) {

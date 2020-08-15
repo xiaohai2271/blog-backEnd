@@ -81,6 +81,7 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
     }
 
     @Override
+
     public Map<String, Object> getLastestUpdateTime() {
         Map<String, Object> map = new HashMap<>();
         map.put("lastUpdateTime", DateFormatUtil.get(webUpdateInfoMapper.getLastestOne().getUpdateTime()));

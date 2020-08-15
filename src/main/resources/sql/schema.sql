@@ -1,6 +1,14 @@
-CREATE DATABASE if not exists `blog`;
+drop view if exists articleView;
+drop view if exists commentView;
+drop table if exists article_tag;
+drop table if exists comment;
+drop table if exists article;
+drop table if exists user;
+drop table if exists tag_category;
+drop table if exists links;
+drop table if exists visitor;
+drop table if exists web_update;
 
-USE blog;
 
 CREATE TABLE `user`
 (
@@ -66,19 +74,23 @@ CREATE TABLE `comment`
     `co_status`         tinyint                         not null default 0 comment '评论的状态',
     `co_pid`            bigint                          not null default -1 comment '评论/留言的父id',
     `co_from_author_id` int                             not null comment '留言者id',
-    `co_to_author_id`   int                                      default null comment '父评论的作者id'
+    `co_to_author_id`   int                                      default null comment '父评论的作者id',
+    foreign key (co_from_author_id) references user (u_id),
+    foreign key (co_to_author_id) references user (u_id)
 ) DEFAULT CHARSET = utf8mb4
   COLLATE utf8mb4_general_ci,comment '评论/留言表';
 
 CREATE TABLE `links`
 (
-    `l_id`        bigint(20) primary key auto_increment,
-    `l_name`      varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友站名称',
-    `l_is_open`   boolean                                          default true comment '是否公开',
-    `l_url`       varchar(255)                            not null comment '首页地址',
-    `l_icon_path` varchar(255)                            not null comment '友链的icon地址',
-    `l_desc`      varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友链的说明描述',
-    `is_delete`   boolean                                 not null default false comment '该数据是否被删除'
+    `l_id`           bigint(20) primary key auto_increment,
+    `l_name`         varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友站名称',
+    `l_is_open`      boolean                                          default true comment '是否公开',
+    `l_url`          varchar(255) unique                     not null comment '首页地址',
+    `l_icon_path`    varchar(255)                            not null comment '友链的icon地址',
+    `l_desc`         varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友链的说明描述',
+    `is_delete`      boolean                                 not null default false comment '该数据是否被删除',
+    `l_email`        varchar(255) comment '网站管理员的邮箱',
+    `l_notification` boolean                                          default false comment '是否通知了'
 ) comment '友站表';
 
 CREATE TABLE `visitor`

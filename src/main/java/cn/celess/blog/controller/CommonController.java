@@ -135,8 +135,6 @@ public class CommonController {
      * FUCK !!!
      *
      * @param file 文件
-     * @return
-     * @throws IOException
      */
     @PostMapping("/imgUpload")
     public void upload(HttpServletRequest request, HttpServletResponse response, @RequestParam("editormd-image-file") MultipartFile file) throws IOException {
@@ -159,6 +157,7 @@ public class CommonController {
             return;
         }
         String fileName = file.getOriginalFilename();
+        assert fileName != null;
         String mime = fileName.substring(fileName.lastIndexOf("."));
         if (".png".equals(mime.toLowerCase()) || ".jpg".equals(mime.toLowerCase()) ||
                 ".jpeg".equals(mime.toLowerCase()) || ".bmp".equals(mime.toLowerCase())) {

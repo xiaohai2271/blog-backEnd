@@ -56,9 +56,12 @@ public class AuthenticationFilter implements HandlerInterceptor {
             return writeResponse(ResponseEnum.LOGIN_EXPIRED, response, request);
         }
         String email = jwtUtil.getUsernameFromToken(jwtStr);
-        if (!redisUtil.hasKey(email + "-login") || jwtUtil.isTokenExpired(jwtStr)) {
+        if (jwtUtil.isTokenExpired(jwtStr)) {
             // 登陆过期
             return writeResponse(ResponseEnum.LOGIN_EXPIRED, response, request);
+        }
+        if (!redisUtil.hasKey(email + "-login")) {
+            return writeResponse(ResponseEnum.LOGOUT, response, request);
         }
         String role = userService.getUserRoleByEmail(email);
         if (role.equals(ROLE_USER) || role.equals(ROLE_ADMIN)) {

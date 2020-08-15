@@ -59,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = new Comment();
         comment.setFromUser(user);
         User userTo = new User();
-        userTo.setId(-1L);
+        userTo.setId(null);
         if (reqBody.getToUserId() != -1) {
             userTo = userMapper.findById(reqBody.getToUserId());
             comment.setToUser(userTo);

@@ -4,18 +4,34 @@ import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.PartnerSite;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.model.PageData;
+import cn.celess.blog.entity.request.LinkApplyReq;
 import cn.celess.blog.entity.request.LinkReq;
+import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.PartnerMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import cn.celess.blog.service.MailService;
+import cn.celess.blog.service.PartnerSiteService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
+
+import java.lang.reflect.Field;
+import java.util.UUID;
 
 import static cn.celess.blog.enmu.ResponseEnum.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
+@Slf4j
 public class LinksControllerTest extends BaseTest {
 
     @Autowired
@@ -26,6 +42,9 @@ public class LinksControllerTest extends BaseTest {
     };
     private static final TypeReference<?> LINK_MODEL_PAGE_TYPE = new TypeReference<Response<PageData<PartnerSite>>>() {
     };
+    @Autowired
+    PartnerSiteService partnerSiteService;
+
 
     @Test
     public void create() throws Exception {
@@ -148,15 +167,83 @@ public class LinksControllerTest extends BaseTest {
         });
     }
 
-    // 手动测试
-    // @Test
-    public void apply() throws Exception {
-        long l = System.currentTimeMillis();
-        String url = "https://www.example.com";
-        getMockData(post("/apply?name=小海博客Api测试，请忽略&url=" + url)).andDo(result -> assertEquals(SUCCESS.getCode(), getResponse(result, OBJECT_TYPE).getCode()));
-        System.out.println("耗时：" + (System.currentTimeMillis() - l) / 1000 + "s");
-        url = "xxx";
-        getMockData(post("/apply?name=小海博客Api测试，请忽略&url=" + url)).andDo(result -> assertEquals(PARAMETERS_URL_ERROR.getCode(), getResponse(result, OBJECT_TYPE).getCode()));
+    @Test
+    public void apply() {
+        // 做service 层的测试
+        //        mockEmailServiceInstance(partnerSiteService, "mailService");
+        mockInjectInstance(partnerSiteService, "mailService", new TestMailServiceImpl());
+        LinkApplyReq req = new LinkApplyReq();
+        req.setName(randomStr(4));
+        req.setUrl("https://" + randomStr(4) + ".celess.cn");
+        req.setIconPath("https://www.celess.cn/example.png");
+        req.setDesc("desc :" + randomStr());
+        req.setEmail(randomStr(4) + "@celess.cn");
+        req.setLinkUrl(req.getUrl() + "/links");
+        try {
+            // 抓取不到数据的链接
+            partnerSiteService.apply(req);
+        } catch (MyException e) {
+            log.debug("测试抓取不到数据");
+            assertEquals(CANNOT_GET_DATA.getCode(), e.getCode());
+        }
 
+        req.setLinkUrl("https://bing.com");
+        req.setUrl(req.getLinkUrl());
+        try {
+            partnerSiteService.apply(req);
+        } catch (MyException e) {
+            log.debug("测试未添加本站链接的友链申请");
+            assertEquals(APPLY_LINK_NO_ADD_THIS_SITE.getCode(), e.getCode());
+            assertNotNull(e.getResult());
+            try {
+                // 测试uuid一致性
+                log.debug("测试uuid一致性");
+                partnerSiteService.apply(req);
+            } catch (MyException e2) {
+                assertEquals(e.getResult(), e2.getResult());
+            }
+        }
+        log.debug("测试正常申请");
+        req.setLinkUrl("https://www.celess.cn");
+        req.setUrl(req.getLinkUrl());
+        PartnerSite apply = partnerSiteService.apply(req);
+        assertNotNull(apply);
+        assertNotNull(apply.getId());
+    }
+
+    @Test
+    public void reapply() {
+        //mockEmailServiceInstance(partnerSiteService, "mailService");
+        try {
+            partnerSiteService.reapply(randomStr());
+            throw new AssertionError();
+        } catch (MyException e) {
+            assertEquals(DATA_EXPIRED.getCode(), e.getCode());
+        }
+
+        LinkApplyReq req = new LinkApplyReq();
+        req.setName(randomStr(4));
+        req.setIconPath("https://www.celess.cn/example.png");
+        req.setDesc("desc :" + randomStr());
+        req.setEmail(randomStr(4) + "@celess.cn");
+        req.setLinkUrl("https://bing.com");
+        req.setUrl(req.getLinkUrl());
+        String uuid = null;
+        try {
+            partnerSiteService.apply(req);
+            // err here
+            throw new AssertionError();
+        } catch (MyException e) {
+            uuid = (String) e.getResult();
+            String reapply = partnerSiteService.reapply(uuid);
+            assertEquals(reapply, "success");
+        }
+
+        try {
+            partnerSiteService.reapply(uuid);
+            throw new AssertionError();
+        } catch (MyException e) {
+            assertEquals(DATA_EXPIRED.getCode(), e.getCode());
+        }
     }
 }

@@ -8,6 +8,7 @@ import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
 import cn.celess.blog.mapper.UserMapper;
+import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.MD5Util;
 import cn.celess.blog.util.RedisUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,12 +30,15 @@ import java.util.stream.Collectors;
 import static cn.celess.blog.enmu.ResponseEnum.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static cn.celess.blog.enmu.ResponseEnum.*;
+
 
 public class UserControllerTest extends BaseTest {
 
     @Autowired
     UserMapper userMapper;
     @Autowired
+
     RedisUtil redisUtil;
     private static final TypeReference<?> USER_MODEL_TYPE = new TypeReference<Response<UserModel>>() {
     };
@@ -42,6 +46,8 @@ public class UserControllerTest extends BaseTest {
     };
     private static final TypeReference<?> USER_MODEL_LIST_TYPE = new TypeReference<Response<List<Map<String, Object>>>>() {
     };
+    UserService userService;
+
 
     @Test
     public void login() throws Exception {
@@ -104,6 +110,10 @@ public class UserControllerTest extends BaseTest {
         connection.setRequestMethod("GET");
         InputStream inputStream = connection.getInputStream();
         assertNotNull(inputStream);
+
+        // mock 实现类
+        mockInjectInstance(userService, "qiniuService", new TestQiNiuServiceImpl());
+
         MockMultipartFile file = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE, inputStream);
         getMockData(multipart("/user/imgUpload").file(file), userLogin()).andDo(result -> {
             Response<Object> response = getResponse(result, OBJECT_TYPE);

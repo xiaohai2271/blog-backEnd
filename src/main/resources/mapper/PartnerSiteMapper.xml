@@ -9,20 +9,26 @@
         <result column="l_icon_path" property="iconPath"/>
         <result column="l_desc" property="desc"/>
         <result column="is_delete" property="delete"/>
+        <result column="l_email" property="email"/>
+        <result column="l_notification" property="notification"/>
     </resultMap>
 
     <insert id="insert" parameterType="cn.celess.blog.entity.PartnerSite" useGeneratedKeys="true" keyProperty="id">
-        insert into links (l_name, l_is_open, l_url, l_icon_path, l_desc, is_delete)
-        values (#{name}, #{open}, #{url}, #{iconPath}, #{desc}, false)
+        insert into links (l_name, l_is_open, l_url, l_icon_path, l_desc, l_email, l_notification, is_delete)
+        values (#{name}, #{open}, #{url}, #{iconPath}, #{desc}, #{email}, #{notification}, false)
     </insert>
 
     <update id="update" parameterType="cn.celess.blog.entity.PartnerSite">
-        update links set
-        <if test="open!=null">l_is_open=#{open},</if>
-        <if test="iconPath!=null">l_icon_path=#{iconPath},</if>
-        <if test="desc!=null">l_desc=#{desc},</if>
-        <if test="url!=null">l_url=#{url},</if>
-        <if test="name!=null">l_name=#{name}</if>
+        update links
+        <trim prefix="set" suffixOverrides=",">
+            <if test="open!=null">l_is_open=#{open},</if>
+            <if test="iconPath!=null">l_icon_path=#{iconPath},</if>
+            <if test="desc!=null">l_desc=#{desc},</if>
+            <if test="url!=null">l_url=#{url},</if>
+            <if test="name!=null">l_name=#{name},</if>
+            <if test="notification!=null">l_notification=#{notification},</if>
+            <if test="email!=null">l_email=#{email}</if>
+        </trim>
         where l_id=#{id}
     </update>
 

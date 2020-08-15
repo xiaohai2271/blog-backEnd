@@ -2,10 +2,16 @@ package cn.celess.blog;
 
 
 import cn.celess.blog.entity.Response;
+import cn.celess.blog.entity.model.QiniuResponse;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
+import cn.celess.blog.service.MailService;
+import cn.celess.blog.service.QiniuService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qiniu.storage.model.FileInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -28,7 +35,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.UUID;
 
 import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
@@ -54,8 +64,7 @@ public class BaseTest {
     protected MockMvc mockMvc;
     protected final static String Code = "code";
     protected final static String Result = "result";
-    protected final static String USERE_MAIL = "zh56462271@qq.com";
-    protected final static String ADMIN_EMAIL = "a@celess.cn";
+
     /**
      * jackson 序列化/反序列化Json
      */
@@ -66,6 +75,9 @@ public class BaseTest {
     };
     protected static final TypeReference<?> OBJECT_TYPE = new TypeReference<Response<Object>>() {
     };
+    protected static final TypeReference<?> MAP_OBJECT_TYPE = new TypeReference<Response<Map<String, Object>>>() {
+    };
+
     @Autowired
     private WebApplicationContext wac;
     protected MockHttpSession session;
@@ -260,4 +272,74 @@ public class BaseTest {
         return null;
     }
 
+
+    /**
+     * 修改 mailService 的实现类
+     *
+     * @param service       service 类
+     * @param mailFiledName service 中自动注入的mailService字段名
+     */
+    protected void mockInjectInstance(Object service, String mailFiledName, Object impl) {
+        Field field;
+        try {
+            field = service.getClass().getDeclaredField(mailFiledName);
+            field.setAccessible(true);
+            field.set(service, impl);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Slf4j
+    public static class TestMailServiceImpl implements MailService {
+
+        @Override
+        public Boolean AsyncSend(SimpleMailMessage message) {
+            log.debug("异步邮件请求,SimpleMailMessage:[{}]", getJson(message));
+            return true;
+        }
+
+        @Override
+        public Boolean send(SimpleMailMessage message) {
+            log.debug("邮件请求,SimpleMailMessage:[{}]", getJson(message));
+            return true;
+        }
+
+        /**
+         * 转json
+         *
+         * @param o
+         * @return
+         */
+        private String getJson(Object o) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                return mapper.writeValueAsString(o);
+            } catch (JsonProcessingException e) {
+                return null;
+            }
+        }
+    }
+
+    @Slf4j
+    public static class TestQiNiuServiceImpl implements QiniuService {
+        @Override
+        public QiniuResponse uploadFile(InputStream is, String fileName) {
+            QiniuResponse response = new QiniuResponse();
+            log.debug("上传文件请求，[fileName:{}]", fileName);
+
+            response.key = "key";
+            response.bucket = "bucket";
+            response.hash = "hash";
+            response.fsize = 1;
+            return response;
+        }
+
+        @Override
+        public FileInfo[] getFileList() {
+            log.debug("获取文件列表请求");
+            return new FileInfo[0];
+        }
+    }
 }
