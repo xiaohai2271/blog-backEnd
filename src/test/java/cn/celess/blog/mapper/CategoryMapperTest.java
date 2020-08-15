@@ -5,7 +5,6 @@ import cn.celess.blog.entity.Category;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 

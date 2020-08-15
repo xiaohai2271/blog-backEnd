@@ -2,16 +2,11 @@ package cn.celess.blog.filter;
 
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.enmu.ResponseEnum;
-import net.sf.json.JSONObject;
+import cn.celess.blog.entity.Response;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-
-import javax.servlet.http.Cookie;
 
 /**
  * @Author: 小海
@@ -31,11 +26,11 @@ public class MultipleSubmitFilter extends BaseTest {
 
 
     private void sendRequest(ResponseEnum expectResponse, String... msg) throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/counts").session(session)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            Assert.assertEquals(expectResponse.getCode(), object.getInt(Code));
+        getMockData(MockMvcRequestBuilders.get("/counts").session(session)).andDo(result -> {
+            Response<Object> response = getResponse(result);
+            Assert.assertEquals(expectResponse.getCode(), response.getCode());
             if (msg.length != 0) {
-                Assert.assertEquals(msg[0], object.getString("msg"));
+                Assert.assertEquals(msg[0], response.getMsg());
             }
         });
     }

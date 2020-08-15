@@ -1,35 +1,46 @@
 package cn.celess.blog.controller;
 
 import cn.celess.blog.BaseTest;
+import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.WebUpdate;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.WebUpdateModel;
 import cn.celess.blog.mapper.WebUpdateInfoMapper;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-import static cn.celess.blog.enmu.ResponseEnum.*;
+import static cn.celess.blog.enmu.ResponseEnum.DATA_NOT_EXIST;
+import static cn.celess.blog.enmu.ResponseEnum.SUCCESS;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
+@Slf4j
 public class WebUpdateInfoControllerTest extends BaseTest {
+
+    private final TypeReference<?> MODAL_TYPE = new TypeReference<Response<WebUpdateModel>>() {
+    };
+    private final TypeReference<?> MODAL_LIST_TYPE = new TypeReference<Response<List<WebUpdateModel>>>() {
+    };
+    private final TypeReference<?> MODAL_PAGE_TYPE = new TypeReference<Response<PageData<WebUpdateModel>>>() {
+    };
+
+
     @Autowired
     WebUpdateInfoMapper mapper;
 
     @Test
     public void create() throws Exception {
-        String info = UUID.randomUUID().toString();
-        mockMvc.perform(post("/admin/webUpdate/create?info=" + info).header("Authorization", adminLogin())).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            assertTrue(object.containsKey(Result));
-            WebUpdateModel webUpdateModel = (WebUpdateModel) JSONObject.toBean(object.getJSONObject(Result), WebUpdateModel.class);
+        String info = randomStr();
+        getMockData(post("/admin/webUpdate/create?info=" + info), adminLogin()).andDo(result -> {
+            Response<WebUpdateModel> response = getResponse(result, MODAL_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            assertNotNull(response.getResult());
+            WebUpdateModel webUpdateModel = response.getResult();
             assertEquals(info, webUpdateModel.getInfo());
             assertNotNull(webUpdateModel.getTime());
             assertNotEquals(0, webUpdateModel.getId());
@@ -40,7 +51,7 @@ public class WebUpdateInfoControllerTest extends BaseTest {
     public void del() throws Exception {
         // 新增数据
         WebUpdate webUpdate = new WebUpdate();
-        webUpdate.setUpdateInfo(UUID.randomUUID().toString());
+        webUpdate.setUpdateInfo(randomStr());
         webUpdate.setUpdateTime(new Date());
         mapper.insert(webUpdate);
         // 接口测试
@@ -49,32 +60,31 @@ public class WebUpdateInfoControllerTest extends BaseTest {
         assertNotEquals(0, update.getId());
 
         long id = update.getId();
-        mockMvc.perform(delete("/admin/webUpdate/del/" + id).header("Authorization", adminLogin())).andDo(result -> {
-            assertEquals(SUCCESS.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code));
-            assertTrue(JSONObject.fromObject(result.getResponse().getContentAsString()).getBoolean(Result));
+        getMockData(delete("/admin/webUpdate/del/" + id), adminLogin()).andDo(result -> {
+            Response<Object> response = getResponse(result);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            assertNotNull(response.getResult());
         });
         do {
             id += 2;
         } while (mapper.existsById(id));
-        System.out.println("准备删除ID=" + id + "的不存在记录");
-        mockMvc.perform(delete("/admin/webUpdate/del/" + id).header("Authorization", adminLogin())).andDo(result ->
-                assertEquals(DATA_NOT_EXIST.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code))
-        );
+        log.debug("准备删除ID={}的不存在记录", id);
+        getMockData(delete("/admin/webUpdate/del/" + id), adminLogin()).andDo(result -> assertEquals(DATA_NOT_EXIST.getCode(), getResponse(result).getCode()));
     }
 
     @Test
     public void update() throws Exception {
         // 新增数据
         WebUpdate webUpdate = new WebUpdate();
-        webUpdate.setUpdateInfo(UUID.randomUUID().toString());
+        webUpdate.setUpdateInfo(randomStr());
         webUpdate.setUpdateTime(new Date());
         mapper.insert(webUpdate);
         List<WebUpdate> all = mapper.findAll();
         WebUpdate update = all.get(all.size() - 1);
         assertNotEquals(0, update.getId());
         assertNotNull(update.getUpdateInfo());
-        String info = UUID.randomUUID().toString();
-        mockMvc.perform(put("/admin/webUpdate/update?id=" + update.getId() + "&info=" + info).header("Authorization", adminLogin())).andDo(result -> {
+        String info = randomStr();
+        getMockData(put("/admin/webUpdate/update?id=" + update.getId() + "&info=" + info), adminLogin()).andDo(result -> {
             List<WebUpdate> list = mapper.findAll();
             WebUpdate up = list.get(list.size() - 1);
             assertEquals(update.getId(), up.getId());
@@ -85,12 +95,12 @@ public class WebUpdateInfoControllerTest extends BaseTest {
 
     @Test
     public void findAll() throws Exception {
-        mockMvc.perform(get("/webUpdate")).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            JSONArray jsonArray = object.getJSONArray(Result);
-            jsonArray.forEach(o -> {
-                WebUpdateModel webUpdate = (WebUpdateModel) JSONObject.toBean(JSONObject.fromObject(o), WebUpdateModel.class);
+        getMockData(get("/webUpdate")).andDo(result -> {
+            Response<List<WebUpdateModel>> response = getResponse(result, MODAL_LIST_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            assertNotNull(response.getResult());
+            assertNotEquals(0, response.getResult());
+            response.getResult().forEach(webUpdate -> {
                 assertNotEquals(0, webUpdate.getId());
                 assertNotNull(webUpdate.getTime());
                 assertNotNull(webUpdate.getInfo());
@@ -100,15 +110,14 @@ public class WebUpdateInfoControllerTest extends BaseTest {
 
     @Test
     public void page() throws Exception {
-        mockMvc.perform(get("/webUpdate/pages?page=1&count=10")).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-            assertNotNull(object.getJSONObject(Result));
-            PageData<WebUpdateModel> pageData = (PageData<WebUpdateModel>) JSONObject.toBean(object.getJSONObject(Result), PageData.class);
+        getMockData(get("/webUpdate/pages?page=1&count=10")).andDo(result -> {
+            Response<PageData<WebUpdateModel>> response = getResponse(result, MODAL_PAGE_TYPE);
+            assertEquals(SUCCESS.getCode(), response.getCode());
+            assertNotNull(response.getResult());
+            PageData<WebUpdateModel> pageData = response.getResult();
             assertEquals(1, pageData.getPageNum());
             assertEquals(10, pageData.getPageSize());
-            for (Object o : pageData.getList()) {
-                WebUpdateModel model = (WebUpdateModel) JSONObject.toBean(JSONObject.fromObject(o), WebUpdateModel.class);
+            for (WebUpdateModel model : pageData.getList()) {
                 assertNotEquals(0, model.getId());
                 assertNotNull(model.getTime());
                 assertNotNull(model.getInfo());
@@ -118,7 +127,6 @@ public class WebUpdateInfoControllerTest extends BaseTest {
 
     @Test
     public void lastestUpdateTime() throws Exception {
-        mockMvc.perform(get("/lastestUpdate")).andDo(result ->
-                assertEquals(SUCCESS.getCode(), JSONObject.fromObject(result.getResponse().getContentAsString()).getInt(Code)));
+        getMockData(get("/lastestUpdate")).andDo(result -> assertEquals(SUCCESS.getCode(), getResponse(result).getCode()));
     }
 }

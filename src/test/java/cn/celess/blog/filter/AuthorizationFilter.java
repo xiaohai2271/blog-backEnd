@@ -1,12 +1,12 @@
 package cn.celess.blog.filter;
 
 import cn.celess.blog.BaseTest;
-import net.sf.json.JSONObject;
+import cn.celess.blog.entity.Response;
 import org.junit.Test;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.junit.Assert.*;
 import static cn.celess.blog.enmu.ResponseEnum.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 /**
  * @Author: 小海
@@ -17,60 +17,37 @@ public class AuthorizationFilter extends BaseTest {
 
     @Test
     public void UserAccess() throws Exception {
-        String token = "";
         // 未登录
-        mockMvc.perform(get("/user/userInfo").header("Authorization", token)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(HAVE_NOT_LOG_IN.getCode(), object.getInt(Code));
-        });
-        token = userLogin();
-        mockMvc.perform(get("/user/userInfo").header("Authorization", token)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-        });
+        getMockData(get("/user/userInfo")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
+        // user权限登录
+        getMockData(get("/user/userInfo"), userLogin()).andDo(result -> assertEquals(SUCCESS.getCode(), getResponse(result).getCode()));
     }
 
     @Test
     public void AdminAccess() throws Exception {
-        String token = "";
         // 未登录
-        mockMvc.perform(get("/admin/articles?page=1&count=1").header("Authorization", token)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(HAVE_NOT_LOG_IN.getCode(), object.getInt(Code));
-        });
-        token = userLogin();
-        mockMvc.perform(get("/admin/articles?page=1&count=1").header("Authorization", token)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(PERMISSION_ERROR.getCode(), object.getInt(Code));
-        });
-        token = adminLogin();
-        mockMvc.perform(get("/admin/articles?page=1&count=1").header("Authorization", token)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
-        });
+        getMockData(get("/admin/articles?page=1&count=1")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
+        // user权限
+        getMockData(get("/admin/articles?page=1&count=1"), userLogin()).andDo(result -> assertEquals(PERMISSION_ERROR.getCode(), getResponse(result).getCode()));
+        // admin 权限
+        getMockData(get("/admin/articles?page=1&count=1"), adminLogin()).andDo(result -> assertEquals(SUCCESS.getCode(), getResponse(result).getCode()));
     }
 
     @Test
     public void VisitorAccess() throws Exception {
-        mockMvc.perform(get("/user/userInfo")).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(HAVE_NOT_LOG_IN.getCode(), object.getInt(Code));
-        });
-        mockMvc.perform(get("/admin/articles?page=1&count=1")).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(HAVE_NOT_LOG_IN.getCode(), object.getInt(Code));
-        });
+        getMockData(get("/user/userInfo")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
+        getMockData(get("/admin/articles?page=1&count=1")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
     }
 
     @Test
     public void authorizationTest() throws Exception {
         // 测试response中有无Authorization字段
-        String s = userLogin();
-        mockMvc.perform(get("/user/userInfo").header("Authorization", s)).andDo(result -> {
-            JSONObject object = JSONObject.fromObject(result.getResponse().getContentAsString());
-            assertEquals(SUCCESS.getCode(), object.getInt(Code));
+        String token = userLogin();
+        getMockData(get("/user/userInfo"), token).andDo(result -> {
+            Response<Object> response = getResponse(result);
+            assertEquals(SUCCESS.getCode(), response.getCode());
             assertNotNull(result.getResponse().getHeader("Authorization"));
-            assertNotEquals(s, result.getResponse().getHeader("Authorization"));
+            assertNotEquals(token, result.getResponse().getHeader("Authorization"));
         });
     }
 }
