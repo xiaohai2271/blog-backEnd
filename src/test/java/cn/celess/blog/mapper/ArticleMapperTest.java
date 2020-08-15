@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -37,7 +36,7 @@ public class ArticleMapperTest extends BaseTest {
     @Test
     public void update() {
         Article article = generateArticle().getArticle();
-        String randomText = UUID.randomUUID().toString();
+        String randomText = randomStr();
 
         // 此字段不会通过insert被写入数据库而是使用插入数据的默认值   数据库中该字段默认为true
         article.setOpen(true);
@@ -117,7 +116,7 @@ public class ArticleMapperTest extends BaseTest {
     public void existsByTitle() {
         Article article = generateArticle().getArticle();
         assertTrue(articleMapper.existsByTitle(article.getTitle()));
-        assertFalse(articleMapper.existsByTitle(UUID.randomUUID().toString()));
+        assertFalse(articleMapper.existsByTitle(randomStr()));
     }
 
     @Test
@@ -196,7 +195,7 @@ public class ArticleMapperTest extends BaseTest {
     }
 
     private ArticleTag generateArticle() {
-        String randomText = UUID.randomUUID().toString();
+        String randomText = randomStr();
 
         Article article = new Article();
         Category category = new Category();
