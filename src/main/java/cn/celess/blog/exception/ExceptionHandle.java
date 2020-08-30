@@ -83,7 +83,12 @@ public class ExceptionHandle {
         simpleMailMessage.setTo("a@celess.cn");
         simpleMailMessage.setSubject("服务器出现了错误");
         StringBuilder msg = new StringBuilder();
-        msg.append("requirePath:\n").append(request.getRequestURL().toString()).append("?").append(request.getQueryString()).append("\n\n\n");
+        String queryString = request.getQueryString();
+        msg.append("requirePath:\n").append(request.getRequestURL().toString());
+        if (queryString != null) {
+            msg.append("?").append(queryString);
+        }
+        msg.append("\n\n\n");
         msg.append("msg:\n").append(e.getMessage()).append("\n\n\n");
         msg.append("date:\n").append(DateFormatUtil.getNow()).append("\n\n\n");
         msg.append("from:\n").append(request.getHeader("User-Agent")).append("\n\n\n");
