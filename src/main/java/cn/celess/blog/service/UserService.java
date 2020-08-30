@@ -129,7 +129,7 @@ public interface UserService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageData<UserModel> getUserList(Integer page, Integer count);
+    PageData<UserModel> getUserList(Integer page, Integer count, Integer status);
 
     /**
      * 更改用户信息

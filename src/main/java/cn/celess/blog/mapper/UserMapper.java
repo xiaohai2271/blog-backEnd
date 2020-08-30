@@ -53,6 +53,8 @@ public interface UserMapper {
 
     int setUserRole(Long id, String role);
 
+    List<User> findAll(Integer status);
+
     List<User> findAll();
 
     int update(User user);

@@ -28,6 +28,7 @@ import java.beans.Transient;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -338,12 +339,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageData<UserModel> getUserList(Integer page, Integer count) {
+    public PageData<UserModel> getUserList(Integer page, Integer count, Integer status) {
         PageHelper.startPage(page, count);
-        List<User> all = userMapper.findAll();
-        List<UserModel> modelList = new ArrayList<>();
-        all.forEach(user -> modelList.add(ModalTrans.userFullInfo(user)));
-        return new PageData<UserModel>(PageInfo.of(all), modelList);
+        List<User> all = userMapper.findAll(status);
+        List<UserModel> modelList = all.stream().map(ModalTrans::userFullInfo).collect(Collectors.toList());
+        return new PageData<>(PageInfo.of(all), modelList);
     }
 
     @Override
