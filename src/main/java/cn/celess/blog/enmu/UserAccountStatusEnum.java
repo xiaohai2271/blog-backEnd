@@ -1,6 +1,9 @@
 package cn.celess.blog.enmu;
 
-import java.util.Arrays;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: 小海
@@ -46,5 +49,13 @@ public enum UserAccountStatusEnum {
             }
         }
         return null;
+    }
+
+    @JsonValue
+    public Map<String, Object> toJson() {
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("code", code);
+        map.put("desc", desc);
+        return map;
     }
 }
