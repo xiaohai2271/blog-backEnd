@@ -1,5 +1,6 @@
 package cn.celess.blog.util;
 
+import cn.celess.blog.enmu.UserAccountStatusEnum;
 import cn.celess.blog.entity.*;
 import cn.celess.blog.entity.model.*;
 import org.springframework.beans.BeanUtils;
@@ -46,6 +47,7 @@ public class ModalTrans {
         }
         UserModel userModel = new UserModel();
         BeanUtils.copyProperties(user, userModel);
+        userModel.setStatus(UserAccountStatusEnum.get(user.getStatus()));
         userModel.setAvatarImgUrl(user.getAvatarImgUrl() == null || user.getAvatarImgUrl().length() == 0 ?
                 null :
                 "http://cdn.celess.cn/" + user.getAvatarImgUrl());

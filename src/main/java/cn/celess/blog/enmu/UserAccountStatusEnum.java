@@ -1,5 +1,7 @@
 package cn.celess.blog.enmu;
 
+import java.util.Arrays;
+
 /**
  * @Author: 小海
  * @Date: 2020-05-22 21:32
@@ -35,5 +37,14 @@ public enum UserAccountStatusEnum {
 
     public String getDesc() {
         return desc;
+    }
+
+    public static UserAccountStatusEnum get(int code) {
+        for (UserAccountStatusEnum value : UserAccountStatusEnum.values()) {
+            if (value.code == code) {
+                return value;
+            }
+        }
+        return null;
     }
 }

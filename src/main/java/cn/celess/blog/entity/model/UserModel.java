@@ -1,5 +1,6 @@
 package cn.celess.blog.entity.model;
 
+import cn.celess.blog.enmu.UserAccountStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,5 +39,5 @@ public class UserModel {
 
     private String token;
 
-    private int status;
+    private UserAccountStatusEnum status;
 }
