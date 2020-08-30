@@ -32,7 +32,7 @@ public class CategoryControllerTest extends BaseTest {
             CategoryModel category = response.getResult();
             assertEquals(categoryName, category.getName());
             assertNotNull(category.getId());
-            assertNotEquals(0, category.getArticles());
+            assertNull(category.getArticles());
         });
     }
 
@@ -56,7 +56,7 @@ public class CategoryControllerTest extends BaseTest {
             assertEquals(SUCCESS.getCode(), response.getCode());
             CategoryModel c = response.getResult();
             assertEquals(name, c.getName());
-            assertNotEquals(0, c.getArticles());
+            assertNull(c.getArticles());
             assertNotNull(c.getId());
         });
     }
@@ -70,7 +70,7 @@ public class CategoryControllerTest extends BaseTest {
             response.getResult().getList().forEach(c -> {
                 assertNotNull(c.getName());
                 assertNotNull(c.getId());
-                assertNotEquals(0, c.getArticles());
+                assertNotNull(c.getArticles());
             });
         });
 
