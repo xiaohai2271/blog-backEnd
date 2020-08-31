@@ -158,7 +158,11 @@ VALUES (1, '程序猿张先生', 1, 'https://zhyocean.cn', '', '', 0),
        (3, '罗炜杰个人博客', 1, 'http://www.lwjppz.cn', '', '', 0),
        (4, '强子博客', 1, 'https://www.lqnb.xyz', '', '', 0),
        (5, '原创博客技术联盟', 1, 'http://techblog.pub/', '', '', 0),
-       (6, 'WarlockMT', 1, 'https://www.warlock.live/', '', '', 0);
+       (6, 'WarlockMT', 1, 'https://www.warlock.live/', '', '', 0),
+       (7, '测试例1', 1, 'https://t1.celess.cn/', '', '', 1),
+       (8, '测试例2', 1, 'https://t2.celess.cn/', '', '', 1),
+       (9, '测试例3', 1, 'https://t3.celess.cn/', '', '', 1),
+       (10, '测试例4', 1, 'https://t4.celess.cn/', '', '', 1);
 
 
 
