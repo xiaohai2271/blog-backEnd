@@ -1,5 +1,11 @@
 package cn.celess.blog.enmu;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @Author: 小海
  * @Date: 2020-05-22 21:32
@@ -35,5 +41,32 @@ public enum UserAccountStatusEnum {
 
     public String getDesc() {
         return desc;
+    }
+
+    public static UserAccountStatusEnum get(int code) {
+        for (UserAccountStatusEnum value : UserAccountStatusEnum.values()) {
+            if (value.code == code) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @JsonCreator
+    public static UserAccountStatusEnum get(Map<String, Object> map) {
+        for (UserAccountStatusEnum value : UserAccountStatusEnum.values()) {
+            if (value.code == (int) map.get("code") && value.desc.equals(map.get("desc"))) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    @JsonValue
+    public Map<String, Object> toJson() {
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("code", code);
+        map.put("desc", desc);
+        return map;
     }
 }

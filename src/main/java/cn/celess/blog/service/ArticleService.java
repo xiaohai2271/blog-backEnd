@@ -52,7 +52,7 @@ public interface ArticleService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageData<ArticleModel> adminArticles(int count, int page, boolean deleted);
+    PageData<ArticleModel> adminArticles(int count, int page, Boolean deleted);
 
     /**
      * 获取文章状态为开放的文章

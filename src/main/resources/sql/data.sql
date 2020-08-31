@@ -1,3 +1,22 @@
+INSERT INTO `user` (`u_id`, `u_email`, `u_pwd`, `u_email_status`, `u_avatar`, `u_desc`, `u_recently_landed_time`,
+                    `u_display_name`, `u_role`, `status`)
+VALUES (1, 'a@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, 'a@celess.cn_2.png', '禾几海不需要自我介绍',
+        '2020-07-02 11:30:38', '禾几海', 'admin', 0),
+       (3, 'zh56462271@qq.com', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user',
+        0),
+       (2, 'b@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 0),
+       (4, 'c@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 1),
+       (5, 'd@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 1),
+       (6, 'e@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 2),
+       (7, 'f@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 2),
+       (8, 'g@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 0),
+       (9, 'h@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 1),
+       (10, 'i@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 2),
+       (11, 'j@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 0),
+       (12, 'k@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user', 1);
+
+
+-- 密码123456789
 INSERT INTO `tag_category` (`t_id`, `t_name`, `is_category`, `is_delete`)
 VALUES (1, '随笔', 1, 0),
        (2, '后端', 1, 0),
@@ -26,17 +45,6 @@ VALUES (1, '随笔', 1, 0),
        (25, '系统变量', 0, 0),
        (26, '脚本', 0, 0),
        (27, '网课', 0, 0);
-
-
--- 密码123456789
-INSERT INTO `user` (`u_id`, `u_email`, `u_pwd`, `u_email_status`, `u_avatar`, `u_desc`, `u_recently_landed_time`,
-                    `u_display_name`, `u_role`, `status`)
-VALUES (1, 'a@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, 'a@celess.cn_2.png', '禾几海不需要自我介绍',
-        '2020-07-02 11:30:38', '禾几海', 'admin', 0),
-       (2, 'b@celess.cn', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user',
-        0),
-       (3, 'zh56462271@qq.com', '25f9e794323b453885f5181f1b624d0b', 1, NULL, NULL, '2020-05-16 13:21:35', NULL, 'user',
-        0);
 
 
 INSERT INTO `article` (`a_id`, `a_title`, `a_summary`, `a_md_content`, `a_url`, `a_author_id`, `a_is_original`,
@@ -150,7 +158,11 @@ VALUES (1, '程序猿张先生', 1, 'https://zhyocean.cn', '', '', 0),
        (3, '罗炜杰个人博客', 1, 'http://www.lwjppz.cn', '', '', 0),
        (4, '强子博客', 1, 'https://www.lqnb.xyz', '', '', 0),
        (5, '原创博客技术联盟', 1, 'http://techblog.pub/', '', '', 0),
-       (6, 'WarlockMT', 1, 'https://www.warlock.live/', '', '', 0);
+       (6, 'WarlockMT', 1, 'https://www.warlock.live/', '', '', 0),
+       (7, '测试例1', 1, 'https://t1.celess.cn/', '', '', 1),
+       (8, '测试例2', 1, 'https://t2.celess.cn/', '', '', 1),
+       (9, '测试例3', 1, 'https://t3.celess.cn/', '', '', 1),
+       (10, '测试例4', 1, 'https://t4.celess.cn/', '', '', 1);
 
 
 

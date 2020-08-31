@@ -25,7 +25,6 @@ public class SessionListener implements HttpSessionListener {
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
-        // TODO : can move 'visit' api  to here
         se.getSession().setAttribute("visitDetail", new HashMap<String, Integer>());
         // 10s for debug
         // se.getSession().setMaxInactiveInterval(10);
@@ -44,9 +43,7 @@ public class SessionListener implements HttpSessionListener {
         sb.append("\t登录情况 => ");
         String email = (String) se.getSession().getAttribute("email");
         sb.append(email == null ? "游客访问" : email);
-        visitDetail.forEach((s, integer) -> {
-            sb.append("\n").append("Method:[").append(s.split(":")[1]).append("]\tTimes:[").append(integer).append("]\tPath:[").append(s.split(":")[0]).append("]");
-        });
+        visitDetail.forEach((s, integer) -> sb.append("\n").append("Method:[").append(s.split(":")[1]).append("]\tTimes:[").append(integer).append("]\tPath:[").append(s.split(":")[0]).append("]"));
         log.info(sb.toString());
     }
 }

@@ -123,9 +123,9 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
     }
 
     @Override
-    public PageData<PartnerSite> partnerSitePages(int page, int count) {
+    public PageData<PartnerSite> partnerSitePages(int page, int count, Boolean deleted) {
         PageHelper.startPage(page, count);
-        List<PartnerSite> sitePage = partnerMapper.findAll();
+        List<PartnerSite> sitePage = partnerMapper.findAll(deleted);
         PageInfo<PartnerSite> pageInfo = new PageInfo<PartnerSite>(sitePage);
         return new PageData<>(pageInfo, sitePage);
     }

@@ -130,5 +130,8 @@
     <select id="findAll" resultMap="userResultMap">
         select *
         from user
+        <if test="_parameter != null">
+            where status=#{status}
+        </if>
     </select>
 </mapper>

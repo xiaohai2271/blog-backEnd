@@ -120,7 +120,7 @@ public class ArticleController {
     @GetMapping("/admin/articles")
     public Response adminArticles(@RequestParam(name = "page", defaultValue = "1") int page,
                                   @RequestParam(name = "count", defaultValue = "10") int count,
-                                  @RequestParam(name = "deleted", defaultValue = "false") boolean deleted) {
+                                  @RequestParam(name = "deleted", required = false) Boolean deleted) {
         return Response.success(articleService.adminArticles(count, page, deleted));
     }
 

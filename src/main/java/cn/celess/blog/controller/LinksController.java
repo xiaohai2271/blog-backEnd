@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -46,21 +46,15 @@ public class LinksController {
 
     @GetMapping("/links")
     public Response allForOpen() {
-        List<PartnerSite> sites = new ArrayList<>();
-        for (PartnerSite p : partnerSiteService.findAll()) {
-            if (p.getOpen()) {
-                //隐藏open字段
-                p.setOpen(null);
-                sites.add(p);
-            }
-        }
+        List<PartnerSite> sites = partnerSiteService.findAll().stream().peek(partnerSite -> partnerSite.setOpen(null)).collect(Collectors.toList());
         return Response.success(sites);
     }
 
     @GetMapping("/admin/links")
     public Response all(@RequestParam("page") int page,
-                        @RequestParam("count") int count) {
-        return Response.success(partnerSiteService.partnerSitePages(page, count));
+                        @RequestParam("count") int count,
+                        @RequestParam(value = "deleted", required = false) Boolean deleted) {
+        return Response.success(partnerSiteService.partnerSitePages(page, count, deleted));
     }
 
     @PostMapping("/apply")

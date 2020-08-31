@@ -78,6 +78,9 @@
     <select id="findAll" resultMap="partnerSiteResultMap">
         select *
         from links
+        <if test="_parameter != null">
+            where is_delete=#{deleted}
+        </if>
     </select>
 
 

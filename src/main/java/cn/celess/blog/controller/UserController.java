@@ -116,8 +116,8 @@ public class UserController {
     }
 
     @GetMapping("/admin/users")
-    public Response getAllUser(@RequestParam("page") int pageNum, @RequestParam("count") int count) {
-        return Response.success(userService.getUserList(pageNum, count));
+    public Response getAllUser(@RequestParam("page") int pageNum, @RequestParam("count") int count, @RequestParam(name = "status", required = false) Integer status) {
+        return Response.success(userService.getUserList(pageNum, count, status));
     }
 
     @GetMapping("/emailStatus/{email}")

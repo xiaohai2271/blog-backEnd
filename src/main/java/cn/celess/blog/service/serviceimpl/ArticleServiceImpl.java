@@ -278,11 +278,16 @@ public class ArticleServiceImpl implements ArticleService {
      * @return PageInfo
      */
     @Override
-    public PageData<ArticleModel> adminArticles(int count, int page, boolean deleted) {
+    public PageData<ArticleModel> adminArticles(int count, int page, Boolean deleted) {
         List<Article> articleList = articleMapper.findAll();
 
         PageData<ArticleModel> pageData = new PageData<>(null, 0, count, page);
-        List<Article> collect = articleList.stream().filter(article -> article.isDeleted() == deleted).collect(Collectors.toList());
+        List<Article> collect;
+        if (deleted != null) {
+            collect = articleList.stream().filter(article -> article.isDeleted() == deleted).collect(Collectors.toList());
+        } else {
+            collect = articleList;
+        }
         pageData.setTotal(collect.size());
         List<ArticleModel> articleModels = collect.stream()
                 .peek(article -> article.setMdContent(null))

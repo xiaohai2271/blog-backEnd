@@ -2,6 +2,7 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.enmu.RoleEnum;
+import cn.celess.blog.enmu.UserAccountStatusEnum;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.PageData;
@@ -28,6 +29,7 @@ import java.beans.Transient;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -98,6 +100,16 @@ public class UserServiceImpl implements UserService {
         if (!RegexUtil.pwdMatch(loginReq.getPassword())) {
             throw new MyException(ResponseEnum.PARAMETERS_PWD_ERROR);
         }
+
+        User user = userMapper.findByEmail(loginReq.getEmail());
+        if (user == null) {
+            // 用户不存在
+            throw new MyException(ResponseEnum.USER_NOT_EXIST);
+        }
+        if (user.getStatus() != UserAccountStatusEnum.NORMAL.getCode()) {
+            throw new MyException(ResponseEnum.CAN_NOT_USE, UserAccountStatusEnum.get(user.getStatus()));
+        }
+
         //获取redis缓存中登录失败次数
         String s = redisUtil.get(loginReq.getEmail() + "-passwordWrongTime");
         if (s != null) {
@@ -105,14 +117,9 @@ public class UserServiceImpl implements UserService {
                 throw new MyException(ResponseEnum.LOGIN_LATER, loginReq.getEmail());
             }
         }
-        User user = null;
-        user = userMapper.findByEmail(loginReq.getEmail());
-        String token = null;
+
+        String token;
         // 密码比对
-        if (user == null) {
-            // 用户不存在
-            throw new MyException(ResponseEnum.USER_NOT_EXIST);
-        }
         if (user.getPwd().equals(MD5Util.getMD5(loginReq.getPassword()))) {
             logger.info("====> {}  进行权限认证  状态：登录成功 <====", loginReq.getEmail());
             userMapper.updateLoginTime(loginReq.getEmail());
@@ -338,12 +345,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageData<UserModel> getUserList(Integer page, Integer count) {
+    public PageData<UserModel> getUserList(Integer page, Integer count, Integer status) {
         PageHelper.startPage(page, count);
-        List<User> all = userMapper.findAll();
-        List<UserModel> modelList = new ArrayList<>();
-        all.forEach(user -> modelList.add(ModalTrans.userFullInfo(user)));
-        return new PageData<UserModel>(PageInfo.of(all), modelList);
+        List<User> all = userMapper.findAll(status);
+        List<UserModel> modelList = all.stream().map(ModalTrans::userFullInfo).collect(Collectors.toList());
+        return new PageData<>(PageInfo.of(all), modelList);
     }
 
     @Override

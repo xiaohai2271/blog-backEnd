@@ -36,5 +36,6 @@ public interface PartnerMapper {
 
     List<PartnerSite> findAll();
 
+    List<PartnerSite> findAll(Boolean deleted);
 
 }
