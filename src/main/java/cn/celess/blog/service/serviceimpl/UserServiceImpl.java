@@ -102,6 +102,10 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userMapper.findByEmail(loginReq.getEmail());
+        if (user == null) {
+            // 用户不存在
+            throw new MyException(ResponseEnum.USER_NOT_EXIST);
+        }
         if (user.getStatus() != UserAccountStatusEnum.NORMAL.getCode()) {
             throw new MyException(ResponseEnum.CAN_NOT_USE, UserAccountStatusEnum.get(user.getStatus()));
         }
@@ -114,12 +118,8 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        String token = null;
+        String token;
         // 密码比对
-        if (user == null) {
-            // 用户不存在
-            throw new MyException(ResponseEnum.USER_NOT_EXIST);
-        }
         if (user.getPwd().equals(MD5Util.getMD5(loginReq.getPassword()))) {
             logger.info("====> {}  进行权限认证  状态：登录成功 <====", loginReq.getEmail());
             userMapper.updateLoginTime(loginReq.getEmail());
