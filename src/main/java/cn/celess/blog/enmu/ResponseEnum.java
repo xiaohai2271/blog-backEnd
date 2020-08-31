@@ -34,6 +34,7 @@ public enum ResponseEnum {
     PWD_NOT_SAME(3602, "新密码与原密码不相同"),
     LOGIN_EXPIRED(3700, "登陆过期"),
     LOGOUT(3710, "账户已注销"),
+    CAN_NOT_USE(3711, "账户不可用"),
     PWD_WRONG(3800, "密码不正确"),
 
     JWT_EXPIRED(3810, "Token过期"),

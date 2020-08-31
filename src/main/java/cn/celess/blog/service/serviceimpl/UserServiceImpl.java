@@ -2,6 +2,7 @@ package cn.celess.blog.service.serviceimpl;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.enmu.RoleEnum;
+import cn.celess.blog.enmu.UserAccountStatusEnum;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.User;
 import cn.celess.blog.entity.model.PageData;
@@ -99,6 +100,12 @@ public class UserServiceImpl implements UserService {
         if (!RegexUtil.pwdMatch(loginReq.getPassword())) {
             throw new MyException(ResponseEnum.PARAMETERS_PWD_ERROR);
         }
+
+        User user = userMapper.findByEmail(loginReq.getEmail());
+        if (user.getStatus() != UserAccountStatusEnum.NORMAL.getCode()) {
+            throw new MyException(ResponseEnum.CAN_NOT_USE, UserAccountStatusEnum.get(user.getStatus()));
+        }
+
         //获取redis缓存中登录失败次数
         String s = redisUtil.get(loginReq.getEmail() + "-passwordWrongTime");
         if (s != null) {
@@ -106,8 +113,7 @@ public class UserServiceImpl implements UserService {
                 throw new MyException(ResponseEnum.LOGIN_LATER, loginReq.getEmail());
             }
         }
-        User user = null;
-        user = userMapper.findByEmail(loginReq.getEmail());
+
         String token = null;
         // 密码比对
         if (user == null) {
