@@ -1650,6 +1650,7 @@
 | ------------ | -------------------------------- |-----------|--------|----|--- |
 |count| count  | query | true |integer  |    |
 |page| page  | query | true |integer  |    |
+|deleted| deleted  | query | false |boolean  |    |
 
 **响应示例**:
 
@@ -2634,6 +2635,7 @@
 | ------------ | -------------------------------- |-----------|--------|----|--- |
 |count| count  | query | true |integer  |    |
 |page| page  | query | true |integer  |    |
+|status| status  | query | false |integer  |    |
 
 **响应示例**:
 
