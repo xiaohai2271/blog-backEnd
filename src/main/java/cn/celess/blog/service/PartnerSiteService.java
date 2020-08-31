@@ -45,7 +45,7 @@ public interface PartnerSiteService {
      * @param page  数据页
      * @return 分页数据
      */
-    PageData<PartnerSite> partnerSitePages(int page, int count);
+    PageData<PartnerSite> partnerSitePages(int page, int count, Boolean deleted);
 
     /**
      * 获取全部数据

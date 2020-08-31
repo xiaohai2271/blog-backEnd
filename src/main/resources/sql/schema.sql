@@ -88,7 +88,7 @@ CREATE TABLE `links`
     `l_url`          varchar(255) unique                     not null comment '首页地址',
     `l_icon_path`    varchar(255)                            not null comment '友链的icon地址',
     `l_desc`         varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友链的说明描述',
-    `is_delete`      boolean                                 not null default false comment '该数据是否被删除',
+    `is_delete`         boolean                                 not null default false comment '该数据是否被删除',
     `l_email`        varchar(255) comment '网站管理员的邮箱',
     `l_notification` boolean                                          default false comment '是否通知了'
 ) comment '友站表';

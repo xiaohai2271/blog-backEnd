@@ -59,8 +59,9 @@ public class LinksController {
 
     @GetMapping("/admin/links")
     public Response all(@RequestParam("page") int page,
-                        @RequestParam("count") int count) {
-        return Response.success(partnerSiteService.partnerSitePages(page, count));
+                        @RequestParam("count") int count,
+                        @RequestParam(value = "deleted", required = false) Boolean deleted) {
+        return Response.success(partnerSiteService.partnerSitePages(page, count, deleted));
     }
 
     @PostMapping("/apply")
