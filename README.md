@@ -8,7 +8,11 @@
 
 [![Build](https://github.com/xiaohai2271/blog-backEnd/workflows/Build/badge.svg)](https://github.com/xiaohai2271/blog-backEnd)
 [![Test](https://github.com/xiaohai2271/blog-backEnd/workflows/Test/badge.svg)](https://github.com/xiaohai2271/blog-backEnd)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/xiaohai2271/blog-backEnd)](https://github.com/xiaohai2271/blog-backEnd)
 [![GitHub](https://img.shields.io/github/license/xiaohai2271/blog-backEnd)](https://github.com/xiaohai2271/blog-backEnd)
+[![GitHub top language](https://img.shields.io/github/languages/top/xiaohai2271/blog-backEnd)](https://github.com/xiaohai2271/blog-backEnd)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/xiaohai2271/blog-backEnd)](https://github.com/xiaohai2271/blog-backEnd)
+[![GitHub last commit](https://img.shields.io/github/last-commit/xiaohai2271/blog-backEnd)](https://github.com/xiaohai2271/blog-backEnd)
 [![Website](https://img.shields.io/website?up_message=%E5%B0%8F%E6%B5%B7%E5%8D%9A%E5%AE%A2&url=https%3A%2F%2Fwww.celess.cn)](https://www.celess.cn)
 </div>
 
