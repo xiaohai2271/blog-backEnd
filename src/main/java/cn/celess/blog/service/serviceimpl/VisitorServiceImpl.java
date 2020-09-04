@@ -7,6 +7,7 @@ import cn.celess.blog.entity.model.VisitorModel;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.VisitorMapper;
 import cn.celess.blog.service.VisitorService;
+import cn.celess.blog.util.AddressUtil;
 import cn.celess.blog.util.DateFormatUtil;
 import cn.celess.blog.util.RedisUtil;
 import com.github.pagehelper.PageHelper;
@@ -151,60 +152,7 @@ public class VisitorServiceImpl implements VisitorService {
      * @return
      */
     private String getLocation(String ip) {
-        StringBuilder result = new StringBuilder();
-        URL url;
-        HttpURLConnection conn = null;
-        InputStream inputStream = null;
-        InputStreamReader inputStreamReader = null;
-        BufferedReader bufferedReader = null;
-        try {
-            url = new URL("http://ip.taobao.com/service/getIpInfo.php?ip=" + ip);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(3000);
-            conn.setDoInput(true);
-            conn.setRequestMethod("GET");
-            inputStream = conn.getInputStream();
-            inputStreamReader = new InputStreamReader(inputStream);
-            bufferedReader = new BufferedReader(inputStreamReader);
-            String tmp;
-            while ((tmp = bufferedReader.readLine()) != null) {
-                result.append(tmp);
-            }
-        } catch (Exception e) {
-            // ignore
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.disconnect();
-                }
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (inputStreamReader != null) {
-                    inputStreamReader.close();
-                }
-                if (bufferedReader != null) {
-                    bufferedReader.close();
-                }
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        if ("".equals(result.toString())) {
-            throw new MyException(ResponseEnum.FAILURE);
-        }
-        Map<String, Object> stringObjectMap = JsonParserFactory.getJsonParser().parseMap(result.toString());
-        if ((Integer) stringObjectMap.get("code") == 0) {
-            LinkedHashMap data = (LinkedHashMap) stringObjectMap.get("data");
-            sb.append(data.get("country"))
-                    .append("-")
-                    .append(data.get("region"))
-                    .append("-")
-                    .append(data.get("city"));
-        }
-        return sb.toString();
-
+        return AddressUtil.getCityInfo(ip);
     }
 
 
