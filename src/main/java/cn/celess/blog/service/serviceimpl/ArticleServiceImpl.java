@@ -306,14 +306,10 @@ public class ArticleServiceImpl implements ArticleService {
         List<Article> articleList = articleMapper.findAllByOpen(true);
         PageData<ArticleModel> pageData = new PageData<>(new PageInfo<Article>(articleList));
 
-        List<ArticleModel> articleModelList = new ArrayList<>();
-
-        articleList.forEach(article -> {
-            ArticleModel model = ModalTrans.article(article, true);
-            setPreAndNextArticle(model);
-            articleModelList.add(model);
-        });
-
+        List<ArticleModel> articleModelList = articleList
+                .stream()
+                .map(article -> setPreAndNextArticle(ModalTrans.article(article, true)))
+                .collect(Collectors.toList());
         pageData.setList(articleModelList);
         return pageData;
     }
@@ -329,15 +325,14 @@ public class ArticleServiceImpl implements ArticleService {
 
         List<ArticleModel> modelList = new ArrayList<>();
 
-        open.forEach(article -> {
-            ArticleModel model = ModalTrans.article(article, true);
-            model.setTags(null);
-            //            setPreAndNextArticle(model);
-            model.setNextArticle(null);
-            model.setPreArticle(null);
-            modelList.add(model);
-        });
-        return new PageData<ArticleModel>(new PageInfo<Article>(open), modelList);
+        modelList = open.stream()
+                .map(article -> ModalTrans.article(article, true))
+                .peek(articleModel -> {
+                    articleModel.setNextArticle(null);
+                    articleModel.setPreArticle(null);
+                })
+                .collect(Collectors.toList());
+        return new PageData<>(new PageInfo<>(open), modelList);
     }
 
     @Override
@@ -348,21 +343,22 @@ public class ArticleServiceImpl implements ArticleService {
         }
         PageHelper.startPage(page, count);
         List<ArticleTag> articleByTag = articleTagMapper.findArticleByTagAndOpen(tag.getId());
-        List<ArticleModel> modelList = new ArrayList<>();
-        articleByTag.forEach(articleTag -> {
-            ArticleModel model = ModalTrans.article(articleTag.getArticle(), true);
-            model.setNextArticle(null);
-            model.setPreArticle(null);
-            modelList.add(model);
-        });
-        return new PageData<ArticleModel>(new PageInfo<ArticleTag>(articleByTag), modelList);
+        List<ArticleModel> modelList = articleByTag
+                .stream()
+                .map(articleTag -> ModalTrans.article(articleTag.getArticle(), true))
+                .peek(articleModel -> {
+                    articleModel.setNextArticle(null);
+                    articleModel.setPreArticle(null);
+                }).collect(Collectors.toList());
+        return new PageData<>(new PageInfo<>(articleByTag), modelList);
     }
 
-    private void setPreAndNextArticle(ArticleModel articleModel) {
+    private ArticleModel setPreAndNextArticle(ArticleModel articleModel) {
         if (articleModel == null) {
-            return;
+            return null;
         }
         articleModel.setPreArticle(ModalTrans.article(articleMapper.getPreArticle(articleModel.getId()), true));
         articleModel.setNextArticle(ModalTrans.article(articleMapper.getNextArticle(articleModel.getId()), true));
+        return articleModel;
     }
 }
