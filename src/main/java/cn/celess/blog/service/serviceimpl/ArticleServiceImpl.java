@@ -304,7 +304,7 @@ public class ArticleServiceImpl implements ArticleService {
     public PageData<ArticleModel> retrievePageForOpen(int count, int page) {
         PageHelper.startPage(page, count);
         List<Article> articleList = articleMapper.findAllByOpen(true);
-        PageData<ArticleModel> pageData = new PageData<>(new PageInfo<Article>(articleList));
+        PageData<ArticleModel> pageData = new PageData<>(new PageInfo<>(articleList));
 
         List<ArticleModel> articleModelList = articleList
                 .stream()
@@ -323,9 +323,7 @@ public class ArticleServiceImpl implements ArticleService {
         PageHelper.startPage(page, count);
         List<Article> open = articleMapper.findAllByCategoryIdAndOpen(category.getId());
 
-        List<ArticleModel> modelList = new ArrayList<>();
-
-        modelList = open.stream()
+        List<ArticleModel> modelList = open.stream()
                 .map(article -> ModalTrans.article(article, true))
                 .peek(articleModel -> {
                     articleModel.setNextArticle(null);

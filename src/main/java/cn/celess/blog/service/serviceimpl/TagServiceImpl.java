@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -81,20 +82,22 @@ public class TagServiceImpl implements TagService {
         List<Tag> tagList = tagMapper.findAll();
         List<TagModel> modelList = new ArrayList<>();
         tagList.forEach(tag -> modelList.add(ModalTrans.tag(tag)));
-        return new PageData<TagModel>(new PageInfo<Tag>(tagList), modelList);
+        return new PageData<>(new PageInfo<>(tagList), modelList);
     }
 
     @Override
     public List<TagModel> findAll() {
-        List<TagModel> list = new ArrayList<>();
-        tagMapper.findAll().forEach(e -> {
-            TagModel model = ModalTrans.tag(e);
-            List<ArticleTag> articleByTagAndOpen = articleTagMapper.findArticleByTagAndOpen(e.getId());
-            List<ArticleModel> articleModelList = new ArrayList<>();
-            articleByTagAndOpen.forEach(articleTag -> articleModelList.add(ModalTrans.article(articleTag.getArticle(), true)));
-            model.setArticles(articleModelList);
-            list.add(model);
-        });
-        return list;
+        return tagMapper.findAll().stream()
+                .map(ModalTrans::tag)
+                .peek(tagModel -> {
+                    List<ArticleTag> articleByTagAndOpen = articleTagMapper.findArticleByTagAndOpen(tagModel.getId());
+                    tagModel.setArticles(
+                            articleByTagAndOpen
+                                    .stream()
+                                    .map(articleTag -> ModalTrans.article(articleTag.getArticle(), true))
+                                    .collect(Collectors.toList())
+                    );
+                })
+                .collect(Collectors.toList());
     }
 }

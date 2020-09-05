@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -107,14 +108,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CommentModel> retrievePageByPid(long pid) {
         List<Comment> allByPagePath = commentMapper.findAllByPid(pid);
-        List<CommentModel> commentModels = new ArrayList<>();
-        allByPagePath.forEach(comment -> {
-            if (comment.getStatus() != CommentStatusEnum.DELETED.getCode()) {
-                commentModels.add(ModalTrans.comment(comment));
-            }
-        });
-
-        return commentModels;
+        return allByPagePath
+                .stream()
+                .filter(comment -> comment.getStatus() != CommentStatusEnum.DELETED.getCode())
+                .map(ModalTrans::comment)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -145,14 +143,11 @@ public class CommentServiceImpl implements CommentService {
 
     private PageData<CommentModel> pageTrans(List<Comment> commentList, boolean noResponseList) {
         PageInfo<Comment> p = PageInfo.of(commentList);
-        List<CommentModel> modelList = new ArrayList<>();
-        commentList.forEach(l -> {
-            CommentModel model = ModalTrans.comment(l);
-            if (!noResponseList) {
-                model.setRespComment(this.retrievePageByPid(model.getId()));
-            }
-            modelList.add(model);
-        });
-        return new PageData<CommentModel>(p, modelList);
+        List<CommentModel> modelList = commentList
+                .stream()
+                .map(ModalTrans::comment)
+                .peek(commentModel -> commentModel.setRespComment(this.retrievePageByPid(commentModel.getId())))
+                .collect(Collectors.toList());
+        return new PageData<>(p, modelList);
     }
 }

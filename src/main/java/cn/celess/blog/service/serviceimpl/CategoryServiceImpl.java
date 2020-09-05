@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -68,22 +68,25 @@ public class CategoryServiceImpl implements CategoryService {
     public PageData<CategoryModel> retrievePage(int page, int count) {
         PageHelper.startPage(page, count);
         List<Category> all = categoryMapper.findAll();
-        List<CategoryModel> modelList = new ArrayList<>();
-        all.forEach(e -> {
-            CategoryModel model = ModalTrans.category(e);
-            List<Article> allByCategoryId = articleMapper.findAllByCategoryId(e.getId());
-            List<ArticleModel> articleModelList = new ArrayList<>();
-            allByCategoryId.forEach(article -> {
-                ArticleModel articleModel = ModalTrans.article(article, true);
-                articleModel.setPreArticle(null);
-                articleModel.setNextArticle(null);
-                articleModel.setTags(null);
-                articleModelList.add(articleModel);
-            });
-            model.setArticles(articleModelList);
-            modelList.add(model);
-        });
-
-        return new PageData<CategoryModel>(new PageInfo<Category>(all), modelList);
+        // 遍历没一个category
+        List<CategoryModel> modelList = all
+                .stream()
+                .map(ModalTrans::category)
+                .peek(categoryModel -> {
+                    // 根据category去查article，并赋值给categoryModel
+                    List<Article> allByCategoryId = articleMapper.findAllByCategoryId(categoryModel.getId());
+                    List<ArticleModel> articleModelList = allByCategoryId
+                            .stream()
+                            .map(article -> ModalTrans.article(article, true))
+                            .peek(articleModel -> {
+                                // 去除不必要的字段
+                                articleModel.setPreArticle(null);
+                                articleModel.setNextArticle(null);
+                                articleModel.setTags(null);
+                            })
+                            .collect(Collectors.toList());
+                    categoryModel.setArticles(articleModelList);
+                }).collect(Collectors.toList());
+        return new PageData<>(new PageInfo<>(all), modelList);
     }
 }
