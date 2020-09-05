@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -72,7 +73,7 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
     public PageData<WebUpdateModel> pages(int count, int page) {
         PageHelper.startPage(page, count);
         List<WebUpdate> updateList = webUpdateInfoMapper.findAll();
-        return new PageData<WebUpdateModel>(new PageInfo<WebUpdate>(updateList), list2List(updateList));
+        return new PageData<>(new PageInfo<>(updateList), list2List(updateList));
     }
 
     @Override
@@ -108,8 +109,6 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
     }
 
     private List<WebUpdateModel> list2List(List<WebUpdate> webUpdates) {
-        List<WebUpdateModel> webUpdateModels = new ArrayList<>();
-        webUpdates.forEach(update -> webUpdateModels.add(ModalTrans.webUpdate(update)));
-        return webUpdateModels;
+        return webUpdates.stream().map(ModalTrans::webUpdate).collect(Collectors.toList());
     }
 }

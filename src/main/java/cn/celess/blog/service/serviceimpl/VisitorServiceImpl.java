@@ -51,7 +51,7 @@ public class VisitorServiceImpl implements VisitorService {
     public PageData<VisitorModel> visitorPage(int page, int count, boolean showLocation) {
         PageHelper.startPage(page, count);
         List<Visitor> visitorList = visitorMapper.findAll();
-        return new PageData<VisitorModel>(new PageInfo<Visitor>(visitorList), list2List(visitorList, showLocation));
+        return new PageData<>(new PageInfo<>(visitorList), list2List(visitorList, showLocation));
     }
 
     @Override
