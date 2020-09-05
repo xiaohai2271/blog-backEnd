@@ -27,7 +27,7 @@ public class VisitorController {
     @GetMapping("/admin/visitor/page")
     public Response page(@RequestParam(value = "count", required = false, defaultValue = "10") int count,
                          @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                         @RequestParam(value = "showLocation", required = false, defaultValue = "false") boolean showLocation) {
+                         @RequestParam(value = "showLocation", required = false, defaultValue = "true") boolean showLocation) {
         return Response.success(visitorService.visitorPage(page, count, showLocation));
     }
 

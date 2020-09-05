@@ -31,6 +31,7 @@ public class VisitorControllerTest extends BaseTest {
     public void page() throws Exception {
         int count = 10;
         int page = 1;
+        // 默认显示location
         getMockData(get("/admin/visitor/page?count=" + count + "&page=" + page), adminLogin()).andDo(result -> {
             Response<PageData<VisitorModel>> response = getResponse(result, VISITOR_PAGE_TYPE);
             assertEquals(SUCCESS.getCode(), response.getCode());
@@ -41,6 +42,7 @@ public class VisitorControllerTest extends BaseTest {
             for (VisitorModel v : pageData.getList()) {
                 assertNotEquals(0, v.getId());
                 assertNotNull(v.getDate());
+                assertNotNull(v.getLocation());
             }
         });
     }

@@ -1,16 +1,15 @@
-package cn.celess.blog.service.serviceimpl;
+package cn.celess.blog.service;
 
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.model.PageData;
 import cn.celess.blog.entity.model.VisitorModel;
-import cn.celess.blog.service.VisitorService;
 import com.alibaba.druid.util.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;
 
-public class VisitorServiceImplTest extends BaseTest {
+public class VisitorServiceTest extends BaseTest {
 
     @Autowired
     VisitorService visitorService;
