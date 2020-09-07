@@ -9,7 +9,8 @@
 ### 2. 拉取项目到本地
 ``` shell script
 git clone https://github.com/xiaohai2271/blog-backEnd.git
-或 git clone git@github.com:xiaohai2271/blog-backEnd.git
+# 或
+git clone git@github.com:xiaohai2271/blog-backEnd.git
 ```
  
 ### 3. maven构建
@@ -26,7 +27,7 @@ java -jar target/blog-0.0.1-SNAPSHOT.jar
 ```shell script
 mvn clean # 清理项目资源
 mvn clean package # 清理项目资源并重新打包
-mvn clean package -DskipTest # 清理项目资源,重新打包并跳过测试
+mvn clean package -DskipTests # 清理项目资源,重新打包并跳过测试
 mvn test # 运行测试 
 ..... #待添加
 ```
