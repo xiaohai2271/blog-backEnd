@@ -32,8 +32,8 @@ public class Response<T> implements Serializable {
      * @param result 结果
      * @return Response
      */
-    public static Response success(Object result) {
-        return new Response(ResponseEnum.SUCCESS.getCode(), ResponseEnum.SUCCESS.getMsg(), result);
+    public static <T> Response<T> success(T result) {
+        return new Response<T>(ResponseEnum.SUCCESS.getCode(), ResponseEnum.SUCCESS.getMsg(), result);
     }
 
     /**
@@ -42,8 +42,8 @@ public class Response<T> implements Serializable {
      * @param result 结果
      * @return Response
      */
-    public static Response failure(String result) {
-        return new Response(ResponseEnum.FAILURE.getCode(), ResponseEnum.FAILURE.getMsg(), result);
+    public static Response<String> failure(String result) {
+        return new Response<String>(ResponseEnum.FAILURE.getCode(), ResponseEnum.FAILURE.getMsg(), result);
     }
 
     /**
@@ -53,8 +53,8 @@ public class Response<T> implements Serializable {
      * @param result 结果
      * @return Response
      */
-    public static Response response(ResponseEnum r, String result) {
-        return new Response(r.getCode(), r.getMsg(), result);
+    public static <T> Response<T> response(ResponseEnum r, T result) {
+        return new Response<T>(r.getCode(), r.getMsg(), result);
     }
 
     @SneakyThrows

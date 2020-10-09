@@ -7,6 +7,7 @@ import cn.celess.blog.exception.MyException;
 import cn.celess.blog.service.CountService;
 import cn.celess.blog.service.QiniuService;
 import cn.celess.blog.util.HttpUtil;
+import cn.celess.blog.util.RedisUserUtil;
 import cn.celess.blog.util.RedisUtil;
 import cn.celess.blog.util.VeriCodeUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,9 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,7 +46,7 @@ public class CommonController {
     @Autowired
     RedisUtil redisUtil;
     @Autowired
-    HttpServletRequest request;
+    RedisUserUtil redisUserUtil;
 
 
     @GetMapping("/counts")
@@ -89,7 +88,7 @@ public class CommonController {
      * @throws IOException IOException
      */
     @GetMapping(value = "/imgCode", produces = MediaType.IMAGE_PNG_VALUE)
-    public void getImg(HttpServletResponse response) throws IOException {
+    public void getImg(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Object[] obj = VeriCodeUtil.createImage();
         request.getSession().setAttribute("code", obj[0]);
         //将图片输出给浏览器
@@ -133,9 +132,10 @@ public class CommonController {
      * FIXME :: 单张图片多次上传的问题
      * editor.md图片上传的接口
      * FUCK !!!
-     *
+     * !! 推荐使用 fileUpload(/fileUpload) 接口
      * @param file 文件
      */
+    @Deprecated
     @PostMapping("/imgUpload")
     public void upload(HttpServletRequest request, HttpServletResponse response, @RequestParam("editormd-image-file") MultipartFile file) throws IOException {
         Map<String, Object> map = new HashMap<>();
@@ -185,5 +185,38 @@ public class CommonController {
         }
         JsonNode images = root.get("images").elements().next();
         return Response.success("https://cn.bing.com" + images.get("url").asText());
+    }
+
+    @PostMapping("/fileUpload")
+    public Response<List<Map<String, Object>>> fileUpload(@RequestParam("file[]") MultipartFile[] files) throws IOException {
+        List<Map<String, Object>> result = new ArrayList<>();
+        String uploadTimesStr = redisUtil.get(redisUserUtil.get().getEmail() + "-fileUploadTimes");
+        int uploadTimes = 0;
+        if (uploadTimesStr != null) {
+            uploadTimes = Integer.parseInt(uploadTimesStr);
+        }
+        if (uploadTimes == 10) {
+            throw new MyException(ResponseEnum.FAILURE.getCode(), "上传次数已达10次，请2小时后在上传");
+        }
+        if (files.length == 0) {
+            throw new MyException(ResponseEnum.NO_FILE);
+        }
+        for (MultipartFile file : files) {
+            Map<String, Object> resp = new HashMap<>(4);
+
+            String fileName = file.getOriginalFilename();
+            assert fileName != null;
+            String mime = fileName.substring(fileName.lastIndexOf("."));
+            String name = fileName.replace(mime, "").replaceAll(" ", "");
+            QiniuResponse qiniuResponse = qiniuService.uploadFile(file.getInputStream(), "file_" + name + '_' + System.currentTimeMillis() + mime);
+            resp.put("originalFilename", fileName);
+            resp.put("success", qiniuResponse != null);
+            if (qiniuResponse != null) {
+                resp.put("host", "http://cdn.celess.cn/");
+                resp.put("path", qiniuResponse.key);
+            }
+            result.add(resp);
+        }
+        return Response.success(result);
     }
 }
