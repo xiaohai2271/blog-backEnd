@@ -20,7 +20,7 @@ import java.io.InputStream;
  * @author : xiaohai
  * @date : 2019/04/25 18:15
  */
-@Service
+@Service("qiniuFileServiceImpl")
 public class QiniuFileServiceImpl implements FileManager {
     private static final Configuration cfg = new Configuration(Zone.zone2());
     private static UploadManager uploadManager;

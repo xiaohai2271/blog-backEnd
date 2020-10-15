@@ -2,6 +2,7 @@ package cn.celess.blog.service.interfaces;
 
 import cn.celess.blog.entity.model.QiniuResponse;
 import com.qiniu.storage.model.FileInfo;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
@@ -10,6 +11,7 @@ import java.io.InputStream;
  * @date : 2020/10/15 18:19
  * @desc : 文件管理器 定义操作文件的方法
  */
+@Service
 public interface FileManager {
 
     /**

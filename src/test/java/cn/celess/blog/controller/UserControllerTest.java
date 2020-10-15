@@ -9,6 +9,8 @@ import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
 import cn.celess.blog.mapper.UserMapper;
 import cn.celess.blog.service.UserService;
+import cn.celess.blog.service.interfaces.FileManager;
+import cn.celess.blog.service.interfaces.FileService;
 import cn.celess.blog.util.MD5Util;
 import cn.celess.blog.util.RedisUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -116,7 +118,7 @@ public class UserControllerTest extends BaseTest {
 
         // mock 实现类
         // FIXME ：：  mock 时不应该为 qiniuService
-        mockInjectInstance(userService, "qiniuService", new TestQiniuFileServiceImpl());
+        mockInjectInstance(userService, "fileService", (FileService) TestQiniuFileServiceImpl::new);
 
         MockMultipartFile file = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE, inputStream);
         getMockData(multipart("/user/imgUpload").file(file), userLogin()).andDo(result -> {

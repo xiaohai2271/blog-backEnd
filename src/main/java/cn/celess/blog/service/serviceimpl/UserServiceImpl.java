@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.beans.Transient;
 import java.io.InputStream;
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
     HttpServletRequest request;
     @Autowired
     MailService mailService;
-    @Autowired
+    @Resource(name = "fileServiceImpl")
     FileService fileService;
     @Autowired
     RedisUtil redisUtil;
