@@ -1,11 +1,6 @@
-package cn.celess.blog.service.interfaces;
+package cn.celess.blog.service;
 
-import cn.celess.blog.entity.model.QiniuResponse;
-import com.qiniu.storage.model.FileInfo;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
-import java.io.InputStream;
 
 /**
  * @author : xiaohai

@@ -5,7 +5,7 @@ import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.model.QiniuResponse;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.service.CountService;
-import cn.celess.blog.service.interfaces.FileService;
+import cn.celess.blog.service.FileService;
 import cn.celess.blog.util.HttpUtil;
 import cn.celess.blog.util.RedisUserUtil;
 import cn.celess.blog.util.RedisUtil;

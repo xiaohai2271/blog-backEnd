@@ -1,8 +1,7 @@
-package cn.celess.blog.service.serviceimpl;
+package cn.celess.blog.service.fileserviceimpl;
 
 import cn.celess.blog.entity.model.QiniuResponse;
-import cn.celess.blog.service.interfaces.FileManager;
-import cn.celess.blog.service.interfaces.FileService;
+import cn.celess.blog.service.FileManager;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.http.Response;

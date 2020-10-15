@@ -12,7 +12,7 @@ import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.UserMapper;
-import cn.celess.blog.service.interfaces.FileService;
+import cn.celess.blog.service.FileService;
 import cn.celess.blog.service.MailService;
 import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.*;

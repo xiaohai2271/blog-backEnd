@@ -1,7 +1,7 @@
-package cn.celess.blog.service.serviceimpl;
+package cn.celess.blog.service.fileserviceimpl;
 
-import cn.celess.blog.service.interfaces.FileManager;
-import cn.celess.blog.service.interfaces.FileService;
+import cn.celess.blog.service.FileManager;
+import cn.celess.blog.service.FileService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

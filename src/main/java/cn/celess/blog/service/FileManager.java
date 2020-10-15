@@ -1,4 +1,4 @@
-package cn.celess.blog.service.interfaces;
+package cn.celess.blog.service;
 
 import cn.celess.blog.entity.model.QiniuResponse;
 import com.qiniu.storage.model.FileInfo;
