@@ -345,5 +345,11 @@ public class BaseTest {
             log.debug("获取文件列表请求");
             return new ArrayList<>();
         }
+
+        @Override
+        public boolean deleteFile(String fileName) {
+            log.debug("删除[{}]成功", fileName);
+            return true;
+        }
     }
 }

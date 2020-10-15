@@ -14,15 +14,27 @@ import java.util.List;
  */
 @Service
 public interface FileManager {
-
     /**
-     * 解决语法错误 占位方法
+     * 上传文件到文件存储容器中
      *
+     * @param is       文件流
+     * @param fileName 文件名
+     * @return FileResponse
      */
     FileResponse uploadFile(InputStream is, String fileName);
 
     /**
-     * 解决语法错误 占位方法
+     * 获取文件列表
+     *
+     * @return 文件信息
      */
     List<FileInfo> getFileList();
+
+    /**
+     * 删除文件
+     *
+     * @param fileName 文件名
+     * @return 是否删除成功
+     */
+    boolean deleteFile(String fileName);
 }

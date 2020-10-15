@@ -12,6 +12,7 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -97,6 +98,14 @@ public class QiniuFileServiceImpl implements FileManager {
                     .collect(Collectors.toList());
         }
         return infoList;
+    }
+
+    @SneakyThrows
+    @Override
+    public boolean deleteFile(String fileName) {
+        Response response = bucketManager.delete(bucket, fileName);
+
+        return false;
     }
 
     private boolean continueFile(String key) {
