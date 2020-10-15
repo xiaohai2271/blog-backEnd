@@ -5,8 +5,8 @@ import cn.celess.blog.enmu.RoleEnum;
 import cn.celess.blog.enmu.UserAccountStatusEnum;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.User;
+import cn.celess.blog.entity.model.FileResponse;
 import cn.celess.blog.entity.model.PageData;
-import cn.celess.blog.entity.model.QiniuResponse;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
@@ -186,7 +186,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object updateUserAavatarImg(InputStream is, String mime) {
         User user = redisUserUtil.get();
-        QiniuResponse upload = fileService.getFileManager().uploadFile(is, user.getEmail() + "_" + user.getId() + mime.toLowerCase());
+        FileResponse upload = fileService.getFileManager().uploadFile(is, user.getEmail() + "_" + user.getId() + mime.toLowerCase());
         user.setAvatarImgUrl(upload.key);
         userMapper.updateAvatarImgUrl(upload.key, user.getId());
         redisUserUtil.set(user);

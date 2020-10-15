@@ -1,10 +1,11 @@
 package cn.celess.blog.service;
 
-import cn.celess.blog.entity.model.QiniuResponse;
-import com.qiniu.storage.model.FileInfo;
+import cn.celess.blog.entity.model.FileInfo;
+import cn.celess.blog.entity.model.FileResponse;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author : xiaohai
@@ -18,10 +19,10 @@ public interface FileManager {
      * 解决语法错误 占位方法
      *
      */
-    QiniuResponse uploadFile(InputStream is, String fileName);
+    FileResponse uploadFile(InputStream is, String fileName);
 
     /**
      * 解决语法错误 占位方法
      */
-    FileInfo[] getFileList();
+    List<FileInfo> getFileList();
 }

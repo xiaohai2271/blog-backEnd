@@ -2,7 +2,8 @@ package cn.celess.blog;
 
 
 import cn.celess.blog.entity.Response;
-import cn.celess.blog.entity.model.QiniuResponse;
+import cn.celess.blog.entity.model.FileInfo;
+import cn.celess.blog.entity.model.FileResponse;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.service.MailService;
@@ -10,7 +11,6 @@ import cn.celess.blog.service.FileManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.qiniu.storage.model.FileInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -37,6 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -327,21 +329,21 @@ public class BaseTest {
     @Slf4j
     public static class TestQiniuFileServiceImpl implements FileManager {
         @Override
-        public QiniuResponse uploadFile(InputStream is, String fileName) {
-            QiniuResponse response = new QiniuResponse();
+        public FileResponse uploadFile(InputStream is, String fileName) {
+            FileResponse response = new FileResponse();
             log.debug("上传文件请求，[fileName:{}]", fileName);
 
             response.key = "key";
             response.bucket = "bucket";
             response.hash = "hash";
-            response.fsize = 1;
+            response.size = 1;
             return response;
         }
 
         @Override
-        public FileInfo[] getFileList() {
+        public List<FileInfo> getFileList() {
             log.debug("获取文件列表请求");
-            return new FileInfo[0];
+            return new ArrayList<>();
         }
     }
 }
