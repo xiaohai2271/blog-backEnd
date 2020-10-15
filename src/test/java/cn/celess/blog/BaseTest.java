@@ -6,7 +6,8 @@ import cn.celess.blog.entity.model.QiniuResponse;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.service.MailService;
-import cn.celess.blog.service.QiniuService;
+import cn.celess.blog.service.interfaces.FileManager;
+import cn.celess.blog.service.interfaces.FileService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -325,7 +326,7 @@ public class BaseTest {
     }
 
     @Slf4j
-    public static class TestQiNiuServiceImpl implements QiniuService {
+    public static class TestQiniuFileServiceImpl implements FileManager {
         @Override
         public QiniuResponse uploadFile(InputStream is, String fileName) {
             QiniuResponse response = new QiniuResponse();

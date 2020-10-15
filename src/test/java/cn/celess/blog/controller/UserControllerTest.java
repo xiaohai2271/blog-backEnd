@@ -115,7 +115,8 @@ public class UserControllerTest extends BaseTest {
         assertNotNull(inputStream);
 
         // mock 实现类
-        mockInjectInstance(userService, "qiniuService", new TestQiNiuServiceImpl());
+        // FIXME ：：  mock 时不应该为 qiniuService
+        mockInjectInstance(userService, "qiniuService", new TestQiniuFileServiceImpl());
 
         MockMultipartFile file = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE, inputStream);
         getMockData(multipart("/user/imgUpload").file(file), userLogin()).andDo(result -> {

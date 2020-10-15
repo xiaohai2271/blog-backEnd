@@ -12,8 +12,8 @@ import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.UserMapper;
+import cn.celess.blog.service.interfaces.FileService;
 import cn.celess.blog.service.MailService;
-import cn.celess.blog.service.QiniuService;
 import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.*;
 import com.github.pagehelper.PageHelper;
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     MailService mailService;
     @Autowired
-    QiniuService qiniuService;
+    FileService fileService;
     @Autowired
     RedisUtil redisUtil;
     @Autowired
@@ -185,7 +185,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object updateUserAavatarImg(InputStream is, String mime) {
         User user = redisUserUtil.get();
-        QiniuResponse upload = qiniuService.uploadFile(is, user.getEmail() + "_" + user.getId() + mime.toLowerCase());
+        QiniuResponse upload = fileService.getFileManager().uploadFile(is, user.getEmail() + "_" + user.getId() + mime.toLowerCase());
         user.setAvatarImgUrl(upload.key);
         userMapper.updateAvatarImgUrl(upload.key, user.getId());
         redisUserUtil.set(user);
