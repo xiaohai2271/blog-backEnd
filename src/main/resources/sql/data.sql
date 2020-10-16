@@ -214,3 +214,10 @@ VALUES (1, '1.新增网站更新接口api \n2.新增友链api \n3.优化了文�
        (16, '登陆处理过程变更，登陆时长修改至5天', '2019-11-22 11:39:03', 0),
        (17, '界面改版v2.0', '2020-04-06 11:00:53', 0);
 
+INSERT INTO config (conf_id, conf_name, conf_value)
+VALUES (1, 'file.type', 'local'),
+       (2, 'file.qiniu.accessKey', ''),
+       (3, 'file.qiniu.secretKey', ''),
+       (4, 'file.qiniu.bucket', ''),
+       (6, 'file.local.dictoryPath', ''),
+       (7, 'db.type', 'h2')

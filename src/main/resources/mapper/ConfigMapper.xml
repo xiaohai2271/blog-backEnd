@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.celess.blog.mapper.ConfigMapper">
+
+    <resultMap type="cn.celess.blog.entity.Config" id="ConfigMap">
+        <result property="id" column="conf_id" jdbcType="INTEGER"/>
+        <result property="name" column="conf_name" jdbcType="VARCHAR"/>
+        <result property="value" column="conf_value" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="getConfiguration" resultMap="ConfigMap">
+        select conf_id,
+               conf_name,
+               conf_value
+        from config
+        where conf_name = #{key}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="getConfigurations" resultMap="ConfigMap">
+        select conf_id,
+               conf_name,
+               conf_value
+        from config
+    </select>
+
+
+    <!--新增所有列-->
+    <insert id="addConfiguration" keyProperty="id" useGeneratedKeys="true">
+        insert into config(conf_name, conf_value)
+        values (#{name}, #{value})
+    </insert>
+
+
+    <!--通过主键修改数据-->
+    <update id="updateConfiguration">
+        update config
+        set conf_value = #{value}
+        where conf_id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteConfiguration">
+        delete
+        from config
+        where conf_id = #{id}
+    </delete>
+
+</mapper>
