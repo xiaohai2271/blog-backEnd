@@ -26,12 +26,14 @@ public class ConfigController {
     @PutMapping("/admin/config")
     public Response<List<Config>> updateConfiguration(@RequestBody List<Config> configs) {
         configs.forEach(config -> configMapper.updateConfiguration(config));
+        configs.forEach(config -> System.setProperty(config.getName(), config.getValue()));
         return Response.success(configMapper.getConfigurations());
     }
 
     @PostMapping("/admin/config")
     public Response<List<Config>> addConfiguration(@RequestBody List<Config> configs) {
         configs.forEach(config -> configMapper.addConfiguration(config));
+        configs.forEach(config -> System.setProperty(config.getName(), config.getValue()));
         return Response.success(configMapper.getConfigurations());
     }
 }
