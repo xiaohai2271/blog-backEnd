@@ -9,12 +9,15 @@ import javax.annotation.Resource;
 /**
  * @author : xiaohai
  * @date : 2020/10/15 18:52
- * @desc :
+ * @desc : 提供文件管理器的服务
  */
 @Service("fileServiceImpl")
 public class FileServiceImpl implements FileService {
     @Resource(name = "qiniuFileServiceImpl")
     FileManager qiniuFileManager;
+
+    @Resource(name = "localFileServiceImpl")
+    FileManager localFileServiceImpl;
 
     @Override
     public FileManager getFileManager() {
