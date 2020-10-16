@@ -327,7 +327,7 @@ public class BaseTest {
     }
 
     @Slf4j
-    public static class TestQiniuFileServiceImpl implements FileManager {
+    public static class TestFileManager implements FileManager {
         @Override
         public FileResponse uploadFile(InputStream is, String fileName) {
             FileResponse response = new FileResponse();
