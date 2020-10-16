@@ -1,9 +1,9 @@
 package cn.celess.blog.service.fileserviceimpl;
 
+import cn.celess.blog.enmu.ConfigKeyEnum;
 import cn.celess.blog.entity.model.FileInfo;
 import cn.celess.blog.entity.model.FileResponse;
 import cn.celess.blog.service.FileManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.http.Response;
@@ -13,7 +13,6 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -33,14 +32,15 @@ public class QiniuFileServiceImpl implements FileManager {
     private static BucketManager bucketManager;
     private static Auth auth;
 
-    @Value("${qiniu.accessKey}")
-    private String accessKey;
-    @Value("${qiniu.secretKey}")
-    private String secretKey;
-    @Value("${qiniu.bucket}")
     private String bucket;
 
+    /**
+     * todo :: 添加reload 方法 配置修改重新创建对象
+     */
     private void init() {
+        String accessKey = System.getProperty(ConfigKeyEnum.FILE_QINIU_ACCESS_KEY.getKey());
+        String secretKey = System.getProperty(ConfigKeyEnum.FILE_QINIU_SECRET_KEY.getKey());
+        this.bucket = System.getProperty(ConfigKeyEnum.FILE_QINIU_BUCKET.getKey());
         if (auth == null || uploadManager == null || bucketManager == null) {
             auth = Auth.create(accessKey, secretKey);
             uploadManager = new UploadManager(cfg);
