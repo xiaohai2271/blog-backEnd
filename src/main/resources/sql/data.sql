@@ -216,8 +216,8 @@ VALUES (1, '1.新增网站更新接口api \n2.新增友链api \n3.优化了文�
 
 INSERT INTO config (conf_id, conf_name, conf_value)
 VALUES (1, 'file.type', 'local'),
-       (2, 'file.qiniu.accessKey', ''),
-       (3, 'file.qiniu.secretKey', ''),
-       (4, 'file.qiniu.bucket', ''),
+       (2, 'file.qiniu.accessKey', null),
+       (3, 'file.qiniu.secretKey', null),
+       (4, 'file.qiniu.bucket', null),
        (6, 'file.local.directoryPath', '~/blog/files'),
        (7, 'db.type', 'h2')

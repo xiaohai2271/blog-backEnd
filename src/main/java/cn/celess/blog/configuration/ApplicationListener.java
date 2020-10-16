@@ -1,11 +1,13 @@
 package cn.celess.blog.configuration;
 
+import cn.celess.blog.enmu.ConfigKeyEnum;
 import cn.celess.blog.entity.Config;
 import cn.celess.blog.mapper.ConfigMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,12 +24,29 @@ public class ApplicationListener implements ApplicationRunner {
 
     @Autowired
     ConfigMapper configMapper;
+    @Autowired
+    Environment env;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("博客启动！");
-        List<Config> configurations = configMapper.getConfigurations();
+        // 设置初始值
+        setProperty(ConfigKeyEnum.FILE_QINIU_SECRET_KEY);
+        setProperty(ConfigKeyEnum.FILE_QINIU_ACCESS_KEY);
+        setProperty(ConfigKeyEnum.FILE_QINIU_BUCKET);
+
+        List<Config> configurations = configMapper.getConfigurations()
+                .stream()
+                .filter(config -> config.getValue() != null && !"".equals(config.getValue()))
+                .collect(Collectors.toList());
         configurations.forEach(config -> System.setProperty(config.getName(), config.getValue()));
         log.debug("注入配置成功 {}", configurations.stream().map(Config::getName).collect(Collectors.toList()));
+    }
+
+    private void setProperty(ConfigKeyEnum e) {
+        String property = env.getProperty(e.getKey());
+        if (property != null) {
+            System.setProperty(e.getKey(), property);
+        }
     }
 }

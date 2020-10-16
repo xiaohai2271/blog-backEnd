@@ -115,7 +115,7 @@ CREATE TABLE `config`
 (
     `conf_id`    int primary key auto_increment,
     `conf_name`  varchar(255) unique not null comment '配置名',
-    `conf_value` varchar(255)        not null comment '配置值'
+    `conf_value` varchar(255) default null comment '配置值'
 );
 
 CREATE VIEW articleView
