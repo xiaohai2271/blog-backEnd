@@ -12,9 +12,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-      env:
-        QINIU_ACCESSKEY: ${{ secrets.QINIU_ACCESSKEY }}
-        QINIU_SECRETKEY: ${{ secrets.QINIU_SECRETKEY }}
+    env:
+      QINIU_ACCESSKEY: ${{ secrets.QINIU_ACCESSKEY }}
+      QINIU_SECRETKEY: ${{ secrets.QINIU_SECRETKEY }}
 
     steps:
       - uses: actions/checkout@v2
