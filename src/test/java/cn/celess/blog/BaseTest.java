@@ -334,7 +334,7 @@ public class BaseTest {
             log.debug("上传文件请求，[fileName:{}]", fileName);
 
             response.key = "key";
-            response.bucket = "bucket";
+            response.type = "test";
             response.hash = "hash";
             response.size = 1;
             return response;

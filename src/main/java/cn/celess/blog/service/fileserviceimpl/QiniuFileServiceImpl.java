@@ -66,7 +66,7 @@ public class QiniuFileServiceImpl implements FileManager {
             StringMap stringMap = response.jsonToMap();
 
             fileResponse.key = (String) stringMap.get("key");
-            fileResponse.bucket = "qiniu";
+            fileResponse.type = "qiniu";
             fileResponse.size = 0;
             fileResponse.hash = (String) stringMap.get("hash");
 

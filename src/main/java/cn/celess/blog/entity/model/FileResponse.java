@@ -8,6 +8,6 @@ package cn.celess.blog.entity.model;
 public class FileResponse {
     public String key;
     public String hash;
-    public String bucket;
+    public String type;
     public long size;
 }

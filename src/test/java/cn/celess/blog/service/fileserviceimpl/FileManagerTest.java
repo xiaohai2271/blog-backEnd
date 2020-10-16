@@ -83,7 +83,7 @@ public class FileManagerTest extends BaseTest {
         File file = createFile();
         FileResponse fileResponse = fileManager.uploadFile(new FileInputStream(file), file.getName());
         assertEquals(file.getName(), fileResponse.key);
-        assertEquals(System.getProperty(ConfigKeyEnum.FILE_TYPE.getKey()), fileResponse.bucket);
+        assertEquals(System.getProperty(ConfigKeyEnum.FILE_TYPE.getKey()), fileResponse.type);
         //        assertNotNull(fileResponse.hash);
         fileName = fileResponse.key;
 

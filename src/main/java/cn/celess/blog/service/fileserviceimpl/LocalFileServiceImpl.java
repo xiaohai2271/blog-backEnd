@@ -48,7 +48,7 @@ public class LocalFileServiceImpl implements FileManager {
         fos.close();
         is.close();
         fileResponse.key = URLEncoder.encode(fileName, "UTF-8");
-        fileResponse.bucket = "local";
+        fileResponse.type = "local";
         return fileResponse;
     }
 
