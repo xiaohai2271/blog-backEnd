@@ -66,8 +66,8 @@ public class QiniuFileServiceImpl implements FileManager {
             StringMap stringMap = response.jsonToMap();
 
             fileResponse.key = (String) stringMap.get("key");
-            fileResponse.bucket = (String) stringMap.get("bucket");
-            fileResponse.size = (long) stringMap.get("fsize");
+            fileResponse.bucket = "qiniu";
+            fileResponse.size = 0;
             fileResponse.hash = (String) stringMap.get("hash");
 
             return fileResponse;
@@ -103,9 +103,9 @@ public class QiniuFileServiceImpl implements FileManager {
     @SneakyThrows
     @Override
     public boolean deleteFile(String fileName) {
+        init();
         Response response = bucketManager.delete(bucket, fileName);
-
-        return false;
+        return "".equals(response.bodyString());
     }
 
     private boolean continueFile(String key) {
