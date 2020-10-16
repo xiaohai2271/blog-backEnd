@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       KEY: ${{ secrets.WEB_HOOK_ACCESS_KEY }}
+      QINIU_ACCESSKEY: ${{ secrets.QINIU_ACCESSKEY }}
+      QINIU_SECRETKEY: ${{ secrets.QINIU_SECRETKEY }}
 
     steps:
       - uses: actions/checkout@v2
