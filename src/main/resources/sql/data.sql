@@ -219,5 +219,6 @@ VALUES (1, 'file.type', 'local'),
        (2, 'file.qiniu.accessKey', null),
        (3, 'file.qiniu.secretKey', null),
        (4, 'file.qiniu.bucket', null),
-       (6, 'file.local.directoryPath', '~/blog/files'),
+       (5, 'blog.file.path', '~/blog/'),
+       (6, 'file.local.directoryPath', '~/blog/files/'),
        (7, 'db.type', 'h2')

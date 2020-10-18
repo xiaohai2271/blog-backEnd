@@ -25,17 +25,22 @@ import java.util.List;
 @Slf4j
 @Service("localFileServiceImpl")
 public class LocalFileServiceImpl implements FileManager {
+    private static String path = null;
+
     @SneakyThrows
     @Override
     public FileResponse uploadFile(InputStream is, String fileName) {
+        if (path == null) {
+            path = System.getProperty(ConfigKeyEnum.FILE_LOCAL_DIRECTORY_PATH.getKey());
+        }
         // 判断文件夹是否存在
-        File directory = new File(getPath());
+        File directory = new File(getPath(path));
         if (!directory.exists() && directory.mkdirs()) {
             log.info("不存在文件夹，创建文件夹=>{}", directory.getAbsolutePath());
         }
         log.info("上传文件 {}", fileName);
         // 存储文件
-        File file1 = new File(getPath() + File.separator + fileName);
+        File file1 = new File(getPath(path) + File.separator + fileName);
         FileOutputStream fos = new FileOutputStream(file1);
         byte[] cache = new byte[1024 * 100];
         int len = 0;
@@ -55,7 +60,10 @@ public class LocalFileServiceImpl implements FileManager {
     @SneakyThrows
     @Override
     public List<FileInfo> getFileList() {
-        File file = new File(getPath());
+        if (path == null) {
+            path = System.getProperty(ConfigKeyEnum.FILE_LOCAL_DIRECTORY_PATH.getKey());
+        }
+        File file = new File(getPath(path));
         File[] files = file.listFiles();
         List<FileInfo> fileInfoList = new ArrayList<>();
         if (files == null) {
@@ -74,17 +82,23 @@ public class LocalFileServiceImpl implements FileManager {
 
     @Override
     public boolean deleteFile(String fileName) {
-        File file = new File(getPath() + File.separator + fileName);
+        if (path == null) {
+            path = System.getProperty(ConfigKeyEnum.FILE_LOCAL_DIRECTORY_PATH.getKey());
+        }
+        File file = new File(getPath(path) + File.separator + fileName);
         return file.delete();
     }
 
-    private String getPath() {
-        String path = System.getProperty(ConfigKeyEnum.FILE_LOCAL_DIRECTORY_PATH.getKey()).replaceAll("//", File.separator);
+    public static String getPath(String path) {
+        if (path == null) {
+            return "";
+        }
+        String pathCop = path.replaceAll("//", File.separator);
         if (path.startsWith("~")) {
             // 家目录
-            path = path.replaceFirst("~", "");
-            path = System.getProperty("user.home") + path;
+            pathCop = path.replaceFirst("~", "");
+            pathCop = System.getProperty("user.home") + pathCop;
         }
-        return path;
+        return pathCop;
     }
 }

@@ -15,6 +15,7 @@ public enum ConfigKeyEnum {
     FILE_QINIU_SECRET_KEY("file.qiniu.secretKey"),
     FILE_QINIU_BUCKET("file.qiniu.bucket"),
     FILE_LOCAL_DIRECTORY_PATH("file.local.directoryPath"),
+    BLOG_FILE_PATH("blog.file.path"),
     DB_TYPE("db.type");
 
 
