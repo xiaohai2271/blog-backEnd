@@ -49,7 +49,9 @@ public class DruidConfig {
 
     private DruidDataSource readConfigFromFile(File file) throws IOException {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(file));
+        FileInputStream fis = new FileInputStream(file);
+        properties.load(fis);
+        fis.close();
         String url = properties.getProperty(DB_CONFIG_URL_PREFIX, null);
         String username = properties.getProperty(DB_CONFIG_USERNAME_PREFIX, null);
         String password = properties.getProperty(DB_CONFIG_PASSWORD_PREFIX, null);

@@ -1,6 +1,8 @@
 package cn.celess.blog.configuration;
 
 import cn.celess.blog.BaseTest;
+import cn.celess.blog.enmu.ConfigKeyEnum;
+import cn.celess.blog.service.fileserviceimpl.LocalFileServiceImpl;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.junit.After;
 import org.junit.Before;
@@ -43,13 +45,17 @@ public class DruidConfigTest extends BaseTest {
 
         // 有配置文件的测试
         Properties properties = new Properties();
-        properties.load(new FileInputStream(configFile));
+        FileInputStream fileInputStream = new FileInputStream(configFile);
+        properties.load(fileInputStream);
+        fileInputStream.close();
         properties.setProperty(DruidConfig.DB_CONFIG_URL_PREFIX, "jdbc:mysql://localhost:3306/blog");
         properties.setProperty(DruidConfig.DB_CONFIG_DRIVER_CLASS_NAME_PREFIX, "com.mysql.cj.jdbc.Driver");
         properties.setProperty(DruidConfig.DB_CONFIG_USERNAME_PREFIX, "username");
         properties.setProperty(DruidConfig.DB_CONFIG_PASSWORD_PREFIX, "password");
         // 保存到文件
-        properties.store(new FileOutputStream(configFile), "db config");
+        FileOutputStream fileOutputStream = new FileOutputStream(configFile);
+        properties.store(fileOutputStream, "数据库配置");
+        fileOutputStream.close();
         druidDataSource = druidConfig.initDataSource();
         assertEquals(properties.getProperty(DruidConfig.DB_CONFIG_URL_PREFIX), druidDataSource.getUrl());
         assertEquals(properties.getProperty(DruidConfig.DB_CONFIG_DRIVER_CLASS_NAME_PREFIX), druidDataSource.getDriverClassName());
@@ -62,12 +68,18 @@ public class DruidConfigTest extends BaseTest {
         if (bakConfigFile.exists()) {
             System.out.println("恢复配置文件成功");
             copyFile(bakConfigFile, configFile);
-            bakConfigFile.deleteOnExit();
+            assertTrue(bakConfigFile.delete());
+        } else {
+            configFile.deleteOnExit();
         }
     }
 
     @Before
-    public void recordConfig() throws IOException {
+    public void recordConfig() {
+        File path = new File(LocalFileServiceImpl.getPath(System.getProperty(ConfigKeyEnum.BLOG_FILE_PATH.getKey())));
+        if (!path.exists() && !path.mkdirs()) {
+            fail("创建失败");
+        }
         this.bakConfigFile = new File(DruidConfig.DB_CONFIG_PATH + ".bak");
         this.configFile = new File(DruidConfig.DB_CONFIG_PATH);
         if (configFile.exists()) {
