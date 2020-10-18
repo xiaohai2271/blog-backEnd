@@ -7,6 +7,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
@@ -14,14 +15,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DruidConfigTest extends BaseTest {
 
-    @Autowired
+    @Mock
     Environment env;
+
+    @Autowired
+    Environment globalEnvironment;
+
 
     private File configFile;
     private File bakConfigFile;
@@ -30,7 +38,10 @@ public class DruidConfigTest extends BaseTest {
     public void initDataSource() throws IOException {
 
         DruidConfig druidConfig = new DruidConfig();
+
         druidConfig.env = env;
+
+        System.out.println(Arrays.toString(env.getActiveProfiles()));
 
         // 无配置文件
         assertTrue(!configFile.exists() || configFile.delete());
@@ -86,6 +97,11 @@ public class DruidConfigTest extends BaseTest {
             System.out.println("备份文件成功");
             copyFile(configFile, bakConfigFile);
         }
+        when(this.env.getActiveProfiles()).thenReturn(new String[]{"dev"});
+        when(this.env.getProperty(DruidConfig.DB_CONFIG_PASSWORD_PREFIX)).thenReturn(globalEnvironment.getProperty(DruidConfig.DB_CONFIG_PASSWORD_PREFIX));
+        when(this.env.getProperty(DruidConfig.DB_CONFIG_URL_PREFIX)).thenReturn(globalEnvironment.getProperty(DruidConfig.DB_CONFIG_URL_PREFIX));
+        when(this.env.getProperty(DruidConfig.DB_CONFIG_USERNAME_PREFIX)).thenReturn(globalEnvironment.getProperty(DruidConfig.DB_CONFIG_USERNAME_PREFIX));
+        when(this.env.getProperty(DruidConfig.DB_CONFIG_DRIVER_CLASS_NAME_PREFIX)).thenReturn(globalEnvironment.getProperty(DruidConfig.DB_CONFIG_DRIVER_CLASS_NAME_PREFIX));
     }
 
     /**

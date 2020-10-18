@@ -9,8 +9,8 @@ import org.springframework.core.env.Environment;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -29,12 +29,13 @@ public class DruidConfig {
     public static final String DB_CONFIG_USERNAME_PREFIX = "spring.datasource.username";
     public static final String DB_CONFIG_PASSWORD_PREFIX = "spring.datasource.password";
     public static final String DB_CONFIG_DRIVER_CLASS_NAME_PREFIX = "spring.datasource.driver-class-name";
+    public static final String TEST_PROFILES = "test";
 
     @Bean
     public DruidDataSource initDataSource() throws IOException {
         DruidDataSource dataSource;
         File file = new File(DB_CONFIG_PATH);
-        if (file.exists()) {
+        if (file.exists() && !Arrays.asList(env.getActiveProfiles()).contains(TEST_PROFILES)) {
             log.debug("从文件中获取数据库配置");
             dataSource = readConfigFromFile(file);
         } else {
