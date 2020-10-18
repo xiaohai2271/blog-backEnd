@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @MapperScan("cn.celess.blog.mapper")
 public class BlogApplication {
-    private static ApplicationContext context;
+    public static ApplicationContext context;
 
     public static void main(String[] args) {
         context = SpringApplication.run(BlogApplication.class, args);
