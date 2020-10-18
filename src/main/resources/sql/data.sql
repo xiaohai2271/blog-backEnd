@@ -221,4 +221,5 @@ VALUES (1, 'file.type', 'local'),
        (4, 'file.qiniu.bucket', null),
        (5, 'blog.file.path', '~/blog/'),
        (6, 'file.local.directoryPath', '~/blog/files/'),
-       (7, 'db.type', 'h2')
+       (8, 'blog.installed', 'false'),
+       (9, 'blog.db.path', '~/blog/db.properties')

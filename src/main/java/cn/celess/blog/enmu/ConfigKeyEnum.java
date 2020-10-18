@@ -16,7 +16,13 @@ public enum ConfigKeyEnum {
     FILE_QINIU_BUCKET("file.qiniu.bucket"),
     FILE_LOCAL_DIRECTORY_PATH("file.local.directoryPath"),
     BLOG_FILE_PATH("blog.file.path"),
-    DB_TYPE("db.type");
+    BLOG_INSTALLED("blog.installed"),
+    DB_TYPE("db.type"),
+    DB_URL("spring.datasource.url"),
+    DB_USERNAME("spring.datasource.username"),
+    DB_PASSWORD("spring.datasource.password"),
+    DB_DRIVER_CLASS_NAME("spring.datasource.driver-class-name"),
+    BLOG_DB_PATH("blog.db.path");
 
 
     private final String key;
