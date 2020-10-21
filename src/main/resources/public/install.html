@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>博客安装页面</title>
+    <link rel="stylesheet" href="css/install.css">
+    <script src="//cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+</head>
+<body>
+<div class="box">
+    <div class="box-inner">
+        <!-- 数据库-->
+        <select id="db-type">
+            <option value="h2">H2数据库</option>
+            <option value="mysql">Mysql数据库</option>
+        </select>
+        <input id="db-url" type="text" placeholder="请输入数据库的地址">
+        <input id="db-username" type="text" placeholder="数据库用户名">
+        <input id="db-password" type="text" placeholder="数据库密码">
+        <button onclick="postInstallEvent()">安装</button>
+    </div>
+</div>
+<script type="text/javascript">
+    function postInstallEvent() {
+        const requestData = {
+            dbPassword: $('#db-password').val(),
+            dbType: $('#db-type').val(),
+            dbUrl: $('#db-url').val(),
+            dbUsername: $('#db-username').val(),
+            email: '',
+            password: '',
+        }
+        $.ajax('/install', {
+            method: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            dataType: 'json',
+            success: function (data) {
+                console.log("data", data);
+                console.log("requestData",requestData);
+            }
+        })
+    }
+</script>
+</body>
+</html>

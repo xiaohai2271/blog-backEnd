@@ -100,4 +100,10 @@ public class InstallController {
 
         return Response.success(installParam);
     }
+
+
+    @GetMapping("/install")
+    public String install() {
+        return "install.html";
+    }
 }

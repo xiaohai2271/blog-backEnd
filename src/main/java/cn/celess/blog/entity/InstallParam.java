@@ -13,4 +13,10 @@ public class InstallParam {
     private String dbUrl;
     private String dbUsername;
     private String dbPassword;
+
+    /**
+     * user 相关
+     */
+    private String email;
+    private String password;
 }
