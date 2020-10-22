@@ -9,8 +9,8 @@ html, body {
 }
 
 .box {
-    width: 40vw;
-    height: 50vh;
+    width: 600px;
+    height: 45vh;
     padding: 8px 10px;
     border: 1px solid rgba(50, 50, 50, .1);
     border-radius: 3px;
@@ -23,16 +23,27 @@ html, body {
 .box-inner {
     height: 100%;
     width: 100%;
-    background: #ececec;
+    overflow: hidden;
 }
 
 .box-inner select, input, button {
     width: 90%;
-    margin: 8px 5%;
+    margin: 12px 5%;
+    height: 40px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    border: 1px solid rgba(50, 50, 50, .1);
+    box-sizing: border-box;
+}
+
+input:focus {
+    border: 1px solid rgba(0, 50, 50, .6);
+    outline: none;
 }
 
 .box-inner h3 {
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .err-msg {
@@ -44,6 +55,56 @@ html, body {
     font-weight: lighter;
 }
 
+
 .show-err-tip {
     display: block;
 }
+
+#first-page, #second-page {
+    height: 100%;
+    margin: 10px 0;
+}
+
+.hidden {
+    height: 0 !important;
+    visibility: hidden;
+    position: absolute;
+}
+
+.show {
+    width: 100%;
+    position: relative;
+    height: 100%;
+    visibility: visible;
+}
+
+
+#next-step, .button-group {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 10px;
+}
+
+.button-group button {
+    width: 80px;
+}
+
+.button-group #install {
+    position: absolute;
+    bottom: 0;
+    right: 20px;
+    background: #1890ff;
+    color: white;
+}
+
+.loading-show {
+    z-index: 10000;
+    display: flex !important;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+}
+
