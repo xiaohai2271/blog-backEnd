@@ -9,20 +9,77 @@
 <body>
 <div class="box">
     <div class="box-inner">
-        <!-- 数据库-->
-        <select id="db-type">
-            <option value="h2">H2数据库</option>
-            <option value="mysql">Mysql数据库</option>
-        </select>
-        <input id="db-url" type="text" placeholder="请输入数据库的地址">
-        <input id="db-username" type="text" placeholder="数据库用户名">
-        <input id="db-password" type="text" placeholder="数据库密码">
-        <button onclick="postInstallEvent()">安装</button>
+        <div id="first-page">
+            <h3>数据库配置</h3>
+            <!-- 数据库-->
+            <select id="db-type">
+                <option value="h2">H2数据库</option>
+                <option value="mysql">Mysql数据库</option>
+            </select>
+            <input id="db-url" type="text" placeholder="请输入数据库的地址">
+            <span class="err-msg" id="err-tip-db-url">数据库的地址不可为空</span>
+            <input id="db-username" type="text" placeholder="请输入数据库用户名">
+            <span class="err-msg" id="err-tip-db-username">数据库用户名不可为空</span>
+            <input id="db-password" type="password" placeholder="请输入数据库密码">
+            <span class="err-msg" id="err-tip-db-password">数据库密码不可为空</span>
+            <button onclick="nextPage()">下一步</button>
+        </div>
+        <div id="second-page">
+            <h3>新建管理员用户</h3>
+            <input id="email" type="email" placeholder="请输入用户名">
+            <span class="err-msg" id="err-tip-email">用户名不可为空</span>
+            <input id="password" type="password" placeholder="请输入密码">
+            <span class="err-msg" id="err-tip-password">密码不可为空</span>
+            <button onclick="postInstallEvent()">安装</button>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
+    let requestData;
+    let interValId;
+
     function postInstallEvent() {
-        const requestData = {
+        requestData.email = $('#email').val()
+        requestData.password = $('#password').val()
+        $('#err-tip-email').removeClass("show-err-tip");
+        $('#err-tip-password').removeClass("show-err-tip");
+        !requestData.email && checkInput($('#email'), $('#err-tip-email'))
+        !requestData.password && checkInput($('#password'), $('#err-tip-password'))
+        if (!requestData.email || !requestData.password) return;
+        $.ajax('/install', {
+            method: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            withCredentials: true,
+            dataType: 'json',
+            success: function (data) {
+                console.log("data", data);
+                console.log("requestData", requestData);
+                interValId = setInterval(checkConnection, 200)
+                checkConnection();
+            }
+        })
+    }
+
+    function checkConnection() {
+        $.ajax('/is_install', {
+            method: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.result.is_install) {
+                    console.log("安装成功");
+                    window.location.href = '/';
+                }
+                clearInterval(interValId);
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    }
+
+    function nextPage() {
+        requestData = {
             dbPassword: $('#db-password').val(),
             dbType: $('#db-type').val(),
             dbUrl: $('#db-url').val(),
@@ -30,16 +87,23 @@
             email: '',
             password: '',
         }
-        $.ajax('/install', {
-            method: "POST",
-            contentType: 'application/json',
-            data: JSON.stringify(requestData),
-            dataType: 'json',
-            success: function (data) {
-                console.log("data", data);
-                console.log("requestData",requestData);
-            }
-        })
+        $('#err-tip-db-type').removeClass("show-err-tip");
+        $('#err-tip-db-url').removeClass("show-err-tip");
+        $('#err-tip-db-username').removeClass("show-err-tip");
+        $('#err-tip-db-password').removeClass("show-err-tip");
+        !requestData.dbType && checkInput($('#db-type'), $('#err-tip-db-type'))
+        !requestData.dbUrl && checkInput($('#db-url'), $('#err-tip-db-url'))
+        !requestData.dbUsername && checkInput($('#db-username'), $('#err-tip-db-username'))
+        !requestData.dbPassword && checkInput($('#db-password'), $('#err-tip-db-password'))
+    }
+
+    function checkInput(component, errTipComponent) {
+        if (!component.val()) {
+            errTipComponent.addClass("show-err-tip");
+            component.focus();
+            return true;
+        }
+        return false;
     }
 </script>
 </body>

@@ -31,3 +31,19 @@ html, body {
     margin: 8px 5%;
 }
 
+.box-inner h3 {
+    text-align: center;
+}
+
+.err-msg {
+    display: none;
+    color: red;
+    width: 100%;
+    padding-left: 30px;
+    font-size: small;
+    font-weight: lighter;
+}
+
+.show-err-tip {
+    display: block;
+}

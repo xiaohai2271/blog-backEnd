@@ -104,6 +104,11 @@ public class InstallController {
 
     @GetMapping("/install")
     public String install() {
+        Config configuration = configMapper.getConfiguration(ConfigKeyEnum.BLOG_INSTALLED.getKey());
+        if (Boolean.parseBoolean(configuration.getValue())) {
+            return "index.html";
+        }
+        log.info("博客第一次运行，还未安装");
         return "install.html";
     }
 }
