@@ -11,22 +11,17 @@ import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.ConfigMapper;
 import cn.celess.blog.mapper.UserMapper;
 import cn.celess.blog.service.InstallService;
-import cn.celess.blog.service.fileserviceimpl.LocalFileServiceImpl;
-import cn.celess.blog.util.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.*;
-import java.util.HashMap;
+import javax.validation.Valid;
 import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 /**
  * @author : xiaohai
@@ -35,6 +30,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Controller
+@Validated
 public class InstallController {
 
     @Autowired
@@ -53,9 +49,8 @@ public class InstallController {
 
     @PostMapping("/install")
     @ResponseBody
-    @Transactional(rollbackFor = Exception.class)
-    public Response install(@RequestBody InstallParam installParam) {
-        return Response.success(installParam);
+    public Response<Object> install(@Valid @RequestBody InstallParam installParam) {
+        return Response.success(installService.install(installParam));
     }
 
 

@@ -16,6 +16,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -62,6 +63,7 @@ public class InstallServiceImpl implements InstallService {
 
     @SneakyThrows
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> install(@NotNull InstallParam installParam) {
         User user = new User(installParam.getEmail(), MD5Util.getMD5(installParam.getPassword()));
         userMapper.addUser(user);
