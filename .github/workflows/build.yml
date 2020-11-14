@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    if: "!contains(github.event.head_commit.message, 'skip ci') && !contains(github.event.head_commit.message, '.md')" # 如果 commit 信息包含以下关键字则跳过该任务
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '.md')" # 如果 commit 信息包含以下关键字则跳过该任务
     runs-on: ubuntu-latest
     env:
       KEY: ${{ secrets.WEB_HOOK_ACCESS_KEY }}
