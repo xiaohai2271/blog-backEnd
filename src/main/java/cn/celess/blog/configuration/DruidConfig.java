@@ -45,6 +45,7 @@ public class DruidConfig {
         dataSource.setInitialSize(10);
         dataSource.setMinIdle(10);
         dataSource.setMaxActive(100);
+        dataSource.setValidationQuery("select 1");
         return dataSource;
     }
 
