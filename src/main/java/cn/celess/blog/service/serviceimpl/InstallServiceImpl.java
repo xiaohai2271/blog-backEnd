@@ -79,12 +79,17 @@ public class InstallServiceImpl implements InstallService {
         Config config = new Config(ConfigKeyEnum.DB_TYPE);
         config.setValue(installParam.getDbType());
         Properties properties = new Properties();
+        StringBuilder urlSb = new StringBuilder();
         if ("h2".equals(installParam.getDbType())) {
             properties.setProperty(ConfigKeyEnum.DB_DRIVER_CLASS_NAME.getKey(), H2_DRIVER_CLASS_NAME);
+            urlSb.append("jdbc:h2:");
         } else {
             properties.setProperty(ConfigKeyEnum.DB_DRIVER_CLASS_NAME.getKey(), MYSQL_DRIVER_CLASS_NAME);
+            urlSb.append("jdbc:mysql:");
         }
-        properties.setProperty(ConfigKeyEnum.DB_URL.getKey(), installParam.getDbUrl());
+        // TODO ::
+        urlSb.append(installParam.getDbHost()).append('/').append(installParam.getDbName());
+        properties.setProperty(ConfigKeyEnum.DB_URL.getKey(), urlSb.toString());
         properties.setProperty(ConfigKeyEnum.DB_USERNAME.getKey(), installParam.getDbUsername());
         properties.setProperty(ConfigKeyEnum.DB_PASSWORD.getKey(), installParam.getDbPassword());
 

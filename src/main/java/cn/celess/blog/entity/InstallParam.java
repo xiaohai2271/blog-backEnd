@@ -14,8 +14,11 @@ public class InstallParam {
     @NotBlank(message = "数据库类型不可为空")
     private String dbType;
 
-    @NotBlank(message = "数据库链接不可为空")
-    private String dbUrl;
+    @NotBlank(message = "数据库主机不可为空")
+    private String dbHost;
+
+    @NotBlank(message = "数据库名称不可为空")
+    private String dbName;
 
     @NotBlank(message = "数据库用户名不可为空")
     private String dbUsername;

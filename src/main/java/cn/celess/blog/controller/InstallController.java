@@ -6,11 +6,10 @@ import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Config;
 import cn.celess.blog.entity.InstallParam;
 import cn.celess.blog.entity.Response;
-import cn.celess.blog.entity.User;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.ConfigMapper;
-import cn.celess.blog.mapper.UserMapper;
 import cn.celess.blog.service.InstallService;
+import cn.celess.blog.util.RegexUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,7 +49,20 @@ public class InstallController {
     @PostMapping("/install")
     @ResponseBody
     public Response<Object> install(@Valid @RequestBody InstallParam installParam) {
+        if (!RegexUtil.emailMatch(installParam.getEmail())) {
+            throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
+        }
+        if (!RegexUtil.pwdMatch(installParam.getPassword())) {
+            throw new MyException(ResponseEnum.PARAMETERS_PWD_ERROR);
+        }
         return Response.success(installService.install(installParam));
+    }
+
+
+    @GetMapping("/default_config")
+    @ResponseBody
+    public Response<String> defaultConfig() {
+        return null;
     }
 
 

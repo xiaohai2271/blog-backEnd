@@ -29,12 +29,19 @@
                 <option value="h2">H2数据库</option>
                 <option value="mysql">Mysql数据库</option>
             </select>
-            <input id="db-url" type="text" placeholder="请输入数据库的地址">
-            <span class="err-msg" id="err-tip-db-url">数据库的地址不可为空</span>
+
+            <input id="db-host" type="text" placeholder="请输入数据库的主机地址">
+            <span class="err-msg" id="err-tip-db-host">数据库的主机地址不可为空</span>
+
+            <input id="db-name" type="text" placeholder="请输入数据库的名称">
+            <span class="err-msg" id="err-tip-db-name">数据库的地址名称不可为空</span>
+
             <input id="db-username" type="text" placeholder="请输入数据库用户名">
             <span class="err-msg" id="err-tip-db-username">数据库用户名不可为空</span>
+
             <input id="db-password" type="password" placeholder="请输入数据库密码">
             <span class="err-msg" id="err-tip-db-password">数据库密码不可为空</span>
+
             <button onclick="nextPage()" id="next-step">下一步</button>
         </div>
         <div id="second-page" class="hidden">
@@ -105,19 +112,22 @@
         requestData = {
             dbPassword: $('#db-password').val(),
             dbType: $('#db-type').val(),
-            dbUrl: $('#db-url').val(),
+            dbHost: $('#db-host').val(),
+            dbName: $('#db-name').val(),
             dbUsername: $('#db-username').val(),
             email: '',
             password: '',
         }
         $('#err-tip-db-type').removeClass("show-err-tip");
-        $('#err-tip-db-url').removeClass("show-err-tip");
+        $('#err-tip-db-host').removeClass("show-err-tip");
+        $('#err-tip-db-name').removeClass("show-err-tip");
         $('#err-tip-db-username').removeClass("show-err-tip");
         $('#err-tip-db-password').removeClass("show-err-tip");
-        !requestData.dbPassword && checkInput($('#db-password'), $('#err-tip-db-password'))
-        !requestData.dbUsername && checkInput($('#db-username'), $('#err-tip-db-username'))
-        !requestData.dbUrl && checkInput($('#db-url'), $('#err-tip-db-url'))
         !requestData.dbType && checkInput($('#db-type'), $('#err-tip-db-type'))
+        !requestData.dbHost && checkInput($('#db-host'), $('#err-tip-db-host'))
+        !requestData.dbName && checkInput($('#db-name'), $('#err-tip-db-name'))
+        !requestData.dbUsername && checkInput($('#db-username'), $('#err-tip-db-username'))
+        !requestData.dbPassword && checkInput($('#db-password'), $('#err-tip-db-password'))
         if (!requestData.dbType || !requestData.dbUrl || !requestData.dbUsername || !requestData.dbPassword) return
         $('#first-page').addClass('hidden');
         $('#first-page').removeClass('show');
