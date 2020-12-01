@@ -40,7 +40,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.2.1</version>
+            <version>1.2.3</version>
         </dependency>
 
         <!--  lombok  -->
