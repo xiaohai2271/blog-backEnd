@@ -64,6 +64,14 @@
           and article_tag.t_id = tag_category.t_id
     </select>
 
+    <select id="findTagByArticleId" resultMap="cn.celess.blog.mapper.TagMapper.tagResultMap">
+        select tag_category.*
+        from article_tag,
+             tag_category
+        where a_id = #{articleId}
+          and article_tag.t_id = tag_category.t_id
+    </select>
+
     <select id="findOneById" resultMap="articleTagResultMap">
         select *
         from article_tag,

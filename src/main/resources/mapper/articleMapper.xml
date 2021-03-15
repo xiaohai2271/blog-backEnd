@@ -19,8 +19,10 @@
         <association property="category" column="a_category_id" javaType="cn.celess.blog.entity.TagCategory"
                      resultMap="cn.celess.blog.mapper.CategoryMapper.categoryResultMap">
         </association>
-        <collection property="tags" ofType="cn.celess.blog.entity.TagCategory"
-                    resultMap="cn.celess.blog.mapper.CategoryMapper.categoryResultMap">
+        <collection property="tags" ofType="cn.celess.blog.entity.Tag"
+                    select="cn.celess.blog.mapper.ArticleTagMapper.findTagByArticleId" column="a_id">
+            <id column="tagId" property="id"/>
+            <result column="tagName" property="name"/>
         </collection>
     </resultMap>
 
@@ -118,12 +120,12 @@
         order by articleId desc
     </select>
 
-    <select id="findAllByOpen" resultMap="articleViewResultMap">
+    <select id="findAllByOpen" resultMap="articleResultMap">
         select *
-        from articleView
-        where isOpen = #{isOpen}
-          and isDelete = false
-        order by articleId desc
+        from article
+        where a_is_open = #{isOpen}
+          and is_delete = false
+        order by a_id desc
     </select>
 
 

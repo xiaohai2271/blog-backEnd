@@ -134,4 +134,13 @@ public class ArticleTagMapperTest extends BaseTest {
 
         return articleTag;
     }
+
+    @Test
+    public void findTagByArticleId() {
+        Article article = articleMapper.findAll().get(0);
+        assertNotNull(article);
+
+        List<Tag> tagByArticleId = articleTagMapper.findTagByArticleId(article.getId());
+        assertNotEquals(0, tagByArticleId.size());
+    }
 }

@@ -1,6 +1,7 @@
 package cn.celess.blog.mapper;
 
 import cn.celess.blog.entity.ArticleTag;
+import cn.celess.blog.entity.Tag;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -26,6 +27,8 @@ public interface ArticleTagMapper {
     int deleteByArticleId(Long articleId);
 
     List<ArticleTag> findAllByArticleId(Long articleId);
+
+    List<Tag> findTagByArticleId(Long articleId);
 
     int deleteMultiById(List<ArticleTag> articleTags);
 
