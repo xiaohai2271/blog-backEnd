@@ -51,7 +51,8 @@
             <result column="userAvatar" property="avatarImgUrl"/>
             <result column="userDisplayName" property="displayName"/>
         </association>
-        <collection property="tags" ofType="cn.celess.blog.entity.Tag">
+        <collection property="tags" ofType="cn.celess.blog.entity.Tag"
+                    select="cn.celess.blog.mapper.ArticleTagMapper.findTagByArticleId" column="{articleId=articleId}">
             <id column="tagId" property="id"/>
             <result column="tagName" property="name"/>
         </collection>
@@ -120,12 +121,38 @@
         order by articleId desc
     </select>
 
-    <select id="findAllByOpen" resultMap="articleResultMap">
-        select *
-        from article
-        where a_is_open = #{isOpen}
-          and is_delete = false
-        order by a_id desc
+    <select id="findAllByOpen" resultMap="articleViewResultMap">
+        select article.a_id             as articleId,
+               article.a_title          as title,
+               article.a_summary        as summary,
+               article.a_md_content     as mdContent,
+               article.a_url            as url,
+               article.a_is_original    as isOriginal,
+               article.a_reading_number as readingCount,
+               article.a_like           as likeCount,
+               article.a_dislike        as dislikeCount,
+               article.a_publish_date   as publishDate,
+               article.a_update_date    as updateDate,
+               article.a_is_open        as isOpen,
+               category.t_id            as categoryId,
+               category.t_name          as categoryName,
+               user.u_id                as authorId,
+               user.u_email             as userEmail,
+               user.u_avatar            as userAvatar,
+               user.u_display_name      as userDisplayName,
+               article.is_delete        as isDelete
+        from article,
+             tag_category as category,
+             article_tag,
+             user
+        where article.a_is_open = #{isOpen}
+          and article.is_delete = false
+          and article.a_id = article_tag.a_id
+          and article.a_category_id = category.t_id
+          and category.is_category = true
+          and article.a_author_id = user.u_id
+        group by article.a_id
+        order by article.a_id desc
     </select>
 
 
