@@ -219,7 +219,7 @@ public class BaseTest {
     protected ResultActions getMockData(MockHttpServletRequestBuilder builder, String token, Object content) throws Exception {
         //        MockHttpServletRequestBuilder mockHttpServletRequestBuilder = get(url);
         if (token != null) {
-            builder.header("Authorization", token);
+            builder.header("Authorization", "Bearer "+token);
         }
         if (content != null) {
             builder.content(mapper.writeValueAsString(content)).contentType(MediaType.APPLICATION_JSON);

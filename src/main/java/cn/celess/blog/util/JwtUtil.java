@@ -30,6 +30,8 @@ public class JwtUtil {
      */
     public static final long EXPIRATION_SHORT_TIME = 7200000;
     private static final String CLAIM_KEY_USERNAME = "sub";
+    private static final String BEARER_PREFIX_UPPER = "Bearer";
+    private static final String BEARER_PREFIX_LOWER = "bearer";
     /**
      * JWT 秘钥需自行设置不可泄露
      */
@@ -48,7 +50,7 @@ public class JwtUtil {
     }
 
     public String updateTokenDate(String token) {
-        Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(getJwtString(token)).getBody();
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(new Date(claims.getExpiration().getTime() + EXPIRATION_SHORT_TIME))
@@ -60,7 +62,7 @@ public class JwtUtil {
      * 获取token是否过期
      */
     public Boolean isTokenExpired(String token) {
-        Date expiration = getExpirationDateFromToken(token);
+        Date expiration = getExpirationDateFromToken(getJwtString(token));
         return expiration == null || expiration.before(new Date());
     }
 
@@ -68,7 +70,7 @@ public class JwtUtil {
      * 根据token获取username
      */
     public String getUsernameFromToken(String token) {
-        Claims claims = getClaimsFromToken(token);
+        Claims claims = getClaimsFromToken(getJwtString(token));
         return claims == null ? null : claims.getSubject();
     }
 
@@ -76,7 +78,7 @@ public class JwtUtil {
      * 获取token的过期时间
      */
     public Date getExpirationDateFromToken(String token) {
-        Claims claims = getClaimsFromToken(token);
+        Claims claims = getClaimsFromToken(getJwtString(token));
         return claims == null ? null : claims.getExpiration();
     }
 
@@ -88,7 +90,7 @@ public class JwtUtil {
         try {
             claims = Jwts.parser()
                     .setSigningKey(SECRET)
-                    .parseClaimsJws(token)
+                    .parseClaimsJws(getJwtString(token))
                     .getBody();
         } catch (ExpiredJwtException e) {
             log.info("JWT令牌过期");
@@ -105,6 +107,11 @@ public class JwtUtil {
             log.debug("JWT非法参数");
         }
         return claims;
+    }
+
+    private String getJwtString(String token) {
+        if (token == null) return token;
+        return token.replaceFirst(BEARER_PREFIX_UPPER, "").replace(BEARER_PREFIX_LOWER, "");
     }
 
 }
