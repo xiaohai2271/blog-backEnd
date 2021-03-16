@@ -204,8 +204,7 @@
              tag_category as category,
              article_tag,
              user
-        where article.is_delete = false
-          and article.a_id = article_tag.a_id
+        where article.a_id = article_tag.a_id
           and article.a_category_id = category.t_id
           and category.is_category = true
           and article.a_author_id = user.u_id
