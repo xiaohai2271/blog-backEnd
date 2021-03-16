@@ -3,6 +3,7 @@ package cn.celess.blog.service;
 import cn.celess.blog.BaseTest;
 import cn.celess.blog.entity.model.ArticleModel;
 import cn.celess.blog.entity.model.PageData;
+import cn.celess.blog.mapper.ArticleMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ public class ArticleServiceTest extends BaseTest {
 
     @Autowired
     ArticleService articleService;
+    @Autowired
+    ArticleMapper articleMapper;
 
     @Test
     public void adminArticles() {
@@ -33,5 +36,17 @@ public class ArticleServiceTest extends BaseTest {
         assertEquals(1, articleModelPageData.getPageNum());
         assertEquals(10, articleModelPageData.getList().size());
         articleModelPageData.getList().forEach(Assert::assertNotNull);
+
+        // 测试open字段
+        articleModelPageData.getList().forEach(articleModel -> {
+            // 当前文章
+            assertTrue(articleMapper.findArticleById(articleModel.getId()).getOpen());
+            if (articleModel.getPreArticle() != null) {
+                assertTrue(articleMapper.findArticleById(articleModel.getPreArticle().getId()).getOpen());
+            }
+            if (articleModel.getNextArticle() != null) {
+                assertTrue(articleMapper.findArticleById(articleModel.getNextArticle().getId()).getOpen());
+            }
+        });
     }
 }
