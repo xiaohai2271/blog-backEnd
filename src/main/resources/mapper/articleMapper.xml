@@ -198,7 +198,8 @@
         from articleView
         where articleId = (select max(articleId)
                            from articleView
-                           where articleId &lt; #{id}
+                           where isOpen = true
+                             and articleId &lt; #{id}
         )
     </select>
     <select id="getNextArticle" resultMap="articleViewResultMap">
@@ -206,7 +207,8 @@
         from articleView
         where articleId = (select min(articleId)
                            from articleView
-                           where articleId &gt; #{id}
+                           where isOpen = true
+                             and articleId &gt; #{id}
         )
     </select>
 
