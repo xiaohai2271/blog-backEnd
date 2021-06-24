@@ -9,6 +9,7 @@ import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
 import cn.celess.blog.mapper.UserMapper;
 import cn.celess.blog.service.UserService;
+import cn.celess.blog.service.FileService;
 import cn.celess.blog.util.MD5Util;
 import cn.celess.blog.util.RedisUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -115,7 +116,7 @@ public class UserControllerTest extends BaseTest {
         assertNotNull(inputStream);
 
         // mock 实现类
-        mockInjectInstance(userService, "qiniuService", new TestQiNiuServiceImpl());
+        mockInjectInstance(userService, "fileService", (FileService) TestFileManager::new);
 
         MockMultipartFile file = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE, inputStream);
         getMockData(multipart("/user/imgUpload").file(file), userLogin()).andDo(result -> {

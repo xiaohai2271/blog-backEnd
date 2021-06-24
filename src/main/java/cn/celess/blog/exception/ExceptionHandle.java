@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +20,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+import java.util.Set;
 
 /**
  * @author : xiaohai
@@ -41,27 +47,32 @@ public class ExceptionHandle {
         if (e instanceof MyException) {
             MyException exception = (MyException) e;
             logger.debug("返回了自定义的exception,[code={},msg={},result={}]", exception.getCode(), e.getMessage(), exception.getResult());
-            return new Response(exception.getCode(), e.getMessage(), exception.getResult());
+            return new Response<>(exception.getCode(), e.getMessage(), exception.getResult());
         }
         //请求路径不支持该方法
         if (e instanceof HttpRequestMethodNotSupportedException) {
             logger.debug("遇到请求路径与请求方法不匹配的请求，[msg={}，path:{},method:{}]", e.getMessage(), request.getRequestURL(), request.getMethod());
-            return new Response(ResponseEnum.ERROR.getCode(), e.getMessage(), null);
+            return new Response<>(ResponseEnum.ERROR.getCode(), e.getMessage(), null);
         }
         //数据输入类型不匹配
         if (e instanceof MethodArgumentTypeMismatchException) {
             logger.debug("输入类型不匹配,[msg={}]", e.getMessage());
-            return new Response(ResponseEnum.PARAMETERS_ERROR.getCode(), "数据输入有问题，请修改后再访问", null);
+            return new Response<>(ResponseEnum.PARAMETERS_ERROR.getCode(), "数据输入有问题，请修改后再访问", null);
         }
         //数据验证失败
         if (e instanceof BindException) {
             logger.debug("数据验证失败,[msg={}]", e.getMessage());
-            return new Response(ResponseEnum.PARAMETERS_ERROR.getCode(), "数据输入有问题，请修改", null);
+            return new Response<>(ResponseEnum.PARAMETERS_ERROR.getCode(), "数据输入有问题，请修改", null);
         }
         //数据输入不完整
         if (e instanceof MissingServletRequestParameterException) {
             logger.debug("数据输入不完整,[msg={}]", e.getMessage());
-            return new Response(ResponseEnum.PARAMETERS_ERROR.getCode(), "数据输入不完整,请检查", null);
+            return new Response<>(ResponseEnum.PARAMETERS_ERROR.getCode(), "数据输入不完整,请检查", null);
+        }
+        if (e instanceof MethodArgumentNotValidException) {
+            logger.debug("数据验证失败，[msg: {}]", e.getMessage());
+            BindingResult violations = ((MethodArgumentNotValidException) e).getBindingResult();
+            return new Response<>(ResponseEnum.PARAMETERS_ERROR.getCode(), violations.getAllErrors().get(0).getDefaultMessage(), null);
         }
 
         // 发送错误信息到邮箱
@@ -70,7 +81,7 @@ public class ExceptionHandle {
             sendMessage(e);
         }
         e.printStackTrace();
-        return new Response(ResponseEnum.ERROR.getCode(), "服务器出现错误，已记录", null);
+        return new Response<>(ResponseEnum.ERROR.getCode(), "服务器出现错误，已记录", null);
     }
 
     /**

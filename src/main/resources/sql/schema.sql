@@ -8,6 +8,7 @@ drop table if exists tag_category;
 drop table if exists links;
 drop table if exists visitor;
 drop table if exists web_update;
+drop table if exists config;
 
 
 CREATE TABLE `user`
@@ -88,7 +89,7 @@ CREATE TABLE `links`
     `l_url`          varchar(255) unique                     not null comment '首页地址',
     `l_icon_path`    varchar(255)                            not null comment '友链的icon地址',
     `l_desc`         varchar(255) COLLATE utf8mb4_unicode_ci not null comment '友链的说明描述',
-    `is_delete`         boolean                                 not null default false comment '该数据是否被删除',
+    `is_delete`      boolean                                 not null default false comment '该数据是否被删除',
     `l_email`        varchar(255) comment '网站管理员的邮箱',
     `l_notification` boolean                                          default false comment '是否通知了'
 ) comment '友站表';
@@ -109,6 +110,13 @@ CREATE TABLE `web_update`
     `wu_time`   datetime                                not null comment '更新时间',
     `is_delete` boolean                                 not null default false comment '该数据是否被删除'
 ) comment '更新内容表';
+
+CREATE TABLE `config`
+(
+    `conf_id`    int primary key auto_increment,
+    `conf_name`  varchar(255) unique not null comment '配置名',
+    `conf_value` varchar(255) default null comment '配置值'
+);
 
 CREATE VIEW articleView
             (articleId, title, summary, mdContent, url, isOriginal, readingCount, likeCount, dislikeCount,

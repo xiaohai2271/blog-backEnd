@@ -2,10 +2,10 @@ package cn.celess.blog.controller;
 
 import cn.celess.blog.enmu.ResponseEnum;
 import cn.celess.blog.entity.Response;
-import cn.celess.blog.entity.model.QiniuResponse;
+import cn.celess.blog.entity.model.FileResponse;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.service.CountService;
-import cn.celess.blog.service.QiniuService;
+import cn.celess.blog.service.FileService;
 import cn.celess.blog.util.HttpUtil;
 import cn.celess.blog.util.RedisUserUtil;
 import cn.celess.blog.util.RedisUtil;
@@ -42,7 +42,7 @@ public class CommonController {
     @Autowired
     CountService countService;
     @Autowired
-    QiniuService qiniuService;
+    FileService fileService;
     @Autowired
     RedisUtil redisUtil;
     @Autowired
@@ -161,10 +161,10 @@ public class CommonController {
         String mime = fileName.substring(fileName.lastIndexOf("."));
         if (".png".equals(mime.toLowerCase()) || ".jpg".equals(mime.toLowerCase()) ||
                 ".jpeg".equals(mime.toLowerCase()) || ".bmp".equals(mime.toLowerCase())) {
-            QiniuResponse qiniuResponse = qiniuService.uploadFile(file.getInputStream(), "img_" + System.currentTimeMillis() + mime);
+            FileResponse fileResponse = fileService.getFileManager().uploadFile(file.getInputStream(), "img_" + System.currentTimeMillis() + mime);
             map.put("success", 1);
             map.put("message", "上传成功");
-            map.put("url", "http://cdn.celess.cn/" + qiniuResponse.key);
+            map.put("url", "http://cdn.celess.cn/" + fileResponse.key);
             response.getWriter().println(mapper.writeValueAsString(map));
             redisUtil.setEx(request.getRemoteAddr() + "-ImgUploadTimes", uploadTimes + 1 + "", 2, TimeUnit.HOURS);
             return;
@@ -208,12 +208,12 @@ public class CommonController {
             assert fileName != null;
             String mime = fileName.substring(fileName.lastIndexOf("."));
             String name = fileName.replace(mime, "").replaceAll(" ", "");
-            QiniuResponse qiniuResponse = qiniuService.uploadFile(file.getInputStream(), "file_" + name + '_' + System.currentTimeMillis() + mime);
+            FileResponse fileResponse = fileService.getFileManager().uploadFile(file.getInputStream(), "file_" + name + '_' + System.currentTimeMillis() + mime);
             resp.put("originalFilename", fileName);
-            resp.put("success", qiniuResponse != null);
-            if (qiniuResponse != null) {
+            resp.put("success", fileResponse != null);
+            if (fileResponse != null) {
                 resp.put("host", "http://cdn.celess.cn/");
-                resp.put("path", qiniuResponse.key);
+                resp.put("path", fileResponse.key);
             }
             result.add(resp);
         }

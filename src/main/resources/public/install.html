@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>博客安装页面</title>
+    <link rel="stylesheet" href="css/install.css">
+    <link rel="stylesheet" href="css/loading.css">
+    <script src="//cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+</head>
+<body>
+<div class="loading">
+    <div class="loader-inner pacman">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <p style="margin-top: 20px;margin-left: 10px;">
+        加载中....
+    </p>
+</div>
+<div class="box">
+    <div class="box-inner">
+        <div id="first-page" class="show">
+            <h3>数据库配置</h3>
+            <!-- 数据库-->
+            <select id="db-type">
+                <option value="h2">H2数据库</option>
+                <option value="mysql">Mysql数据库</option>
+            </select>
+
+            <input id="db-host" type="text" placeholder="请输入数据库的主机地址">
+            <span class="err-msg" id="err-tip-db-host">数据库的主机地址不可为空</span>
+
+            <input id="db-name" type="text" placeholder="请输入数据库的名称">
+            <span class="err-msg" id="err-tip-db-name">数据库的地址名称不可为空</span>
+
+            <input id="db-username" type="text" placeholder="请输入数据库用户名">
+            <span class="err-msg" id="err-tip-db-username">数据库用户名不可为空</span>
+
+            <input id="db-password" type="password" placeholder="请输入数据库密码">
+            <span class="err-msg" id="err-tip-db-password">数据库密码不可为空</span>
+
+            <button onclick="nextPage()" id="next-step">下一步</button>
+        </div>
+        <div id="second-page" class="hidden">
+            <h3>新建管理员用户</h3>
+            <input id="email" type="email" placeholder="请输入用户名">
+            <span class="err-msg" id="err-tip-email">用户名不可为空</span>
+            <input id="password" type="password" placeholder="请输入密码">
+            <span class="err-msg" id="err-tip-password">密码不可为空</span>
+            <div class="button-group">
+                <button onclick="preStep()" id="pre-step">上一步</button>
+                <button onclick="postInstallEvent()" id="install"> 安装</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    let requestData;
+    let interValId;
+
+    function postInstallEvent() {
+        requestData.email = $('#email').val()
+        requestData.password = $('#password').val()
+        $('#err-tip-email').removeClass("show-err-tip");
+        $('#err-tip-password').removeClass("show-err-tip");
+        !requestData.password && checkInput($('#password'), $('#err-tip-password'))
+        !requestData.email && checkInput($('#email'), $('#err-tip-email'))
+        if (!requestData.email || !requestData.password) return;
+        $('.loading').addClass('loading-show');
+        $.ajax('/install', {
+            method: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            withCredentials: true,
+            dataType: 'json',
+            success: function (data) {
+                console.log("data", data);
+                console.log("requestData", requestData);
+                interValId = setInterval(checkConnection, 500)
+                checkConnection();
+            }
+        })
+    }
+
+    function checkConnection() {
+        $.ajax('/is_install', {
+            method: "GET",
+            dataType: 'json',
+            success: function (data) {
+                if (data.result.is_install) {
+                    console.log("安装成功");
+                    window.location.href = '/';
+                } else {
+                    console.log("安装失败");
+                }
+                $('.loading').removeClass('loading-show');
+                clearInterval(interValId);
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    }
+
+    /**
+     * 切换下一页
+     */
+    function nextPage() {
+        requestData = {
+            dbPassword: $('#db-password').val(),
+            dbType: $('#db-type').val(),
+            dbHost: $('#db-host').val(),
+            dbName: $('#db-name').val(),
+            dbUsername: $('#db-username').val(),
+            email: '',
+            password: '',
+        }
+        $('#err-tip-db-type').removeClass("show-err-tip");
+        $('#err-tip-db-host').removeClass("show-err-tip");
+        $('#err-tip-db-name').removeClass("show-err-tip");
+        $('#err-tip-db-username').removeClass("show-err-tip");
+        $('#err-tip-db-password').removeClass("show-err-tip");
+        !requestData.dbType && checkInput($('#db-type'), $('#err-tip-db-type'))
+        !requestData.dbHost && checkInput($('#db-host'), $('#err-tip-db-host'))
+        !requestData.dbName && checkInput($('#db-name'), $('#err-tip-db-name'))
+        !requestData.dbUsername && checkInput($('#db-username'), $('#err-tip-db-username'))
+        !requestData.dbPassword && checkInput($('#db-password'), $('#err-tip-db-password'))
+        if (!requestData.dbType || !requestData.dbUrl || !requestData.dbUsername || !requestData.dbPassword) return
+        $('#first-page').addClass('hidden');
+        $('#first-page').removeClass('show');
+        $('#second-page').addClass('show');
+        $('#second-page').removeClass('hidden');
+    }
+
+    function preStep() {
+        $('#second-page').addClass('hidden');
+        $('#second-page').removeClass('show');
+        $('#first-page').addClass('show');
+        $('#first-page').removeClass('hidden');
+
+        $('#err-tip-email').removeClass("show-err-tip");
+        $('#err-tip-password').removeClass("show-err-tip");
+    }
+
+    /**
+     * 检查组件的状态
+     * @param component 输入框
+     * @param errTipComponent 错误信息提示框
+     * @returns {boolean} 是否有错误
+     */
+    function checkInput(component, errTipComponent) {
+        if (!component.val()) {
+            errTipComponent.addClass("show-err-tip");
+            component.focus();
+            return true;
+        }
+        return false;
+    }
+</script>
+</body>
+</html>

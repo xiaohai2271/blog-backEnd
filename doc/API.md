@@ -1411,6 +1411,78 @@
 | 401 | Unauthorized  ||
 | 403 | Forbidden  ||
 | 404 | Not Found  ||
+## fileUpload
+
+
+**接口描述**:
+
+
+**接口地址**:`/fileUpload`
+
+
+**请求方式**：`POST`
+
+
+**consumes**:`["application/json"]`
+
+
+**produces**:`["*/*"]`
+
+
+
+**请求参数**：
+
+| 参数名称         | 参数说明     |     in |  是否必须      |  数据类型  |  schema  |
+| ------------ | -------------------------------- |-----------|--------|----|--- |
+|file[]| file[]  | formData | true |array  | file   |
+
+**响应示例**:
+
+```json
+{
+	"code": 0,
+	"msg": "",
+	"result": [
+		{}
+	]
+}
+```
+
+**响应参数**:
+
+
+| 参数名称         | 参数说明                             |    类型 |  schema |
+| ------------ | -------------------|-------|----------- |
+|code|   |integer(int32)  | integer(int32)   |
+|msg|   |string  |    |
+|result|   |array  | Map«string,object»   |
+
+
+
+**schema属性说明**
+
+
+
+
+**Map«string,object»**
+
+| 参数名称         | 参数说明                             |    类型 |  schema |
+| ------------ | ------------------|--------|----------- |
+
+
+
+
+
+**响应状态**:
+
+
+| 状态码         | 说明                            |    schema                         |
+| ------------ | -------------------------------- |---------------------- |
+| 200 | OK  |Response«List«Map«string,object»»»|
+| 201 | Created  ||
+| 401 | Unauthorized  ||
+| 403 | Forbidden  ||
+| 404 | Not Found  ||
 ## headerInfo
 
 
@@ -1623,6 +1695,231 @@
 | 401 | Unauthorized  ||
 | 403 | Forbidden  ||
 | 404 | Not Found  ||
+# config-controller
+
+## getConfiguration
+
+
+**接口描述**:
+
+
+**接口地址**:`/admin/config`
+
+
+**请求方式**：`GET`
+
+
+**consumes**:``
+
+
+**produces**:`["*/*"]`
+
+
+
+**请求参数**：
+暂无
+
+
+
+**响应示例**:
+
+```json
+{
+	"code": 0,
+	"msg": "",
+	"result": [
+		{
+			"id": 0,
+			"name": "",
+			"value": ""
+		}
+	]
+}
+```
+
+**响应参数**:
+
+
+| 参数名称         | 参数说明                             |    类型 |  schema |
+| ------------ | -------------------|-------|----------- |
+|code|   |integer(int32)  | integer(int32)   |
+|msg|   |string  |    |
+|result|   |array  | Config   |
+
+
+
+**schema属性说明**
+
+
+
+
+**Config**
+
+| 参数名称         | 参数说明                             |    类型 |  schema |
+| ------------ | ------------------|--------|----------- |
+|id |    |integer(int32)  |    |
+|name |    |string  |    |
+|value |    |string  |    |
+
+**响应状态**:
+
+
+| 状态码         | 说明                            |    schema                         |
+| ------------ | -------------------------------- |---------------------- |
+| 200 | OK  |Response«List«Config»»|
+| 401 | Unauthorized  ||
+| 403 | Forbidden  ||
+| 404 | Not Found  ||
+## addConfiguration
+
+
+**接口描述**:
+
+
+**接口地址**:`/admin/config`
+
+
+**请求方式**：`POST`
+
+
+**consumes**:`["application/json"]`
+
+
+**produces**:`["*/*"]`
+
+
+
+**请求参数**：
+
+| 参数名称         | 参数说明     |     in |  是否必须      |  数据类型  |  schema  |
+| ------------ | -------------------------------- |-----------|--------|----|--- |
+|configs| configs  | query | false |array  | Config   |
+
+**响应示例**:
+
+```json
+{
+	"code": 0,
+	"msg": "",
+	"result": [
+		{
+			"id": 0,
+			"name": "",
+			"value": ""
+		}
+	]
+}
+```
+
+**响应参数**:
+
+
+| 参数名称         | 参数说明                             |    类型 |  schema |
+| ------------ | -------------------|-------|----------- |
+|code|   |integer(int32)  | integer(int32)   |
+|msg|   |string  |    |
+|result|   |array  | Config   |
+
+
+
+**schema属性说明**
+
+
+
+
+**Config**
+
+| 参数名称         | 参数说明                             |    类型 |  schema |
+| ------------ | ------------------|--------|----------- |
+|id |    |integer(int32)  |    |
+|name |    |string  |    |
+|value |    |string  |    |
+
+**响应状态**:
+
+
+| 状态码         | 说明                            |    schema                         |
+| ------------ | -------------------------------- |---------------------- |
+| 200 | OK  |Response«List«Config»»|
+| 201 | Created  ||
+| 401 | Unauthorized  ||
+| 403 | Forbidden  ||
+| 404 | Not Found  ||
+## updateConfiguration
+
+
+**接口描述**:
+
+
+**接口地址**:`/admin/config`
+
+
+**请求方式**：`PUT`
+
+
+**consumes**:`["application/json"]`
+
+
+**produces**:`["*/*"]`
+
+
+
+**请求参数**：
+
+| 参数名称         | 参数说明     |     in |  是否必须      |  数据类型  |  schema  |
+| ------------ | -------------------------------- |-----------|--------|----|--- |
+|configs| configs  | query | false |array  | Config   |
+
+**响应示例**:
+
+```json
+{
+	"code": 0,
+	"msg": "",
+	"result": [
+		{
+			"id": 0,
+			"name": "",
+			"value": ""
+		}
+	]
+}
+```
+
+**响应参数**:
+
+
+| 参数名称         | 参数说明                             |    类型 |  schema |
+| ------------ | -------------------|-------|----------- |
+|code|   |integer(int32)  | integer(int32)   |
+|msg|   |string  |    |
+|result|   |array  | Config   |
+
+
+
+**schema属性说明**
+
+
+
+
+**Config**
+
+| 参数名称         | 参数说明                             |    类型 |  schema |
+| ------------ | ------------------|--------|----------- |
+|id |    |integer(int32)  |    |
+|name |    |string  |    |
+|value |    |string  |    |
+
+**响应状态**:
+
+
+| 状态码         | 说明                            |    schema                         |
+| ------------ | -------------------------------- |---------------------- |
+| 200 | OK  |Response«List«Config»»|
+| 201 | Created  ||
+| 401 | Unauthorized  ||
+| 403 | Forbidden  ||
+| 404 | Not Found  ||
 # links-controller
 
 ## all
@@ -1649,8 +1946,8 @@
 | 参数名称         | 参数说明     |     in |  是否必须      |  数据类型  |  schema  |
 | ------------ | -------------------------------- |-----------|--------|----|--- |
 |count| count  | query | true |integer  |    |
-|page| page  | query | true |integer  |    |
 |deleted| deleted  | query | false |boolean  |    |
+|page| page  | query | true |integer  |    |
 
 **响应示例**:
 

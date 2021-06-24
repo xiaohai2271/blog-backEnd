@@ -5,15 +5,15 @@ import cn.celess.blog.enmu.RoleEnum;
 import cn.celess.blog.enmu.UserAccountStatusEnum;
 import cn.celess.blog.entity.Response;
 import cn.celess.blog.entity.User;
+import cn.celess.blog.entity.model.FileResponse;
 import cn.celess.blog.entity.model.PageData;
-import cn.celess.blog.entity.model.QiniuResponse;
 import cn.celess.blog.entity.model.UserModel;
 import cn.celess.blog.entity.request.LoginReq;
 import cn.celess.blog.entity.request.UserReq;
 import cn.celess.blog.exception.MyException;
 import cn.celess.blog.mapper.UserMapper;
+import cn.celess.blog.service.FileService;
 import cn.celess.blog.service.MailService;
-import cn.celess.blog.service.QiniuService;
 import cn.celess.blog.service.UserService;
 import cn.celess.blog.util.*;
 import com.github.pagehelper.PageHelper;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.beans.Transient;
 import java.io.InputStream;
@@ -45,8 +46,8 @@ public class UserServiceImpl implements UserService {
     HttpServletRequest request;
     @Autowired
     MailService mailService;
-    @Autowired
-    QiniuService qiniuService;
+    @Resource(name = "fileServiceImpl")
+    FileService fileService;
     @Autowired
     RedisUtil redisUtil;
     @Autowired
@@ -185,7 +186,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object updateUserAavatarImg(InputStream is, String mime) {
         User user = redisUserUtil.get();
-        QiniuResponse upload = qiniuService.uploadFile(is, user.getEmail() + "_" + user.getId() + mime.toLowerCase());
+        FileResponse upload = fileService.getFileManager().uploadFile(is, user.getEmail() + "_" + user.getId() + mime.toLowerCase());
         user.setAvatarImgUrl(upload.key);
         userMapper.updateAvatarImgUrl(upload.key, user.getId());
         redisUserUtil.set(user);
