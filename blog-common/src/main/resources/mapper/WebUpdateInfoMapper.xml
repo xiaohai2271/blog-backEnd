@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.celess.common.mapper.WebUpdateInfoMapper">
+    <resultMap id="webUpdateResultMap" type="cn.celess.common.entity.WebUpdate">
+        <id column="wu_id" property="id"/>
+        <result column="wu_info" property="updateInfo"/>
+        <result column="wu_time" property="updateTime"/>
+        <result column="is_delete" property="delete"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="cn.celess.common.entity.WebUpdate" useGeneratedKeys="true" keyProperty="id">
+        insert into web_update(wu_info, wu_time, is_delete)
+        values (#{updateInfo}, now(), false)
+    </insert>
+
+    <update id="update">
+        update web_update
+        set wu_info=#{info}
+        where wu_id = #{id};
+    </update>
+
+    <update id="delete">
+        update web_update
+        set is_delete = true
+        where wu_id = #{id}
+    </update>
+    <select id="existsById" resultType="java.lang.Boolean">
+        select EXISTS(select * from web_update where wu_id = #{id})
+    </select>
+
+    <select id="findById" resultMap="webUpdateResultMap">
+        select *
+        from web_update
+        where wu_id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="webUpdateResultMap">
+        select *
+        from web_update
+        order by wu_id desc
+    </select>
+
+    <select id="findAllNotDeleted" resultMap="webUpdateResultMap">
+        select *
+        from web_update
+        where is_delete = false
+    </select>
+
+    <select id="getLastestOne" resultMap="webUpdateResultMap">
+        select *
+        from web_update
+        order by wu_id desc
+        limit 1
+    </select>
+
+
+</mapper>

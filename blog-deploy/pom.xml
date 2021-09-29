@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>blog</artifactId>
+        <groupId>cn.celess</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>blog-deploy</artifactId>
+
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.source>13</maven.compiler.source>
+        <maven.compiler.target>13</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.kstyrc</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+            <version>1.9.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-common</artifactId>
+            <version>${blog-common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-article</artifactId>
+            <version>${blog-article.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-categorytag</artifactId>
+            <version>${blog-categorytag.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-comment</artifactId>
+            <version>${blog-comment.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-extension</artifactId>
+            <version>${blog-extension.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-partnersite</artifactId>
+            <version>${blog-partnersite.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-siteinfo</artifactId>
+            <version>${blog-siteinfo.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-user</artifactId>
+            <version>${blog-user.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-visitor</artifactId>
+            <version>${blog-visitor.version}</version>
+        </dependency>
+
+    </dependencies>
+
+</project>

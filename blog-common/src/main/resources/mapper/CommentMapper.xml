@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.celess.common.mapper.CommentMapper">
+    <resultMap id="commentResultMap" type="cn.celess.common.entity.Comment">
+        <id column="co_id" property="id"/>
+        <result column="co_page_path" property="pagePath"/>
+        <result column="co_status" property="status"/>
+        <result column="co_content" property="content"/>
+        <result column="co_date" property="date"/>
+        <result column="co_pid" property="pid"/>
+        <result column="co_from_author_id" property="fromUser.id"/>
+        <result column="co_to_author_id" property="toUser.id"/>
+    </resultMap>
+
+    <resultMap id="commentViewResultMap" type="cn.celess.common.entity.Comment">
+        <id column="commentId" property="id"/>
+        <result column="pagePath" property="pagePath"/>
+        <result column="status" property="status"/>
+        <result column="content" property="content"/>
+        <result column="date" property="date"/>
+        <result column="pid" property="pid"/>
+        <result column="fromAuthorId" property="fromUser.id"/>
+        <result column="toAuthorId" property="toUser.id"/>
+        <association property="fromUser" column="fromAuthorId" javaType="cn.celess.common.entity.User">
+            <id column="fromAuthorId" property="id"/>
+            <result column="fromAuthorEmail" property="email"/>
+            <result column="fromAuthorDisplayName" property="displayName"/>
+            <result column="fromAuthorAvatar" property="avatarImgUrl"/>
+        </association>
+        <association property="toUser" column="toAuthorId" javaType="cn.celess.common.entity.User">
+            <id column="toAuthorId" property="id"/>
+            <result column="toAuthorEmail" property="email"/>
+            <result column="toAuthorDisplayName" property="displayName"/>
+            <result column="toAuthorAvatar" property="avatarImgUrl"/>
+        </association>
+    </resultMap>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into comment (co_page_path, co_content, co_date, co_pid, co_from_author_id, co_to_author_id, co_status)
+        VALUES (#{pagePath}, #{content}, now(), #{pid}, #{fromUser.id}, #{toUser.id}, 0)
+    </insert>
+
+    <update id="updateContent">
+        update comment
+        set co_content=#{content}
+        where co_id = #{id}
+    </update>
+
+    <update id="delete">
+        update comment
+        set co_status = 3
+        where co_id = #{id}
+    </update>
+
+    <update id="deleteByPagePath">
+        update comment
+        set co_status = 3
+        where co_page_path = #{path}
+    </update>
+
+    <select id="existsById" resultType="java.lang.Boolean">
+        SELECT EXISTS(SELECT * FROM comment WHERE co_id = #{id})
+    </select>
+
+    <select id="findCommentById" resultMap="commentViewResultMap">
+        select *
+        from commentView
+        where commentId = #{sqid}
+    </select>
+
+    <select id="findAllByFromUser" resultMap="commentViewResultMap">
+        select *
+        from commentView
+        where fromAuthorId = #{id}
+    </select>
+
+    <select id="findAllByPid" resultMap="commentViewResultMap">
+        select *
+        from commentView
+        where pid = #{pid}
+    </select>
+
+    <select id="findAllByPagePath" resultMap="commentViewResultMap" parameterType="string">
+        select *
+        from commentView
+        <if test="toString() != null ">
+            where pagePath = #{pagePath}
+        </if>
+    </select>
+
+    <select id="findAllByPagePathAndFromUser" resultMap="commentViewResultMap">
+        select *
+        from commentView
+        where
+        <if test="pagePath != null ">
+            pagePath = #{pagePath} and
+        </if>
+        fromAuthorId = #{userId}
+    </select>
+
+    <select id="findAllByPagePathAndPidAndNormal" resultMap="commentViewResultMap">
+        select *
+        from commentView
+        where
+        <if test="pagePath != null ">
+            pagePath = #{pagePath} and
+        </if>
+        pid = #{pid} and status = 0
+    </select>
+
+    <select id="countByPagePath" resultType="java.lang.Long">
+        select count(*)
+        from commentView
+        where pagePath = #{pagePath}
+    </select>
+
+    <select id="getLastestComment" resultMap="commentViewResultMap">
+        select *
+        from commentView
+        order by commentId desc
+        limit 1
+    </select>
+
+    <select id="count" resultType="long">
+        select count(*)
+        from comment
+        where co_status = 0;
+    </select>
+
+</mapper>

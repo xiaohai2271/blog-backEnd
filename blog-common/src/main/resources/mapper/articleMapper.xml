@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.celess.common.mapper.ArticleMapper">
+    <resultMap id="articleResultMap" type="cn.celess.common.entity.Article">
+        <id column="a_id" property="id"/>
+        <result column="a_title" property="title"/>
+        <result column="a_summary" property="summary"/>
+        <result column="a_md_content" property="mdContent"/>
+        <result column="a_url" property="url"/>
+        <result column="a_author_id" property="user.id"/>
+        <result column="a_is_open" property="open"/>
+        <result column="a_is_original" property="type"/>
+        <!--        <result column="next_a_id" property="nextArticleId"/>-->
+        <!--        <result column="pre_a_id" property="preArticleId"/>-->
+        <result column="a_reading_number" property="readingNumber"/>
+        <result column="a_publish_date" property="publishDate"/>
+        <result column="a_update_date" property="updateDate"/>
+        <result column="is_delete" property="deleted"/>
+        <association property="category" column="a_category_id" javaType="cn.celess.common.entity.TagCategory"
+                     resultMap="cn.celess.common.mapper.CategoryMapper.categoryResultMap">
+        </association>
+        <collection property="tags" ofType="cn.celess.common.entity.Tag"
+                    select="cn.celess.common.mapper.ArticleTagMapper.findTagByArticleId" column="a_id">
+            <id column="tagId" property="id"/>
+            <result column="tagName" property="name"/>
+        </collection>
+    </resultMap>
+
+
+    <resultMap id="articleViewResultMap" type="cn.celess.common.entity.Article">
+        <id column="articleId" property="id"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="mdContent" property="mdContent"/>
+        <result column="url" property="url"/>
+        <result column="isOpen" property="open"/>
+        <result column="isOriginal" property="type"/>
+        <result column="likeCount" property="likeCount"/>
+        <result column="dislikeCount" property="dislikeCount"/>
+        <result column="readingCount" property="readingNumber"/>
+        <result column="publishDate" property="publishDate"/>
+        <result column="updateDate" property="updateDate"/>
+        <result column="isDelete" property="deleted"/>
+        <association property="category" column="categoryId" javaType="cn.celess.common.entity.Category">
+            <id column="categoryId" property="id"/>
+            <result column="categoryName" property="name"/>
+        </association>
+        <association property="user" column="authorId" javaType="cn.celess.common.entity.User">
+            <id column="authorId" property="id"/>
+            <result column="userEmail" property="email"/>
+            <result column="userAvatar" property="avatarImgUrl"/>
+            <result column="userDisplayName" property="displayName"/>
+        </association>
+        <collection property="tags" ofType="cn.celess.common.entity.Tag"
+                    select="cn.celess.common.mapper.ArticleTagMapper.findTagByArticleId" column="{articleId=articleId}">
+            <id column="tagId" property="id"/>
+            <result column="tagName" property="name"/>
+        </collection>
+
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="cn.celess.common.entity.Article">
+        insert into article (a_author_id, a_category_id, a_md_content, a_is_original,
+                             a_summary, a_title, a_url)
+        values (#{user.id}, #{category.id}, #{mdContent}, #{type}, #{summary}, #{title}, #{url})
+    </insert>
+    <update id="delete">
+        update article
+        set is_delete = true
+        where a_id = #{id}
+    </update>
+
+    <update id="update">
+        update article
+        set a_update_date=now(),
+        <if test="title!=null">a_title=#{title},</if>
+        <if test="mdContent!=null">a_md_content=#{mdContent},</if>
+        <if test="summary!=null">a_summary=#{summary},</if>
+        <if test="type!=null">a_is_original=#{type},</if>
+        <if test="url!=null">a_url=#{url},</if>
+        <if test="category!=null">a_category_id=#{category.id},</if>
+        <if test="open!=null">a_is_open=#{open}</if>
+        where a_id = #{id}
+    </update>
+
+    <update id="updateReadingNumber">
+        update article
+        set a_reading_number=a_reading_number + 1
+        where a_id = #{id}
+    </update>
+
+    <select id="getLastestArticle" resultMap="articleViewResultMap" resultType="cn.celess.common.entity.Article">
+        select *
+        from articleView
+        order by articleId desc
+        limit 1
+    </select>
+
+
+    <select id="findArticleById" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where articleId = #{id}
+    </select>
+
+    <select id="existsByTitle" resultType="boolean">
+        SELECT EXISTS(SELECT * FROM article WHERE a_title = #{title})
+    </select>
+
+    <select id="isDeletedById" resultType="boolean">
+        select is_delete
+        from article
+        WHERE a_id = #{id}
+    </select>
+
+    <select id="findAllByAuthorId" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where authorId = #{authorId}
+          and isDelete = false
+        order by articleId desc
+    </select>
+
+    <select id="findAllByOpen" resultMap="articleViewResultMap">
+        select article.a_id             as articleId,
+               article.a_title          as title,
+               article.a_summary        as summary,
+               article.a_md_content     as mdContent,
+               article.a_url            as url,
+               article.a_is_original    as isOriginal,
+               article.a_reading_number as readingCount,
+               article.a_like           as likeCount,
+               article.a_dislike        as dislikeCount,
+               article.a_publish_date   as publishDate,
+               article.a_update_date    as updateDate,
+               article.a_is_open        as isOpen,
+               category.t_id            as categoryId,
+               category.t_name          as categoryName,
+               user.u_id                as authorId,
+               user.u_email             as userEmail,
+               user.u_avatar            as userAvatar,
+               user.u_display_name      as userDisplayName,
+               article.is_delete        as isDelete
+        from article,
+             tag_category as category,
+             article_tag,
+             user
+        where article.a_is_open = #{isOpen}
+          and article.is_delete = false
+          and article.a_id = article_tag.a_id
+          and article.a_category_id = category.t_id
+          and category.is_category = true
+          and article.a_author_id = user.u_id
+        group by article.a_id
+        order by article.a_id desc
+    </select>
+
+
+    <select id="getTitleById" resultType="string">
+        SELECT title
+        from articleView
+        where articleId = #{id}
+    </select>
+
+    <select id="findAllByCategoryId" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where categoryId = #{id}
+          and isDelete = false
+        order by articleId desc
+    </select>
+
+    <select id="findAllByCategoryIdAndOpen" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where categoryId = #{id}
+          and isDelete = false
+          and isOpen = true
+        order by articleId desc
+    </select>
+
+
+    <select id="findAll" resultMap="articleViewResultMap">
+        select article.a_id             as articleId,
+               article.a_title          as title,
+               article.a_summary        as summary,
+               article.a_md_content     as mdContent,
+               article.a_url            as url,
+               article.a_is_original    as isOriginal,
+               article.a_reading_number as readingCount,
+               article.a_like           as likeCount,
+               article.a_dislike        as dislikeCount,
+               article.a_publish_date   as publishDate,
+               article.a_update_date    as updateDate,
+               article.a_is_open        as isOpen,
+               category.t_id            as categoryId,
+               category.t_name          as categoryName,
+               user.u_id                as authorId,
+               user.u_email             as userEmail,
+               user.u_avatar            as userAvatar,
+               user.u_display_name      as userDisplayName,
+               article.is_delete        as isDelete
+        from article,
+             tag_category as category,
+             article_tag,
+             user
+        where article.a_id = article_tag.a_id
+          and article.a_category_id = category.t_id
+          and category.is_category = true
+          and article.a_author_id = user.u_id
+        group by article.a_id
+        order by article.a_id desc
+    </select>
+
+
+    <select id="count" resultType="long">
+        select count(*)
+        from article
+        where is_delete = false;
+    </select>
+
+    <select id="getPreArticle" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where articleId = (select max(articleId)
+                           from articleView
+                           where isOpen = true
+                             and articleId &lt; #{id}
+        )
+    </select>
+    <select id="getNextArticle" resultMap="articleViewResultMap">
+        select *
+        from articleView
+        where articleId = (select min(articleId)
+                           from articleView
+                           where isOpen = true
+                             and articleId &gt; #{id}
+        )
+    </select>
+
+
+</mapper>

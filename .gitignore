@@ -4,5 +4,5 @@
 target/
 
 # 本地项目的私有文件
-src/main/resources/application-dev.properties
+blog-deploy/src/main/resources/application-dev.properties
 src/main/resources/application-prod.properties

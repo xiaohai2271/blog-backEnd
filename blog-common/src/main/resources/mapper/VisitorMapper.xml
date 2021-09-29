@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.celess.common.mapper.VisitorMapper">
+    <resultMap id="partnerSiteResultMap" type="cn.celess.common.entity.Visitor">
+        <id column="v_id" property="id"/>
+        <result column="v_date" property="date"/>
+        <result column="v_user_agent" property="ua"/>
+        <result column="v_ip" property="ip"/>
+        <result column="is_delete" property="delete"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into visitor (v_date, v_ip, v_user_agent)
+        values (#{date}, #{ip}, #{ua})
+    </insert>
+    <update id="delete">
+        update visitor
+        set is_delete = true
+        where v_id = #{id}
+    </update>
+    <select id="findAll" resultMap="partnerSiteResultMap">
+        select *
+        from visitor
+        order by v_id desc
+    </select>
+
+    <select id="findAllNotDeleted" resultMap="partnerSiteResultMap">
+        select *
+        from visitor
+        where is_delete = false
+        order by v_id desc
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from visitor
+    </select>
+
+
+</mapper>
