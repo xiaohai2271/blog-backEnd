@@ -29,6 +29,8 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <blog-common.version>0.0.1-SNAPSHOT</blog-common.version>
         <blog-article.version>0.0.1-SNAPSHOT</blog-article.version>
         <blog-categorytag.version>0.0.1-SNAPSHOT</blog-categorytag.version>
