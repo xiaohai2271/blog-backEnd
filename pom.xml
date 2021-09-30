@@ -14,6 +14,7 @@
         <module>blog-siteinfo</module>
         <module>blog-extension</module>
         <module>blog-deploy</module>
+        <module>blog-resource</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -40,6 +41,7 @@
         <blog-visitor.version>0.0.1-SNAPSHOT</blog-visitor.version>
         <blog-siteinfo.version>0.0.1-SNAPSHOT</blog-siteinfo.version>
         <blog-extension.version>0.0.1-SNAPSHOT</blog-extension.version>
+        <blog-resource.version>0.0.1-SNAPSHOT</blog-resource.version>
     </properties>
 
     <dependencies>
@@ -49,7 +51,30 @@
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.kstyrc</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.6</version>
+            <!--            <exclusions>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>com.google.guava</groupId>-->
+            <!--                    <artifactId>guava</artifactId>-->
+            <!--                </exclusion>-->
+            <!--            </exclusions>-->
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>

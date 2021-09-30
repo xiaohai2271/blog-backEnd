@@ -24,6 +24,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,22 +39,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
-    @Autowired
+    @Resource
     ArticleMapper articleMapper;
 
-    @Autowired
+    @Resource
     TagMapper tagMapper;
-    @Autowired
+    @Resource
     CategoryMapper categoryMapper;
-    @Autowired
+    @Resource
     CommentMapper commentMapper;
-    @Autowired
+    @Resource
     ArticleTagMapper articleTagMapper;
-    @Autowired
+    @Resource
     UserService userService;
     @Autowired
     HttpServletRequest request;
-    @Autowired
+    @Resource
     RedisUserUtil redisUserUtil;
 
     @Override

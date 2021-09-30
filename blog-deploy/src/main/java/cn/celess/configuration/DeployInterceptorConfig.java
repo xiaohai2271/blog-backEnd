@@ -1,0 +1,33 @@
+package cn.celess.configuration;
+
+import cn.celess.configuration.filter.MultipleSubmitFilter;
+import cn.celess.configuration.filter.VisitorRecord;
+import cn.celess.configuration.listener.SessionListener;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+/**
+ * @Author: 小海
+ * @Date: 2019/10/18 14:19
+ * @Description:
+ */
+@Configuration
+public class DeployInterceptorConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new MultipleSubmitFilter()).addPathPatterns("/**");
+        registry.addInterceptor(new VisitorRecord()).addPathPatterns("/**");
+    }
+
+    @Bean
+    public ServletListenerRegistrationBean<SessionListener> servletListenerRegistrationBean() {
+        // session listener register bean
+        ServletListenerRegistrationBean<SessionListener> slrBean = new ServletListenerRegistrationBean<SessionListener>();
+        slrBean.setListener(new SessionListener());
+        return slrBean;
+    }
+}

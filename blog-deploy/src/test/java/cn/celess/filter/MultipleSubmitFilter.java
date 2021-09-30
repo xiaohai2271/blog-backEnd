@@ -1,6 +1,6 @@
 package cn.celess.filter;
 
-import cn.celess.BaseTest;
+import cn.celess.DeployBaseTest;
 import cn.celess.common.enmu.ResponseEnum;
 import cn.celess.common.entity.Response;
 import org.junit.Assert;
@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
  * @Date: 2019/11/28 16:17
  * @Description: 测试重复请求
  */
-public class MultipleSubmitFilter extends BaseTest {
+public class MultipleSubmitFilter extends DeployBaseTest {
 
     private MockHttpSession session = null;
 

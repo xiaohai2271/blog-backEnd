@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -28,11 +27,11 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ExceptionHandle {
     public static final Logger logger = LoggerFactory.getLogger(ExceptionHandle.class);
-    @Resource
+    @Autowired
     MailService mailService;
     @Autowired
     HttpServletRequest request;
-    @Value("${spring.profiles.active}")
+    @Value("${spring.profiles.active:dev}")
     private String activeModel;
 
     @ExceptionHandler(value = Exception.class)

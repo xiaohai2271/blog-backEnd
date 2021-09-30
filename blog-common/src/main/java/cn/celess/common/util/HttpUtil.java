@@ -15,6 +15,9 @@ import java.io.IOException;
  * @Desc:
  */
 public class HttpUtil {
+    /**
+     * FIXME
+     */
     public static String get(String urlStr) {
         try (final WebClient webClient = new WebClient(BrowserVersion.CHROME)) {
             webClient.getOptions().setCssEnabled(false);
@@ -34,7 +37,9 @@ public class HttpUtil {
         }
     }
 
-
+    /**
+     * FIXME
+     */
     public static String getAfterRendering(String url) {
         try (final WebClient webClient = new WebClient(BrowserVersion.BEST_SUPPORTED)) {
             webClient.getOptions().setCssEnabled(false);
