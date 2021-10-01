@@ -6,7 +6,7 @@ import cn.celess.common.entity.Response;
 import cn.celess.common.entity.dto.LinkApplyReq;
 import cn.celess.common.entity.dto.LinkReq;
 import cn.celess.common.entity.vo.PageData;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.PartnerMapper;
 import cn.celess.common.service.PartnerSiteService;
 import cn.celess.partnersite.PartnerSiteBaseTest;
@@ -172,7 +172,7 @@ public class PartnerSiteControllerTest extends PartnerSiteBaseTest {
         try {
             // 抓取不到数据的链接
             partnerSiteService.apply(req);
-        } catch (MyException e) {
+        } catch (BlogResponseException e) {
             log.debug("测试抓取不到数据");
             assertEquals(CANNOT_GET_DATA.getCode(), e.getCode());
         }
@@ -181,7 +181,7 @@ public class PartnerSiteControllerTest extends PartnerSiteBaseTest {
         req.setUrl(req.getLinkUrl());
         try {
             partnerSiteService.apply(req);
-        } catch (MyException e) {
+        } catch (BlogResponseException e) {
             log.debug("测试未添加本站链接的友链申请");
             assertEquals(APPLY_LINK_NO_ADD_THIS_SITE.getCode(), e.getCode());
             assertNotNull(e.getResult());
@@ -189,7 +189,7 @@ public class PartnerSiteControllerTest extends PartnerSiteBaseTest {
                 // 测试uuid一致性
                 log.debug("测试uuid一致性");
                 partnerSiteService.apply(req);
-            } catch (MyException e2) {
+            } catch (BlogResponseException e2) {
                 assertEquals(e.getResult(), e2.getResult());
             }
         }
@@ -207,7 +207,7 @@ public class PartnerSiteControllerTest extends PartnerSiteBaseTest {
         try {
             partnerSiteService.reapply(randomStr());
             throw new AssertionError();
-        } catch (MyException e) {
+        } catch (BlogResponseException e) {
             assertEquals(DATA_EXPIRED.getCode(), e.getCode());
         }
 
@@ -223,7 +223,7 @@ public class PartnerSiteControllerTest extends PartnerSiteBaseTest {
             partnerSiteService.apply(req);
             // err here
             throw new AssertionError();
-        } catch (MyException e) {
+        } catch (BlogResponseException e) {
             uuid = (String) e.getResult();
             String reapply = partnerSiteService.reapply(uuid);
             assertEquals(reapply, "success");
@@ -232,7 +232,7 @@ public class PartnerSiteControllerTest extends PartnerSiteBaseTest {
         try {
             partnerSiteService.reapply(uuid);
             throw new AssertionError();
-        } catch (MyException e) {
+        } catch (BlogResponseException e) {
             assertEquals(DATA_EXPIRED.getCode(), e.getCode());
         }
     }

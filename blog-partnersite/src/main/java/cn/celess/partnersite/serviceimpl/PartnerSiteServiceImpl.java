@@ -5,7 +5,7 @@ import cn.celess.common.entity.PartnerSite;
 import cn.celess.common.entity.dto.LinkApplyReq;
 import cn.celess.common.entity.dto.LinkReq;
 import cn.celess.common.entity.vo.PageData;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.PartnerMapper;
 import cn.celess.common.service.MailService;
 import cn.celess.common.service.PartnerSiteService;
@@ -46,23 +46,23 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
     @Override
     public PartnerSite create(LinkReq reqBody) {
         if (reqBody == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         //判空
         if (reqBody.getName() == null || reqBody.getUrl() == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         //判空
         if (reqBody.getName().replaceAll(" ", "").isEmpty() || reqBody.getUrl().replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         //是否存在 同名
         if (partnerMapper.existsByName(reqBody.getName())) {
-            throw new MyException(ResponseEnum.DATA_HAS_EXIST);
+            throw new BlogResponseException(ResponseEnum.DATA_HAS_EXIST);
         }
         //url是否合法
         if (!RegexUtil.urlMatch(reqBody.getUrl())) {
-            throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_URL_ERROR);
         }
         PartnerSite partnerSite = new PartnerSite();
         reqBody.setId(0);
@@ -84,7 +84,7 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
     public Boolean del(long id) {
         //判断数据是否存在
         if (!partnerMapper.existsById(id)) {
-            throw new MyException(ResponseEnum.DATA_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.DATA_NOT_EXIST);
         }
         return partnerMapper.delete(id) == 1;
     }
@@ -93,13 +93,13 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
     public PartnerSite update(LinkReq reqBody) {
         PartnerSite partnerSite = partnerMapper.findById(reqBody.getId());
         if (partnerSite == null) {
-            throw new MyException(ResponseEnum.DATA_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.DATA_NOT_EXIST);
         }
         if (partnerMapper.existsByName(reqBody.getName()) && !reqBody.getName().equals(partnerSite.getName())) {
-            throw new MyException(ResponseEnum.DATA_HAS_EXIST);
+            throw new BlogResponseException(ResponseEnum.DATA_HAS_EXIST);
         }
         if (!RegexUtil.urlMatch(reqBody.getUrl())) {
-            throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_URL_ERROR);
         }
         if (!reqBody.getUrl().contains("http://") && !reqBody.getUrl().contains("https://")) {
             reqBody.setUrl("http://" + reqBody.getUrl());
@@ -145,17 +145,17 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
                 || StringUtils.isEmpty(linkApplyReq.getUrl())
                 || StringUtils.isEmpty(linkApplyReq.getEmail())
                 || StringUtils.isEmpty(linkApplyReq.getLinkUrl())) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         // 链接不合法
         if (!RegexUtil.emailMatch(linkApplyReq.getEmail())) {
-            throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
         }
         if (!RegexUtil.urlMatch(linkApplyReq.getLinkUrl()) || !RegexUtil.urlMatch(linkApplyReq.getUrl())) {
-            throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_URL_ERROR);
         }
         if (!StringUtils.isEmpty(linkApplyReq.getIconPath()) && !RegexUtil.urlMatch(linkApplyReq.getIconPath())) {
-            throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_URL_ERROR);
         }
         // 非强制字段 设置空
         if (StringUtils.isEmpty(linkApplyReq.getIconPath())) {
@@ -164,7 +164,7 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
         // 抓取页面
         String resp = HttpUtil.getAfterRendering(linkApplyReq.getLinkUrl());
         if (resp == null) {
-            throw new MyException(ResponseEnum.CANNOT_GET_DATA);
+            throw new BlogResponseException(ResponseEnum.CANNOT_GET_DATA);
         }
         PartnerSite ps = new PartnerSite();
         if (resp.contains(SITE_URL)) {
@@ -198,7 +198,7 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
                 redisUtil.setEx(uuid, mapper.writeValueAsString(linkApplyReq), 10, TimeUnit.MINUTES);
                 redisUtil.setEx(linkApplyReq.getUrl(), uuid, 10, TimeUnit.MINUTES);
             }
-            throw new MyException(ResponseEnum.APPLY_LINK_NO_ADD_THIS_SITE, null, uuid);
+            throw new BlogResponseException(ResponseEnum.APPLY_LINK_NO_ADD_THIS_SITE, null, uuid);
         }
         return ps;
     }
@@ -207,13 +207,13 @@ public class PartnerSiteServiceImpl implements PartnerSiteService {
     @Override
     public String reapply(String key) {
         if (!redisUtil.hasKey(key)) {
-            throw new MyException(ResponseEnum.DATA_EXPIRED);
+            throw new BlogResponseException(ResponseEnum.DATA_EXPIRED);
         }
         String s = redisUtil.get(key);
         ObjectMapper mapper = new ObjectMapper();
         LinkApplyReq linkApplyReq = mapper.readValue(s, LinkApplyReq.class);
         if (linkApplyReq == null) {
-            throw new MyException(ResponseEnum.DATA_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.DATA_NOT_EXIST);
         }
         SimpleMailMessage smm = new SimpleMailMessage();
         smm.setSubject("友链申请");

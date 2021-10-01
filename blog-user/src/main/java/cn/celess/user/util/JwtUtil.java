@@ -2,7 +2,7 @@ package cn.celess.user.util;
 
 import cn.celess.common.enmu.ResponseEnum;
 import cn.celess.common.entity.User;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -96,10 +96,10 @@ public class JwtUtil {
             log.info("JWT令牌过期");
         } catch (UnsupportedJwtException e) {
             log.info("不支持的JWT令牌");
-            throw new MyException(ResponseEnum.JWT_NOT_SUPPORT);
+            throw new BlogResponseException(ResponseEnum.JWT_NOT_SUPPORT);
         } catch (MalformedJwtException e) {
             log.info("JWT令牌格式错误");
-            throw new MyException(ResponseEnum.JWT_MALFORMED);
+            throw new BlogResponseException(ResponseEnum.JWT_MALFORMED);
         } catch (IllegalArgumentException e) {
             log.debug("JWT非法参数");
         }

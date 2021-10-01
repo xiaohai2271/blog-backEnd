@@ -6,7 +6,7 @@ import cn.celess.common.entity.Category;
 import cn.celess.common.entity.vo.ArticleModel;
 import cn.celess.common.entity.vo.CategoryModel;
 import cn.celess.common.entity.vo.PageData;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.ArticleMapper;
 import cn.celess.common.mapper.CategoryMapper;
 import cn.celess.common.service.CategoryService;
@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryModel create(String name) {
         if (categoryMapper.existsByName(name)) {
-            throw new MyException(ResponseEnum.CATEGORY_HAS_EXIST);
+            throw new BlogResponseException(ResponseEnum.CATEGORY_HAS_EXIST);
         }
         Category category = new Category();
         category.setName(name);
@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
     public boolean delete(long id) {
         Category category = categoryMapper.findCategoryById(id);
         if (category == null) {
-            throw new MyException(ResponseEnum.CATEGORY_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.CATEGORY_NOT_EXIST);
         }
         return categoryMapper.delete(id) == 1;
     }
@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryModel update(Long id, String name) {
         if (id == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR.getCode(), "id不可为空");
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR.getCode(), "id不可为空");
         }
         Category category = categoryMapper.findCategoryById(id);
         category.setName(name);

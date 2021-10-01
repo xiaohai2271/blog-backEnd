@@ -6,7 +6,7 @@ import cn.celess.common.entity.*;
 import cn.celess.common.entity.dto.ArticleReq;
 import cn.celess.common.entity.vo.ArticleModel;
 import cn.celess.common.entity.vo.PageData;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.*;
 import cn.celess.common.service.ArticleService;
 import cn.celess.common.service.UserService;
@@ -61,35 +61,35 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional(rollbackFor = Exception.class)
     public ArticleModel create(ArticleReq reqBody) {
         if (reqBody == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         //数据判断
         if (reqBody.getTitle() == null || reqBody.getTitle().replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         } else if (reqBody.getMdContent() == null || reqBody.getMdContent().replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         //转载 判断链接
         if (!reqBody.getType()) {
             if (reqBody.getUrl() == null || reqBody.getUrl().replaceAll(" ", "").isEmpty()) {
-                throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+                throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
             } else if (!RegexUtil.urlMatch(reqBody.getUrl())) {
-                throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
+                throw new BlogResponseException(ResponseEnum.PARAMETERS_URL_ERROR);
             }
         }
         if (reqBody.getCategory() == null || reqBody.getCategory().replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         if (reqBody.getTags() == null || reqBody.getTags().length == 0) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         if (articleMapper.existsByTitle(reqBody.getTitle())) {
-            throw new MyException(ResponseEnum.ARTICLE_HAS_EXIST);
+            throw new BlogResponseException(ResponseEnum.ARTICLE_HAS_EXIST);
         }
         // 查看是否存在已有的分类
         Category category = categoryMapper.findCategoryByName(reqBody.getCategory());
         if (category == null) {
-            throw new MyException(ResponseEnum.CATEGORY_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.CATEGORY_NOT_EXIST);
         }
 
         // 构建 需要写入数据库的对象数据
@@ -137,13 +137,13 @@ public class ArticleServiceImpl implements ArticleService {
 
         if (articleForDel == null) {
             //文章不存在
-            throw new MyException(ResponseEnum.ARTICLE_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.ARTICLE_NOT_EXIST);
         }
 
         //对访问情况进行判断  非admin 权限不可删除文章
         User user = redisUserUtil.get();
         if (!RoleEnum.ADMIN_ROLE.getRoleName().equals(user.getRole())) {
-            throw new MyException(ResponseEnum.PERMISSION_ERROR);
+            throw new BlogResponseException(ResponseEnum.PERMISSION_ERROR);
         }
         //删除指定文章
         articleMapper.delete(articleId);
@@ -157,7 +157,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public ArticleModel update(ArticleReq reqBody) {
         if (reqBody == null || reqBody.getId() == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         // 查找数据
         Article article = articleMapper.findArticleById(reqBody.getId());
@@ -165,7 +165,7 @@ public class ArticleServiceImpl implements ArticleService {
         //数据判断
         if (reqBody.getTitle() != null && !reqBody.getTitle().replaceAll(" ", "").isEmpty()) {
             if (!article.getTitle().equals(reqBody.getTitle()) && articleMapper.existsByTitle(reqBody.getTitle())) {
-                throw new MyException(ResponseEnum.ARTICLE_HAS_EXIST);
+                throw new BlogResponseException(ResponseEnum.ARTICLE_HAS_EXIST);
             }
             article.setTitle(reqBody.getTitle());
         }
@@ -176,11 +176,11 @@ public class ArticleServiceImpl implements ArticleService {
         //转载 判断链接
         if (reqBody.getType() != null) {
             if (!reqBody.getType() && reqBody.getUrl() == null) {
-                throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+                throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
             }
 
             if (!reqBody.getType() && !RegexUtil.urlMatch(reqBody.getUrl())) {
-                throw new MyException(ResponseEnum.PARAMETERS_URL_ERROR);
+                throw new BlogResponseException(ResponseEnum.PARAMETERS_URL_ERROR);
             }
             article.setType(reqBody.getType());
             article.setUrl(reqBody.getUrl());
@@ -255,12 +255,12 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleModel retrieveOneById(long articleId, boolean is4update) {
         Article article = articleMapper.findArticleById(articleId);
         if (article == null) {
-            throw new MyException(ResponseEnum.ARTICLE_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.ARTICLE_NOT_EXIST);
         }
         if (!article.getOpen()) {
             User user = redisUserUtil.getWithOutExc();
             if (user == null || "user".equals(user.getRole())) {
-                throw new MyException(ResponseEnum.ARTICLE_NOT_PUBLIC);
+                throw new BlogResponseException(ResponseEnum.ARTICLE_NOT_PUBLIC);
             }
         }
         ArticleModel articleModel = ModalTrans.article(article);
@@ -322,7 +322,7 @@ public class ArticleServiceImpl implements ArticleService {
     public PageData<ArticleModel> findByCategory(String name, int page, int count) {
         Category category = categoryMapper.findCategoryByName(name);
         if (category == null) {
-            throw new MyException(ResponseEnum.CATEGORY_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.CATEGORY_NOT_EXIST);
         }
         PageHelper.startPage(page, count);
         List<Article> open = articleMapper.findAllByCategoryIdAndOpen(category.getId());
@@ -342,7 +342,7 @@ public class ArticleServiceImpl implements ArticleService {
     public PageData<ArticleModel> findByTag(String name, int page, int count) {
         Tag tag = tagMapper.findTagByName(name);
         if (tag == null) {
-            throw new MyException(ResponseEnum.TAG_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.TAG_NOT_EXIST);
         }
         PageHelper.startPage(page, count);
         List<ArticleTag> articleByTag = articleTagMapper.findArticleByTagAndOpen(tag.getId());

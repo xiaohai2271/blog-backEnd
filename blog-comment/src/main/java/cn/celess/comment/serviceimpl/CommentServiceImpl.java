@@ -7,7 +7,7 @@ import cn.celess.common.entity.User;
 import cn.celess.common.entity.dto.CommentReq;
 import cn.celess.common.entity.vo.CommentModel;
 import cn.celess.common.entity.vo.PageData;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.ArticleMapper;
 import cn.celess.common.mapper.CommentMapper;
 import cn.celess.common.mapper.UserMapper;
@@ -44,7 +44,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentModel create(CommentReq reqBody) {
         if (reqBody == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         User user = redisUserUtil.get();
         Comment pComment = null;
@@ -54,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
         //不是一级评论
         if (reqBody.getPid() != -1 && pComment == null) {
             //父评论不存在
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         Comment comment = new Comment();
         comment.setFromUser(user);
@@ -75,10 +75,10 @@ public class CommentServiceImpl implements CommentService {
     public boolean delete(long id) {
         Comment b = commentMapper.findCommentById(id);
         if (b == null) {
-            throw new MyException(ResponseEnum.COMMENT_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.COMMENT_NOT_EXIST);
         }
         if (b.getStatus() == CommentStatusEnum.DELETED.getCode()) {
-            throw new MyException(ResponseEnum.DATA_IS_DELETED);
+            throw new BlogResponseException(ResponseEnum.DATA_IS_DELETED);
         }
         commentMapper.delete(id);
         return true;
@@ -87,7 +87,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentModel update(CommentReq reqBody) {
         if (reqBody.getId() == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR.getCode(), "id不可为空");
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR.getCode(), "id不可为空");
         }
         Comment comment = commentMapper.findCommentById(reqBody.getId());
         if (!comment.getContent().equals(reqBody.getContent())) {

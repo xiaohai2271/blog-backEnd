@@ -6,7 +6,7 @@ import cn.celess.common.entity.ArticleTag;
 import cn.celess.common.entity.Tag;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.TagModel;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.ArticleMapper;
 import cn.celess.common.mapper.ArticleTagMapper;
 import cn.celess.common.mapper.TagMapper;
@@ -42,7 +42,7 @@ public class TagServiceImpl implements TagService {
     public TagModel create(String name) {
         boolean b = tagMapper.existsByName(name);
         if (b) {
-            throw new MyException(ResponseEnum.TAG_HAS_EXIST);
+            throw new BlogResponseException(ResponseEnum.TAG_HAS_EXIST);
         }
         Tag tag = new Tag();
         tag.setName(name);
@@ -55,7 +55,7 @@ public class TagServiceImpl implements TagService {
     public boolean delete(long tagId) {
         Tag tag = tagMapper.findTagById(tagId);
         if (tag == null) {
-            throw new MyException(ResponseEnum.TAG_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.TAG_NOT_EXIST);
         }
         List<ArticleTag> articleByTag = articleTagMapper.findArticleByTag(tagId);
         // 删除文章
@@ -67,7 +67,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagModel update(Long id, String name) {
         if (id == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR.getCode(), "缺少ID");
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR.getCode(), "缺少ID");
         }
         Tag tag = tagMapper.findTagById(id);
         tag.setName(name);

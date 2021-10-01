@@ -10,7 +10,7 @@ import cn.celess.common.entity.dto.UserReq;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.QiniuResponse;
 import cn.celess.common.entity.vo.UserModel;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.UserMapper;
 import cn.celess.common.service.MailService;
 import cn.celess.common.service.QiniuService;
@@ -63,21 +63,21 @@ public class UserServiceImpl implements UserService {
     @Transient
     public Boolean registration(String email, String password) {
         if (password.length() < 6 || password.length() > 16) {
-            throw new MyException(ResponseEnum.PASSWORD_TOO_SHORT_OR_LONG);
+            throw new BlogResponseException(ResponseEnum.PASSWORD_TOO_SHORT_OR_LONG);
         }
         if (!RegexUtil.emailMatch(email)) {
-            throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
         }
         if (!RegexUtil.pwdMatch(password)) {
-            throw new MyException(ResponseEnum.PARAMETERS_PWD_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_PWD_ERROR);
         }
         //验证码验证状态
         Boolean verifyStatus = (Boolean) request.getSession().getAttribute("verImgCodeStatus");
         if (verifyStatus == null || !verifyStatus) {
-            throw new MyException(ResponseEnum.IMG_CODE_DIDNOTVERIFY);
+            throw new BlogResponseException(ResponseEnum.IMG_CODE_DIDNOTVERIFY);
         }
         if (userMapper.existsByEmail(email)) {
-            throw new MyException(ResponseEnum.USERNAME_HAS_EXIST);
+            throw new BlogResponseException(ResponseEnum.USERNAME_HAS_EXIST);
         }
         User user = new User(email, MD5Util.getMD5(password));
         boolean b = userMapper.addUser(user) == 1;
@@ -97,29 +97,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel login(LoginReq loginReq) {
         if (loginReq == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         if (!RegexUtil.emailMatch(loginReq.getEmail())) {
-            throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
         }
         if (!RegexUtil.pwdMatch(loginReq.getPassword())) {
-            throw new MyException(ResponseEnum.PARAMETERS_PWD_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_PWD_ERROR);
         }
 
         User user = userMapper.findByEmail(loginReq.getEmail());
         if (user == null) {
             // 用户不存在
-            throw new MyException(ResponseEnum.USER_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.USER_NOT_EXIST);
         }
         if (user.getStatus() != UserAccountStatusEnum.NORMAL.getCode()) {
-            throw new MyException(ResponseEnum.CAN_NOT_USE, UserAccountStatusEnum.get(user.getStatus()));
+            throw new BlogResponseException(ResponseEnum.CAN_NOT_USE, UserAccountStatusEnum.get(user.getStatus()));
         }
 
         //获取redis缓存中登录失败次数
         String s = redisUtil.get(loginReq.getEmail() + "-passwordWrongTime");
         if (s != null) {
             if (Integer.parseInt(s) == 5) {
-                throw new MyException(ResponseEnum.LOGIN_LATER, loginReq.getEmail());
+                throw new BlogResponseException(ResponseEnum.LOGIN_LATER, loginReq.getEmail());
             }
         }
 
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
             count++;
             //更新登录失败的次数
             redisUtil.setEx(loginReq.getEmail() + "-passwordWrongTime", count + "", 2, TimeUnit.HOURS);
-            throw new MyException(ResponseEnum.LOGIN_FAILURE);
+            throw new BlogResponseException(ResponseEnum.LOGIN_FAILURE);
         }
         UserModel trans = ModalTrans.userFullInfo(user);
         trans.setToken(token);
@@ -182,7 +182,7 @@ public class UserServiceImpl implements UserService {
     public String getUserRoleByEmail(String email) {
         String role = userMapper.getRoleByEmail(email);
         if (role == null) {
-            throw new MyException(ResponseEnum.USER_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.USER_NOT_EXIST);
         }
         return role;
     }
@@ -214,7 +214,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object sendResetPwdEmail(String email) {
         if (!RegexUtil.emailMatch(email)) {
-            throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
         }
 
         User user = userMapper.findByEmail(email);
@@ -223,7 +223,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (!user.getEmailStatus()) {
-            throw new MyException(ResponseEnum.USEREMAIL_NOT_VERIFY);
+            throw new BlogResponseException(ResponseEnum.USEREMAIL_NOT_VERIFY);
         }
 
         String verifyId = UUID.randomUUID().toString().replaceAll("-", "");
@@ -242,7 +242,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object sendVerifyEmail(String email) {
         if (!RegexUtil.emailMatch(email)) {
-            throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
         }
 
         User user = userMapper.findByEmail(email);
@@ -270,14 +270,14 @@ public class UserServiceImpl implements UserService {
     public Object verifyEmail(String verifyId, String email) {
         User user = userMapper.findByEmail(email);
         if (user == null) {
-            throw new MyException(ResponseEnum.FAILURE);
+            throw new BlogResponseException(ResponseEnum.FAILURE);
         }
         if (user.getEmailStatus()) {
-            throw new MyException(ResponseEnum.FAILURE.getCode(), "邮箱已验证过了");
+            throw new BlogResponseException(ResponseEnum.FAILURE.getCode(), "邮箱已验证过了");
         }
         String verifyIdFromCache = redisUtil.get(user.getEmail() + "-verify");
         if (verifyIdFromCache == null) {
-            throw new MyException(ResponseEnum.FAILURE.getCode(), "验证链接无效");
+            throw new BlogResponseException(ResponseEnum.FAILURE.getCode(), "验证链接无效");
         }
         if (verifyIdFromCache.equals(verifyId)) {
             userMapper.updateEmailStatus(email, true);
@@ -286,7 +286,7 @@ public class UserServiceImpl implements UserService {
             redisUserUtil.set(user);
             return "验证成功";
         } else {
-            throw new MyException(ResponseEnum.FAILURE);
+            throw new BlogResponseException(ResponseEnum.FAILURE);
         }
     }
 
@@ -294,27 +294,27 @@ public class UserServiceImpl implements UserService {
     public Object reSetPwd(String verifyId, String email, String pwd) {
         User user = userMapper.findByEmail(email);
         if (user == null) {
-            throw new MyException(ResponseEnum.USER_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.USER_NOT_EXIST);
         }
         if (!RegexUtil.pwdMatch(pwd)) {
-            throw new MyException(ResponseEnum.PARAMETERS_PWD_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_PWD_ERROR);
         }
         if (!user.getEmailStatus()) {
-            throw new MyException(ResponseEnum.USEREMAIL_NOT_VERIFY);
+            throw new BlogResponseException(ResponseEnum.USEREMAIL_NOT_VERIFY);
         }
         String resetPwdIdFromCache = redisUtil.get(user.getEmail() + "-resetPwd");
         if (resetPwdIdFromCache == null) {
-            throw new MyException(ResponseEnum.FAILURE.getCode(), "请先获取重置密码的邮件");
+            throw new BlogResponseException(ResponseEnum.FAILURE.getCode(), "请先获取重置密码的邮件");
         }
         if (resetPwdIdFromCache.equals(verifyId)) {
             if (MD5Util.getMD5(pwd).equals(user.getPwd())) {
-                throw new MyException(ResponseEnum.PWD_SAME);
+                throw new BlogResponseException(ResponseEnum.PWD_SAME);
             }
             userMapper.updatePwd(email, MD5Util.getMD5(pwd));
             redisUtil.delete(user.getEmail() + "-resetPwd");
             return "验证成功";
         } else {
-            throw new MyException(ResponseEnum.FAILURE.getCode(), "标识码不一致");
+            throw new BlogResponseException(ResponseEnum.FAILURE.getCode(), "标识码不一致");
         }
     }
 
@@ -360,7 +360,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel adminUpdate(UserReq userReq) {
         if (userReq == null || userReq.getId() == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         User user = userMapper.findById(userReq.getId());
         // 设置数据
@@ -375,10 +375,10 @@ public class UserServiceImpl implements UserService {
         }
         if (userReq.getPwd() != null) {
             if (userReq.getPwd().length() < 6 || userReq.getPwd().length() > 16) {
-                throw new MyException(ResponseEnum.PASSWORD_TOO_SHORT_OR_LONG);
+                throw new BlogResponseException(ResponseEnum.PASSWORD_TOO_SHORT_OR_LONG);
             }
             if (!RegexUtil.pwdMatch(userReq.getPwd())) {
-                throw new MyException(ResponseEnum.PARAMETERS_PWD_ERROR);
+                throw new BlogResponseException(ResponseEnum.PARAMETERS_PWD_ERROR);
             }
             user.setPwd(MD5Util.getMD5(userReq.getPwd()));
         }
@@ -386,19 +386,19 @@ public class UserServiceImpl implements UserService {
             if (RoleEnum.USER_ROLE.getRoleName().equals(userReq.getRole()) || RoleEnum.ADMIN_ROLE.getRoleName().equals(userReq.getRole())) {
                 user.setRole(userReq.getRole());
             } else {
-                throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+                throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
             }
         }
         if (userReq.getEmail() != null) {
             if (!RegexUtil.emailMatch(userReq.getEmail())) {
-                throw new MyException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
+                throw new BlogResponseException(ResponseEnum.PARAMETERS_EMAIL_ERROR);
             }
             user.setEmail(userReq.getEmail());
         }
         // 数据写入
         int updateResult = userMapper.update(user);
         if (updateResult == 0) {
-            throw new MyException(ResponseEnum.FAILURE);
+            throw new BlogResponseException(ResponseEnum.FAILURE);
         }
         if (redisUserUtil.get().getId().equals(userReq.getId())) {
             redisUserUtil.set(user);
@@ -417,10 +417,10 @@ public class UserServiceImpl implements UserService {
         User user = redisUserUtil.get();
         String pwd1 = userMapper.getPwd(user.getEmail());
         if (!MD5Util.getMD5(pwd).equals(pwd1)) {
-            throw new MyException(ResponseEnum.PWD_WRONG);
+            throw new BlogResponseException(ResponseEnum.PWD_WRONG);
         }
         if (!newPwd.equals(confirmPwd)) {
-            throw new MyException(ResponseEnum.PWD_NOT_SAME);
+            throw new BlogResponseException(ResponseEnum.PWD_NOT_SAME);
         }
         userMapper.updatePwd(user.getEmail(), MD5Util.getMD5(newPwd));
         return ModalTrans.userFullInfo(userMapper.findByEmail(user.getEmail()));

@@ -3,7 +3,7 @@ package cn.celess.extension.controller;
 import cn.celess.common.enmu.ResponseEnum;
 import cn.celess.common.entity.Response;
 import cn.celess.common.entity.vo.QiniuResponse;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.service.CountService;
 import cn.celess.common.service.QiniuService;
 import cn.celess.common.util.HttpUtil;
@@ -112,10 +112,10 @@ public class ExtensionController {
         request.getSession().setAttribute("verImgCodeStatus", false);
         String codeStr = (String) request.getSession().getAttribute("code");
         if (code == null) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         if (codeStr == null) {
-            throw new MyException(ResponseEnum.IMG_CODE_TIMEOUT);
+            throw new BlogResponseException(ResponseEnum.IMG_CODE_TIMEOUT);
         }
         code = code.toLowerCase();
         codeStr = codeStr.toLowerCase();
@@ -147,7 +147,7 @@ public class ExtensionController {
             uploadTimes = Integer.parseInt(uploadTimesStr);
         }
         if (uploadTimes == 10) {
-            throw new MyException(ResponseEnum.FAILURE.getCode(), "上传次数已达10次，请2小时后在上传");
+            throw new BlogResponseException(ResponseEnum.FAILURE.getCode(), "上传次数已达10次，请2小时后在上传");
         }
         request.setCharacterEncoding("utf-8");
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
@@ -197,10 +197,10 @@ public class ExtensionController {
             uploadTimes = Integer.parseInt(uploadTimesStr);
         }
         if (uploadTimes == 10) {
-            throw new MyException(ResponseEnum.FAILURE.getCode(), "上传次数已达10次，请2小时后在上传");
+            throw new BlogResponseException(ResponseEnum.FAILURE.getCode(), "上传次数已达10次，请2小时后在上传");
         }
         if (files.length == 0) {
-            throw new MyException(ResponseEnum.NO_FILE);
+            throw new BlogResponseException(ResponseEnum.NO_FILE);
         }
         for (MultipartFile file : files) {
             Map<String, Object> resp = new HashMap<>(4);

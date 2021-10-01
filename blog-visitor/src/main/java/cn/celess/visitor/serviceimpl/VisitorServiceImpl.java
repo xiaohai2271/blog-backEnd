@@ -4,7 +4,7 @@ import cn.celess.common.enmu.ResponseEnum;
 import cn.celess.common.entity.Visitor;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.VisitorModel;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.VisitorMapper;
 import cn.celess.common.service.VisitorService;
 import cn.celess.common.util.DateFormatUtil;
@@ -75,7 +75,7 @@ public class VisitorServiceImpl implements VisitorService {
             redisUtil.setEx("dayVisitCount", count + "", secondsLeftToday, TimeUnit.SECONDS);
         }
         if (visitorMapper.insert(visitor) == 0) {
-            throw new MyException(ResponseEnum.FAILURE);
+            throw new BlogResponseException(ResponseEnum.FAILURE);
         }
         return trans(visitor);
     }

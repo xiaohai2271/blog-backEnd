@@ -6,7 +6,7 @@ import cn.celess.common.entity.User;
 import cn.celess.common.entity.dto.LoginReq;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.UserModel;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.UserMapper;
 import cn.celess.common.service.UserService;
 import cn.celess.common.util.MD5Util;
@@ -55,7 +55,7 @@ public class UserServiceTest extends UserBaseTest {
         try {
             userService.login(loginReq);
             fail("测试登录被锁账户 失败！");
-        } catch (MyException e) {
+        } catch (BlogResponseException e) {
             assertEquals(ResponseEnum.CAN_NOT_USE.getCode(), e.getCode());
             assertEquals(UserAccountStatusEnum.LOCKED, e.getResult());
         }
@@ -64,7 +64,7 @@ public class UserServiceTest extends UserBaseTest {
         try {
             userService.login(loginReq);
             fail("测试登录被删除账户 失败！");
-        } catch (MyException e) {
+        } catch (BlogResponseException e) {
             assertEquals(ResponseEnum.CAN_NOT_USE.getCode(), e.getCode());
             assertEquals(UserAccountStatusEnum.DELETED, e.getResult());
         }

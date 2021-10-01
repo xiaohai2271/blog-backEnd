@@ -4,7 +4,7 @@ import cn.celess.common.enmu.ResponseEnum;
 import cn.celess.common.entity.WebUpdate;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.WebUpdateModel;
-import cn.celess.common.exception.MyException;
+import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.WebUpdateInfoMapper;
 import cn.celess.common.service.WebUpdateInfoService;
 import cn.celess.common.util.DateFormatUtil;
@@ -38,11 +38,11 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
     @Override
     public WebUpdateModel create(String info) {
         if (info == null || info.replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         WebUpdate webUpdate = new WebUpdate(info);
         if (webUpdateInfoMapper.insert(webUpdate) == 0) {
-            throw new MyException(ResponseEnum.FAILURE);
+            throw new BlogResponseException(ResponseEnum.FAILURE);
         }
         return ModalTrans.webUpdate(webUpdateInfoMapper.findById(webUpdate.getId()));
     }
@@ -50,7 +50,7 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
     @Override
     public Boolean del(long id) {
         if (!webUpdateInfoMapper.existsById(id)) {
-            throw new MyException(ResponseEnum.DATA_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.DATA_NOT_EXIST);
         }
         return webUpdateInfoMapper.delete(id) == 1;
     }
@@ -59,10 +59,10 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
     public WebUpdateModel update(long id, String info) {
         WebUpdate webUpdate = webUpdateInfoMapper.findById(id);
         if (webUpdate == null) {
-            throw new MyException(ResponseEnum.DATA_NOT_EXIST);
+            throw new BlogResponseException(ResponseEnum.DATA_NOT_EXIST);
         }
         if (info == null || info.replaceAll(" ", "").isEmpty()) {
-            throw new MyException(ResponseEnum.PARAMETERS_ERROR);
+            throw new BlogResponseException(ResponseEnum.PARAMETERS_ERROR);
         }
         webUpdate.setUpdateInfo(info);
         webUpdateInfoMapper.update(id, info);

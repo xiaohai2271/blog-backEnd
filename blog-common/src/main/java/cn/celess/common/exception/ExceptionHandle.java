@@ -38,8 +38,8 @@ public class ExceptionHandle {
     @ResponseBody
     public Response handle(Exception e) {
         //自定义错误
-        if (e instanceof MyException) {
-            MyException exception = (MyException) e;
+        if (e instanceof BlogResponseException) {
+            BlogResponseException exception = (BlogResponseException) e;
             logger.debug("返回了自定义的exception,[code={},msg={},result={}]", exception.getCode(), e.getMessage(), exception.getResult());
             return new Response(exception.getCode(), e.getMessage(), exception.getResult());
         }
