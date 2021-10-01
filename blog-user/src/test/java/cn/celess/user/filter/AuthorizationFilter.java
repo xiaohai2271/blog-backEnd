@@ -26,17 +26,17 @@ public class AuthorizationFilter extends UserBaseTest {
     @Test
     public void AdminAccess() throws Exception {
         // 未登录
-        getMockData(get("/admin/articles?page=1&count=1")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
+        getMockData(get("/admin/users?page=1&count=1")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
         // user权限
-        getMockData(get("/admin/articles?page=1&count=1"), userLogin()).andDo(result -> assertEquals(PERMISSION_ERROR.getCode(), getResponse(result).getCode()));
+        getMockData(get("/admin/users?page=1&count=1"), userLogin()).andDo(result -> assertEquals(PERMISSION_ERROR.getCode(), getResponse(result).getCode()));
         // admin 权限
-        getMockData(get("/admin/articles?page=1&count=1"), adminLogin()).andDo(result -> assertEquals(SUCCESS.getCode(), getResponse(result).getCode()));
+        getMockData(get("/admin/users?page=1&count=1"), adminLogin()).andDo(result -> assertEquals(SUCCESS.getCode(), getResponse(result).getCode()));
     }
 
     @Test
     public void VisitorAccess() throws Exception {
         getMockData(get("/user/userInfo")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
-        getMockData(get("/admin/articles?page=1&count=1")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
+        getMockData(get("/admin/users?page=1&count=1")).andDo(result -> assertEquals(HAVE_NOT_LOG_IN.getCode(), getResponse(result).getCode()));
     }
 
     @Test

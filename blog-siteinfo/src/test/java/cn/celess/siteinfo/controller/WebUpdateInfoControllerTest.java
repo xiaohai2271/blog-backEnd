@@ -5,10 +5,9 @@ import cn.celess.common.entity.WebUpdate;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.WebUpdateModel;
 import cn.celess.common.mapper.WebUpdateInfoMapper;
-import cn.celess.common.test.BaseTest;
+import cn.celess.siteinfo.SiteInfoBaseTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +20,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @Slf4j
-public class WebUpdateInfoControllerTest extends BaseTest {
+public class WebUpdateInfoControllerTest extends SiteInfoBaseTest {
     private final TypeReference<?> MODAL_TYPE = new TypeReference<Response<WebUpdateModel>>() {
     };
     private final TypeReference<?> MODAL_LIST_TYPE = new TypeReference<Response<List<WebUpdateModel>>>() {
@@ -126,7 +125,6 @@ public class WebUpdateInfoControllerTest extends BaseTest {
     }
 
     @Test
-    @Ignore
     public void lastestUpdateTime() throws Exception {
         getMockData(get("/lastestUpdate")).andDo(result -> assertEquals(SUCCESS.getCode(), getResponse(result).getCode()));
     }

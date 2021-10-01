@@ -1,11 +1,11 @@
 package cn.celess.visitor.util;
 
-import cn.celess.common.test.BaseTest;
+import cn.celess.visitor.VisitorBaseTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class AddressUtilTest extends BaseTest {
+public class AddressUtilTest extends VisitorBaseTest {
 
     @Test
     public void getCityInfo() {

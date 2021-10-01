@@ -1,5 +1,7 @@
 package cn.celess.common.test;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
 import redis.embedded.RedisServer;
 
 import javax.annotation.PostConstruct;
@@ -10,7 +12,9 @@ import java.io.IOException;
  * @author : xiaohai
  * @date : 2020/08/14 16:20
  */
-public class RedisServerMock extends BaseTest {
+@Configuration
+@Slf4j
+public class BaseRedisTest extends BaseTest {
     private static RedisServer redisServer;
 
     @PostConstruct
@@ -19,14 +23,19 @@ public class RedisServerMock extends BaseTest {
             if (redisServer == null) {
                 redisServer = new RedisServer(6380);
                 redisServer.start();
+                log.info("start Redis success");
             }
         } catch (IOException e) {
+            log.error("start Redis failed");
             e.printStackTrace();
         }
     }
 
-    @PreDestroy
+    @PreDestroy()
     public static void stopRedis() {
-        if (redisServer.isActive()) redisServer.stop();
+        if (redisServer.isActive()) {
+            redisServer.stop();
+            log.info("stop Redis success");
+        }
     }
 }

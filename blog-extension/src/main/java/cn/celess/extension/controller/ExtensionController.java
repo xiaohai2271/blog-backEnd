@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +46,7 @@ public class ExtensionController {
     QiniuService qiniuService;
     @Autowired
     RedisUtil redisUtil;
-    @Autowired
+    @Resource
     RedisUserUtil redisUserUtil;
 
 
@@ -179,7 +180,7 @@ public class ExtensionController {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root;
         try {
-            root = mapper.readTree(HttpUtil.get("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"));
+            root = mapper.readTree(HttpUtil.getHttpResponse("https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt=zh-CN"));
         } catch (IOException e) {
             return Response.failure(null);
         }

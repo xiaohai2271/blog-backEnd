@@ -3,7 +3,7 @@ package cn.celess.visitor.controller;
 import cn.celess.common.entity.Response;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.VisitorModel;
-import cn.celess.common.test.BaseTest;
+import cn.celess.visitor.VisitorBaseTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-public class VisitorControllerTest extends BaseTest {
+public class VisitorControllerTest extends VisitorBaseTest {
     private final TypeReference<?> VISITOR_PAGE_TYPE = new TypeReference<Response<PageData<VisitorModel>>>() {
     };
     private final TypeReference<?> VISITOR_TYPE = new TypeReference<Response<VisitorModel>>() {

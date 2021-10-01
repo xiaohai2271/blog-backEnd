@@ -3,7 +3,7 @@ package cn.celess.partnersite.serviceimpl;
 import cn.celess.common.entity.PartnerSite;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.service.PartnerSiteService;
-import cn.celess.common.test.BaseTest;
+import cn.celess.partnersite.PartnerSiteBaseTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-public class PartnerSiteServiceTest extends BaseTest {
+public class PartnerSiteServiceTest extends PartnerSiteBaseTest {
 
     @Autowired
     PartnerSiteService partnerSiteService;

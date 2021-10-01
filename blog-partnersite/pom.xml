@@ -17,6 +17,11 @@
             <artifactId>blog-common</artifactId>
             <version>${blog-common.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-user</artifactId>
+            <version>${blog-user.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

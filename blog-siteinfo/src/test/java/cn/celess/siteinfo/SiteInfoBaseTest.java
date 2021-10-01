@@ -1,11 +1,11 @@
-package cn.celess.article;
+package cn.celess.siteinfo;
 
-import cn.celess.common.test.BaseRedisTest;
+import cn.celess.common.test.BaseTest;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@SpringBootTest(classes = {ArticleApplication.class})
+@SpringBootTest(classes = SiteInfoApplication.class)
 @RunWith(SpringRunner.class)
-public abstract class ArticleBaseTest extends BaseRedisTest {
+public abstract class SiteInfoBaseTest extends BaseTest {
 }

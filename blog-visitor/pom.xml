@@ -19,6 +19,18 @@
         </dependency>
 
         <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-user</artifactId>
+            <version>${blog-user.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.celess</groupId>
+            <artifactId>blog-extension</artifactId>
+            <version>${blog-extension.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>

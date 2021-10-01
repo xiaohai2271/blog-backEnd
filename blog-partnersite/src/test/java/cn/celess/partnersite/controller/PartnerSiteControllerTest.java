@@ -9,7 +9,7 @@ import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.exception.MyException;
 import cn.celess.common.mapper.PartnerMapper;
 import cn.celess.common.service.PartnerSiteService;
-import cn.celess.common.test.BaseTest;
+import cn.celess.partnersite.PartnerSiteBaseTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @Slf4j
-public class PartnerSiteControllerTest extends BaseTest {
+public class PartnerSiteControllerTest extends PartnerSiteBaseTest {
 
     @Autowired
     PartnerMapper mapper;

@@ -90,7 +90,7 @@ public class WebUpdateInfoServiceImpl implements WebUpdateInfoService {
         map.put("lastUpdateInfo", webUpdateInfoMapper.getLastestOne().getUpdateInfo());
         try {
             ObjectMapper mapper = new ObjectMapper();
-            String respStr = HttpUtil.get("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1");
+            String respStr = HttpUtil.getHttpResponse("https://api.github.com/repos/xiaohai2271/blog-frontEnd/commits?page=1&per_page=1");
             if (!StringUtils.isEmpty(respStr)) {
                 JsonNode root = mapper.readTree(respStr);
                 Iterator<JsonNode> elements = root.elements();

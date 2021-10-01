@@ -3,7 +3,7 @@ package cn.celess.visitor.serviceimpl;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.VisitorModel;
 import cn.celess.common.service.VisitorService;
-import cn.celess.common.test.BaseTest;
+import cn.celess.visitor.VisitorBaseTest;
 import com.alibaba.druid.util.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class VisitorServiceTest extends BaseTest {
+public class VisitorServiceTest extends VisitorBaseTest {
 
     @Autowired
     VisitorService visitorService;
