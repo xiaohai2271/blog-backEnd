@@ -25,8 +25,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 
 @ControllerAdvice
-public class ExceptionHandle {
-    public static final Logger logger = LoggerFactory.getLogger(ExceptionHandle.class);
+public class BlogExceptionHandler {
+    public static final Logger logger = LoggerFactory.getLogger(BlogExceptionHandler.class);
     @Autowired
     MailService mailService;
     @Autowired
