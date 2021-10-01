@@ -4,10 +4,10 @@ import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.Response;
 import cn.celess.common.service.MailService;
 import cn.celess.common.util.DateFormatUtil;
+import cn.celess.common.util.EnvironmentUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -31,8 +31,6 @@ public class BlogExceptionHandler {
     MailService mailService;
     @Autowired
     HttpServletRequest request;
-    @Value("${spring.profiles.active:dev}")
-    private String activeModel;
 
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
@@ -65,7 +63,7 @@ public class BlogExceptionHandler {
         }
 
         // 发送错误信息到邮箱
-        if ("prod".equals(activeModel)) {
+        if ("prod".equals(EnvironmentUtil.getProperties("spring.profiles.active", "dev"))) {
             logger.debug("有一个未捕获的bug，已发送到邮箱");
             sendMessage(e);
         }

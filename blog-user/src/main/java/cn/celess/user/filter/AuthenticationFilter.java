@@ -28,8 +28,6 @@ public class AuthenticationFilter implements HandlerInterceptor {
     private static final String ROLE_ADMIN = "admin";
     private static final String ROLE_USER = "user";
     @Autowired
-    JwtUtil jwtUtil;
-    @Autowired
     RedisUtil redisUtil;
     @Autowired
     UserService userService;
@@ -41,9 +39,9 @@ public class AuthenticationFilter implements HandlerInterceptor {
         int indexOf = path.indexOf("/", 1);
         String rootPath = indexOf == -1 ? path : path.substring(0, indexOf);
         String jwtStr = request.getHeader("Authorization");
-        if (jwtStr != null && !jwtStr.isEmpty() && !jwtUtil.isTokenExpired(jwtStr)) {
+        if (jwtStr != null && !jwtStr.isEmpty() && !JwtUtil.isTokenExpired(jwtStr)) {
             // 已登录 记录当前email
-            request.getSession().setAttribute("email", jwtUtil.getUsernameFromToken(jwtStr));
+            request.getSession().setAttribute("email", JwtUtil.getUsernameFromToken(jwtStr));
         }
         // 不需要鉴权的路径
         if (!USER_PREFIX.equalsIgnoreCase(rootPath) && !ADMIN_PREFIX.equalsIgnoreCase(rootPath)) {
@@ -53,11 +51,11 @@ public class AuthenticationFilter implements HandlerInterceptor {
         if (jwtStr == null || jwtStr.isEmpty()) {
             return writeResponse(ResponseEnum.HAVE_NOT_LOG_IN, response, request);
         }
-        if (jwtUtil.isTokenExpired(jwtStr)) {
+        if (JwtUtil.isTokenExpired(jwtStr)) {
             return writeResponse(ResponseEnum.LOGIN_EXPIRED, response, request);
         }
-        String email = jwtUtil.getUsernameFromToken(jwtStr);
-        if (jwtUtil.isTokenExpired(jwtStr)) {
+        String email = JwtUtil.getUsernameFromToken(jwtStr);
+        if (JwtUtil.isTokenExpired(jwtStr)) {
             // 登陆过期
             return writeResponse(ResponseEnum.LOGIN_EXPIRED, response, request);
         }
@@ -67,7 +65,7 @@ public class AuthenticationFilter implements HandlerInterceptor {
         String role = userService.getUserRoleByEmail(email);
         if (role.equals(ROLE_USER) || role.equals(ROLE_ADMIN)) {
             // 更新token
-            String token = jwtUtil.updateTokenDate(jwtStr);
+            String token = JwtUtil.updateTokenDate(jwtStr);
             response.setHeader("Authorization", token);
         }
         if (role.equals(ROLE_ADMIN)) {

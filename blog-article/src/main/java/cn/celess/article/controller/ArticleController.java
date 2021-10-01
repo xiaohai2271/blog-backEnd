@@ -6,9 +6,9 @@ import cn.celess.common.entity.Response;
 import cn.celess.common.entity.dto.ArticleReq;
 import cn.celess.common.entity.vo.ArticleModel;
 import cn.celess.common.service.ArticleService;
+import cn.celess.common.util.EnvironmentUtil;
 import cn.celess.user.util.RedisUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +25,6 @@ public class ArticleController {
     SitemapGenerateUtil sitemapGenerateUtil;
     @Autowired
     RedisUserUtil redisUserUtil;
-    @Value("${spring.profiles.active}")
-    private String activeModel;
 
     /**
      * 新建一篇文章
@@ -37,7 +35,7 @@ public class ArticleController {
     @PostMapping("/admin/article/create")
     public Response create(@RequestBody ArticleReq body) {
         ArticleModel articleModel = articleService.create(body);
-        if ("prod".equals(activeModel)) {
+        if ("prod".equals(EnvironmentUtil.getProperties("spring.profiles.active", "dev"))) {
             sitemapGenerateUtil.createSitemap();
         }
         return Response.success(articleModel);
@@ -52,7 +50,7 @@ public class ArticleController {
     @DeleteMapping("/admin/article/del")
     public Response delete(@RequestParam("articleID") long articleId) {
         boolean delete = articleService.delete(articleId);
-        if ("prod".equals(activeModel)) {
+        if ("prod".equals(EnvironmentUtil.getProperties("spring.profiles.active", "dev"))) {
             sitemapGenerateUtil.createSitemap();
         }
         return Response.success(delete);
@@ -67,7 +65,7 @@ public class ArticleController {
     @PutMapping("/admin/article/update")
     public Response update(@RequestBody ArticleReq body) {
         ArticleModel update = articleService.update(body);
-        if ("prod".equals(activeModel)) {
+        if ("prod".equals(EnvironmentUtil.getProperties("spring.profiles.active", "dev"))) {
             sitemapGenerateUtil.createSitemap();
         }
         return Response.success(update);

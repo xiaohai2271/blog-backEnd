@@ -4,8 +4,8 @@ package cn.celess.article.util;
 import cn.celess.common.entity.Article;
 import cn.celess.common.mapper.ArticleMapper;
 import cn.celess.common.util.DateFormatUtil;
+import cn.celess.common.util.EnvironmentUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -38,9 +38,6 @@ public class SitemapGenerateUtil {
 
     @Autowired
     ArticleMapper articleMapper;
-
-    @Value("${sitemap.path}")
-    private String path;
     private Map<String, String> urlList;
 
     private static DocumentBuilder getDocumentBuilder() {
@@ -57,7 +54,8 @@ public class SitemapGenerateUtil {
     @Async
     public void createSitemap() {
         initList();
-        if ("".equals(path) || "classpath".equals(path)) {
+        String path = EnvironmentUtil.getProperties("sitemap.path", System.getProperty("user.dir"));
+        if ("classpath".equals(path)) {
             path = System.getProperty("user.dir") + "/sitemap.xml";
         }
         File file = new File(path);

@@ -55,8 +55,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     RedisUtil redisUtil;
     @Autowired
-    JwtUtil jwtUtil;
-    @Autowired
     RedisUserUtil redisUserUtil;
 
     @Override
@@ -131,7 +129,7 @@ public class UserServiceImpl implements UserService {
             redisUtil.delete(loginReq.getEmail() + "-passwordWrongTime");
             // redis 标记
             redisUserUtil.set(user, loginReq.getIsRememberMe());
-            token = jwtUtil.generateToken(user, loginReq.getIsRememberMe());
+            token = JwtUtil.generateToken(user, loginReq.getIsRememberMe());
         } else {
             logger.info("====> {}  进行权限认证  状态：登录失败 <====", loginReq.getEmail());
             request.getSession().removeAttribute("code");
@@ -160,7 +158,7 @@ public class UserServiceImpl implements UserService {
         if (token == null || token.isEmpty()) {
             return "注销登录成功";
         }
-        String email = jwtUtil.getUsernameFromToken(token);
+        String email = JwtUtil.getUsernameFromToken(token);
         if (redisUtil.hasKey(email + "-login")) {
             redisUtil.delete(email + "-login");
         }

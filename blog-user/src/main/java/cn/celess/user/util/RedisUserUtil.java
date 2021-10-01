@@ -21,8 +21,6 @@ public class RedisUserUtil {
     @Autowired
     RedisUtil redisUtil;
     @Autowired
-    JwtUtil jwtUtil;
-    @Autowired
     HttpServletRequest request;
 
     public User get() {
@@ -39,7 +37,7 @@ public class RedisUserUtil {
         if (token == null || token.isEmpty()) {
             return null;
         }
-        String email = jwtUtil.getUsernameFromToken(token);
+        String email = JwtUtil.getUsernameFromToken(token);
         return new ObjectMapper().readValue(redisUtil.get(email + "-login"), User.class);
     }
 

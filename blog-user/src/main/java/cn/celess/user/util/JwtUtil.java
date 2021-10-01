@@ -3,10 +3,9 @@ package cn.celess.user.util;
 import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.User;
 import cn.celess.common.exception.BlogResponseException;
+import cn.celess.common.util.EnvironmentUtil;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Date;
@@ -18,7 +17,6 @@ import java.util.Map;
  * @Date: 2019/11/16 11:26
  * @Description: JWT工具类
  */
-@Component
 @Log4j2
 public class JwtUtil {
     /**
@@ -32,36 +30,31 @@ public class JwtUtil {
     private static final String CLAIM_KEY_USERNAME = "sub";
     private static final String BEARER_PREFIX_UPPER = "Bearer";
     private static final String BEARER_PREFIX_LOWER = "bearer";
-    /**
-     * JWT 秘钥需自行设置不可泄露
-     */
-    @Value("${jwt.secret}")
-    private String SECRET;
 
-    public String generateToken(User user, boolean isRemember) {
+    public static String generateToken(User user, boolean isRemember) {
         Map<String, Object> claims = new HashMap<>(16);
         claims.put(CLAIM_KEY_USERNAME, user.getEmail());
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(new Date(Instant.now().toEpochMilli() + (isRemember ? EXPIRATION_LONG_TIME : EXPIRATION_SHORT_TIME)))
-                .signWith(SignatureAlgorithm.HS512, SECRET)
+                .signWith(SignatureAlgorithm.HS512, EnvironmentUtil.getProperties("jwt.secret"))
                 .compact();
     }
 
-    public String updateTokenDate(String token) {
-        Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(getJwtString(token)).getBody();
+    public static String updateTokenDate(String token) {
+        Claims claims = Jwts.parser().setSigningKey(EnvironmentUtil.getProperties("jwt.secret")).parseClaimsJws(getJwtString(token)).getBody();
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(new Date(claims.getExpiration().getTime() + EXPIRATION_SHORT_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET)
+                .signWith(SignatureAlgorithm.HS512, EnvironmentUtil.getProperties("jwt.secret"))
                 .compact();
     }
 
     /**
      * 获取token是否过期
      */
-    public Boolean isTokenExpired(String token) {
+    public static Boolean isTokenExpired(String token) {
         Date expiration = getExpirationDateFromToken(getJwtString(token));
         return expiration == null || expiration.before(new Date());
     }
@@ -69,7 +62,7 @@ public class JwtUtil {
     /**
      * 根据token获取username
      */
-    public String getUsernameFromToken(String token) {
+    public static String getUsernameFromToken(String token) {
         Claims claims = getClaimsFromToken(getJwtString(token));
         return claims == null ? null : claims.getSubject();
     }
@@ -77,7 +70,7 @@ public class JwtUtil {
     /**
      * 获取token的过期时间
      */
-    public Date getExpirationDateFromToken(String token) {
+    public static Date getExpirationDateFromToken(String token) {
         Claims claims = getClaimsFromToken(getJwtString(token));
         return claims == null ? null : claims.getExpiration();
     }
@@ -85,11 +78,11 @@ public class JwtUtil {
     /**
      * 解析JWT
      */
-    private Claims getClaimsFromToken(String token) {
+    private static Claims getClaimsFromToken(String token) {
         Claims claims = null;
         try {
             claims = Jwts.parser()
-                    .setSigningKey(SECRET)
+                    .setSigningKey(EnvironmentUtil.getProperties("jwt.secret"))
                     .parseClaimsJws(getJwtString(token))
                     .getBody();
         } catch (ExpiredJwtException e) {
@@ -106,7 +99,7 @@ public class JwtUtil {
         return claims;
     }
 
-    private String getJwtString(String token) {
+    private static String getJwtString(String token) {
         if (token == null) return token;
         return token.replaceFirst(BEARER_PREFIX_UPPER, "").replace(BEARER_PREFIX_LOWER, "");
     }

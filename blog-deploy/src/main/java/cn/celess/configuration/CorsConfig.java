@@ -1,6 +1,6 @@
 package cn.celess.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
+import cn.celess.common.util.EnvironmentUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -14,8 +14,6 @@ import org.springframework.web.filter.CorsFilter;
  */
 @Configuration
 public class CorsConfig {
-    @Value("${spring.profiles.active}")
-    private String activeModel;
 
     @Bean
     public CorsFilter corsFilter() {
@@ -26,7 +24,7 @@ public class CorsConfig {
         config.addAllowedOrigin("https://celess.cn");
         config.addAllowedOrigin("https://www.celess.cn");
         // 本地调试时的跨域
-        if (!"prod".equals(activeModel)) {
+        if (!"prod".equals(EnvironmentUtil.getProperties("spring.profiles.active", "dev"))) {
             config.addAllowedOrigin("http://localhost:4200");
             config.addAllowedOrigin("http://127.0.0.1:4200");
         }

@@ -2,6 +2,7 @@ package cn.celess.extension.serviceimpl;
 
 import cn.celess.common.entity.vo.QiniuResponse;
 import cn.celess.common.service.QiniuService;
+import cn.celess.common.util.EnvironmentUtil;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.http.Response;
@@ -10,7 +11,6 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -26,14 +26,9 @@ public class QiniuServiceImpl implements QiniuService {
     private static BucketManager bucketManager;
     private static Auth auth;
 
-    @Value("${qiniu.accessKey}")
-    private String accessKey;
-    @Value("${qiniu.secretKey}")
-    private String secretKey;
-    @Value("${qiniu.bucket}")
-    private String bucket;
-
     private void init() {
+        String accessKey = EnvironmentUtil.getProperties("qiniu.accessKey");
+        String secretKey = EnvironmentUtil.getProperties("qiniu.secretKey");
         if (auth == null || uploadManager == null || bucketManager == null) {
             auth = Auth.create(accessKey, secretKey);
             uploadManager = new UploadManager(cfg);
@@ -44,6 +39,7 @@ public class QiniuServiceImpl implements QiniuService {
     @Override
     public QiniuResponse uploadFile(InputStream is, String fileName) {
         init();
+        String bucket = EnvironmentUtil.getProperties("qiniu.bucket");
         //文件存在则删除文件
         if (continueFile(fileName)) {
             try {
@@ -66,6 +62,7 @@ public class QiniuServiceImpl implements QiniuService {
     @Override
     public FileInfo[] getFileList() {
         init();
+        String bucket = EnvironmentUtil.getProperties("qiniu.bucket");
         BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(bucket, "", 1000, "");
         FileInfo[] items = null;
         while (fileListIterator.hasNext()) {
