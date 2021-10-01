@@ -79,9 +79,8 @@ public class VeriCodeUtil {
      */
     public static Color getRandomColor() {
         Random ran = new Random();
-        Color color = new Color(ran.nextInt(256),
+        return new Color(ran.nextInt(256),
                 ran.nextInt(256), ran.nextInt(256));
-        return color;
     }
 
 

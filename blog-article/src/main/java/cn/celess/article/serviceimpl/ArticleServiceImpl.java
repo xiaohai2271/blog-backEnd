@@ -12,7 +12,7 @@ import cn.celess.common.service.ArticleService;
 import cn.celess.common.service.UserService;
 import cn.celess.common.util.ModalTrans;
 import cn.celess.common.util.RegexUtil;
-import cn.celess.common.util.StringFromHtmlUtil;
+import cn.celess.common.util.StringUtil;
 import cn.celess.user.util.RedisUserUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -99,7 +99,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setUser(redisUserUtil.get());
 
         //markdown->html->summary
-        String str = StringFromHtmlUtil.getString(MDTool.markdown2Html(article.getMdContent()));
+        String str = StringUtil.getString(MDTool.markdown2Html(article.getMdContent()));
         //获取摘要  摘要长度为255个字符
         String summary = str.length() > 240 ? str.substring(0, 240) + "......" : str;
         article.setSummary(summary);
@@ -197,7 +197,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         //写入数据库的数据
         article.setOpen(reqBody.getOpen() == null ? article.getOpen() : reqBody.getOpen());
-        String str = StringFromHtmlUtil.getString(MDTool.markdown2Html(article.getMdContent()));
+        String str = StringUtil.getString(MDTool.markdown2Html(article.getMdContent()));
         article.setSummary(str.length() > 240 ? str.substring(0, 240) + "......" : str);
         articleMapper.update(article);
 

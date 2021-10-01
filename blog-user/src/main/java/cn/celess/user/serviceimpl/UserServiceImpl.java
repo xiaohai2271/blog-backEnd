@@ -15,10 +15,10 @@ import cn.celess.common.mapper.UserMapper;
 import cn.celess.common.service.MailService;
 import cn.celess.common.service.QiniuService;
 import cn.celess.common.service.UserService;
-import cn.celess.common.util.MD5Util;
 import cn.celess.common.util.ModalTrans;
 import cn.celess.common.util.RedisUtil;
 import cn.celess.common.util.RegexUtil;
+import cn.celess.common.util.StringUtil;
 import cn.celess.user.util.JwtUtil;
 import cn.celess.user.util.RedisUserUtil;
 import com.github.pagehelper.PageHelper;
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         if (userMapper.existsByEmail(email)) {
             throw new BlogResponseException(ResponseEnum.USERNAME_HAS_EXIST);
         }
-        User user = new User(email, MD5Util.getMD5(password));
+        User user = new User(email, StringUtil.getMD5(password));
         boolean b = userMapper.addUser(user) == 1;
         if (b) {
             String verifyId = UUID.randomUUID().toString().replaceAll("-", "");
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
 
         String token;
         // 密码比对
-        if (user.getPwd().equals(MD5Util.getMD5(loginReq.getPassword()))) {
+        if (user.getPwd().equals(StringUtil.getMD5(loginReq.getPassword()))) {
             logger.info("====> {}  进行权限认证  状态：登录成功 <====", loginReq.getEmail());
             userMapper.updateLoginTime(loginReq.getEmail());
             redisUtil.delete(loginReq.getEmail() + "-passwordWrongTime");
@@ -307,10 +307,10 @@ public class UserServiceImpl implements UserService {
             throw new BlogResponseException(ResponseEnum.FAILURE.getCode(), "请先获取重置密码的邮件");
         }
         if (resetPwdIdFromCache.equals(verifyId)) {
-            if (MD5Util.getMD5(pwd).equals(user.getPwd())) {
+            if (StringUtil.getMD5(pwd).equals(user.getPwd())) {
                 throw new BlogResponseException(ResponseEnum.PWD_SAME);
             }
-            userMapper.updatePwd(email, MD5Util.getMD5(pwd));
+            userMapper.updatePwd(email, StringUtil.getMD5(pwd));
             redisUtil.delete(user.getEmail() + "-resetPwd");
             return "验证成功";
         } else {
@@ -380,7 +380,7 @@ public class UserServiceImpl implements UserService {
             if (!RegexUtil.pwdMatch(userReq.getPwd())) {
                 throw new BlogResponseException(ResponseEnum.PARAMETERS_PWD_ERROR);
             }
-            user.setPwd(MD5Util.getMD5(userReq.getPwd()));
+            user.setPwd(StringUtil.getMD5(userReq.getPwd()));
         }
         if (userReq.getRole() != null) {
             if (RoleEnum.USER_ROLE.getRoleName().equals(userReq.getRole()) || RoleEnum.ADMIN_ROLE.getRoleName().equals(userReq.getRole())) {
@@ -416,13 +416,13 @@ public class UserServiceImpl implements UserService {
     public UserModel setPwd(String pwd, String newPwd, String confirmPwd) {
         User user = redisUserUtil.get();
         String pwd1 = userMapper.getPwd(user.getEmail());
-        if (!MD5Util.getMD5(pwd).equals(pwd1)) {
+        if (!StringUtil.getMD5(pwd).equals(pwd1)) {
             throw new BlogResponseException(ResponseEnum.PWD_WRONG);
         }
         if (!newPwd.equals(confirmPwd)) {
             throw new BlogResponseException(ResponseEnum.PWD_NOT_SAME);
         }
-        userMapper.updatePwd(user.getEmail(), MD5Util.getMD5(newPwd));
+        userMapper.updatePwd(user.getEmail(), StringUtil.getMD5(newPwd));
         return ModalTrans.userFullInfo(userMapper.findByEmail(user.getEmail()));
     }
 }

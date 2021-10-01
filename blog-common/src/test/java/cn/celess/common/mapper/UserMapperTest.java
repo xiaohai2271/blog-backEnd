@@ -4,7 +4,7 @@ import cn.celess.common.CommonBaseTest;
 import cn.celess.common.enmu.RoleEnum;
 import cn.celess.common.enmu.UserAccountStatusEnum;
 import cn.celess.common.entity.User;
-import cn.celess.common.util.MD5Util;
+import cn.celess.common.util.StringUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -51,7 +51,7 @@ public class UserMapperTest extends CommonBaseTest {
     @Test
     public void updatePwd() {
         User user = generateUser();
-        assertEquals(1, userMapper.updatePwd(user.getEmail(), MD5Util.getMD5("12345687654")));
+        assertEquals(1, userMapper.updatePwd(user.getEmail(), StringUtil.getMD5("12345687654")));
     }
 
     @Test
@@ -163,7 +163,7 @@ public class UserMapperTest extends CommonBaseTest {
         user.setRole(RoleEnum.ADMIN_ROLE.getRoleName());
         user.setAvatarImgUrl("https://celess.cn/examcple.jpg");
         user.setEmail(randomStr(8) + "@celess.cn");
-        user.setPwd(MD5Util.getMD5("010100000100000"));
+        user.setPwd(StringUtil.getMD5("010100000100000"));
         assertEquals(1, userMapper.update(user));
         User byId = userMapper.findById(user.getId());
         assertEquals(user.getDesc(), byId.getDesc());
@@ -176,7 +176,7 @@ public class UserMapperTest extends CommonBaseTest {
     }
 
     private User generateUser() {
-        User user = new User(randomStr(6) + "@celess.cn", MD5Util.getMD5("1234567890"));
+        User user = new User(randomStr(6) + "@celess.cn", StringUtil.getMD5("1234567890"));
         userMapper.addUser(user);
         User newUser = userMapper.findByEmail(user.getEmail());
         assertEquals(user.getId(), newUser.getId());

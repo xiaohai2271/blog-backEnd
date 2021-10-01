@@ -9,7 +9,7 @@ import cn.celess.common.entity.vo.UserModel;
 import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.mapper.UserMapper;
 import cn.celess.common.service.UserService;
-import cn.celess.common.util.MD5Util;
+import cn.celess.common.util.StringUtil;
 import cn.celess.user.UserBaseTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class UserServiceTest extends UserBaseTest {
     public void testLogin() {
         // 测试账户 被锁 被删除  登录
         String email = randomStr(5) + "@celess.cn";
-        String pwd = MD5Util.getMD5("123456789");
+        String pwd = StringUtil.getMD5("123456789");
         User user = new User(email, pwd);
         userMapper.addUser(user);
         assertNotNull(user.getId());

@@ -1,6 +1,6 @@
 package cn.celess.configuration.filter;
 
-import cn.celess.common.util.RequestUtil;
+import cn.celess.common.util.StringUtil;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -27,11 +27,11 @@ public class VisitorRecord implements HandlerInterceptor {
             return true;
         }
         // 获取访问次数
-        Integer count = visitDetail.get(RequestUtil.getCompleteUrlAndMethod(request));
+        Integer count = visitDetail.get(StringUtil.getCompleteUrlAndMethod(request));
         // 自增
         count = count == null ? 1 : ++count;
         // 更新
-        visitDetail.put(RequestUtil.getCompleteUrlAndMethod(request), count);
+        visitDetail.put(StringUtil.getCompleteUrlAndMethod(request), count);
         session.setAttribute("ip", request.getRemoteAddr());
         return true;
     }

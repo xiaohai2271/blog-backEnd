@@ -8,8 +8,8 @@ import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.UserModel;
 import cn.celess.common.mapper.UserMapper;
 import cn.celess.common.service.UserService;
-import cn.celess.common.util.MD5Util;
 import cn.celess.common.util.RedisUtil;
+import cn.celess.common.util.StringUtil;
 import cn.celess.user.UserBaseTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
@@ -138,7 +138,7 @@ public class UserControllerTest extends UserBaseTest {
     @Test
     public void emailVerify() throws Exception {
         String email = randomStr(4) + "@celess.cn";
-        String pwd = MD5Util.getMD5("123456789");
+        String pwd = StringUtil.getMD5("123456789");
         userMapper.addUser(new User(email, pwd));
         String verifyId = randomStr();
         LoginReq req = new LoginReq(email, "123456789", true);
@@ -151,7 +151,7 @@ public class UserControllerTest extends UserBaseTest {
     @Test
     public void resetPwd() throws Exception {
         String email = randomStr(4) + "@celess.cn";
-        String pwd = MD5Util.getMD5("1234567890");
+        String pwd = StringUtil.getMD5("1234567890");
         userMapper.addUser(new User(email, pwd));
         LoginReq req = new LoginReq(email, "1234567890", true);
         String verifyId = randomStr();
@@ -172,7 +172,7 @@ public class UserControllerTest extends UserBaseTest {
         for (int i = 0; i < 10; i++) {
             String s = randomStr();
             String email = s.substring(s.length() - 4) + "@celess.cn";
-            String pwd = MD5Util.getMD5("123456789");
+            String pwd = StringUtil.getMD5("123456789");
             User user = new User(email, pwd);
             int i1 = userMapper.addUser(user);
             if (i1 == 0) {
@@ -206,7 +206,7 @@ public class UserControllerTest extends UserBaseTest {
     public void updateInfoByAdmin() throws Exception {
         UserReq userReq = new UserReq();
         String email = randomStr(4) + "@celess.cn";
-        User user = new User(email, MD5Util.getMD5("123456789"));
+        User user = new User(email, StringUtil.getMD5("123456789"));
         userMapper.addUser(user);
         User userByDb = userMapper.findByEmail(email);
         userReq.setId(userByDb.getId());
@@ -261,7 +261,7 @@ public class UserControllerTest extends UserBaseTest {
     @Test
     public void setPwd() throws Exception {
         String email = randomStr(4) + "@celess.cn";
-        assertEquals(1, userMapper.addUser(new User(email, MD5Util.getMD5("1234567890"))));
+        assertEquals(1, userMapper.addUser(new User(email, StringUtil.getMD5("1234567890"))));
         LoginReq req = new LoginReq(email, "1234567890", false);
         String token = login(req);
         assertNotNull(token);
@@ -271,7 +271,7 @@ public class UserControllerTest extends UserBaseTest {
         param.add("confirmPwd", "aaabbbccc");
         getMockData(post("/user/setPwd").params(param), token).andDo(result -> {
             assertEquals(SUCCESS.getCode(), getResponse(result).getCode());
-            assertEquals(MD5Util.getMD5("aaabbbccc"), userMapper.getPwd(email));
+            assertEquals(StringUtil.getMD5("aaabbbccc"), userMapper.getPwd(email));
         });
     }
 }

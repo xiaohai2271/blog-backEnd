@@ -2,7 +2,7 @@ package cn.celess.configuration.filter;
 
 import cn.celess.common.enmu.ResponseEnum;
 import cn.celess.common.entity.Response;
-import cn.celess.common.util.RequestUtil;
+import cn.celess.common.util.StringUtil;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class MultipleSubmitFilter implements HandlerInterceptor {
         if (lastSubmitTime == null || completeUrl == null) {
             return true;
         }
-        if (System.currentTimeMillis() - lastSubmitTime < WAIT_TIME && RequestUtil.getCompleteUrlAndMethod(request).equals(completeUrl)) {
+        if (System.currentTimeMillis() - lastSubmitTime < WAIT_TIME && StringUtil.getCompleteUrlAndMethod(request).equals(completeUrl)) {
             // 请求参数和路径均相同 且请求时间间隔小于 WAIT_TIME
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -39,6 +39,6 @@ public class MultipleSubmitFilter implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         HttpSession session = request.getSession();
         session.setAttribute("lastSubmitTime", System.currentTimeMillis());
-        session.setAttribute("completeUrl&method", RequestUtil.getCompleteUrlAndMethod(request));
+        session.setAttribute("completeUrl&method", StringUtil.getCompleteUrlAndMethod(request));
     }
 }
