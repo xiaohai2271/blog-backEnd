@@ -2,15 +2,12 @@ package cn.celess.common.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Map;
-import java.util.Properties;
+import org.springframework.core.env.Environment;
 
 @Slf4j
 public class EnvironmentUtil {
 
-    private static final Properties properties = new Properties();
-
+    private static Environment environment;
 
     public static String getEnv(String name) {
         String value = System.getenv(name);
@@ -29,7 +26,7 @@ public class EnvironmentUtil {
     }
 
     public static String getProperties(String key) {
-        String value = properties.getProperty(key);
+        String value = environment.getProperty(key);
         if (StringUtils.isBlank(value)) {
             log.error("没有找到配置项: {}", key);
         }
@@ -37,11 +34,10 @@ public class EnvironmentUtil {
     }
 
     public static String getProperties(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
+        return environment.getProperty(key, defaultValue);
     }
 
-
-    public static void addProperties(Map<?, ?> map) {
-        properties.putAll(map);
+    public static void setEnvironment(Environment environment) {
+        EnvironmentUtil.environment = environment;
     }
 }
