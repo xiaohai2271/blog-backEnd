@@ -1,16 +1,20 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java#apache-maven-with-a-settings-path
-
 name: Build
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+    paths-ignore:
+      - "doc/**"
+      - "**/README.md"
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+      - "doc/**"
+      - "**/README.md"
 
 jobs:
   build:
-    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '.md')" # 如果 commit 信息包含以下关键字则跳过该任务
+    if: "!contains(github.event.head_commit.message, '[skip ci]')" # 如果 commit 信息包含以下关键字则跳过该任务
     runs-on: ubuntu-latest
     env:
       KEY: ${{ secrets.WEB_HOOK_ACCESS_KEY }}
@@ -29,9 +33,9 @@ jobs:
           SSH_KEY: ${{ secrets.GITEE_KEY }}
         with:
           # GitHub存储库的SSH URL.
-          github-repo: git@github.com:xiaohai2271/blog-backEnd.git 
+          github-repo: git@github.com:xiaohai2271/blog-backEnd.git
           # Gitee存储库的SSH URL.
           gitee-repo: git@gitee.com:xiaohai2271/blog-backEnd.git
-    
-      - name: Deploy
-        run: mvn -B test --file pom.xml && curl http://bt.celess.cn:2271/hook?access_key=$KEY
+
+      - name: Unit Test
+        run: mvn package -B -pl blog-deploy -am
