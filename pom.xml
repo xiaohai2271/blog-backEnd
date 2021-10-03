@@ -24,7 +24,7 @@
     </parent>
     <groupId>cn.celess</groupId>
     <artifactId>blog</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>blog</name>
     <description>personal blog system project for Spring Boot</description>
 
@@ -32,16 +32,16 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <blog-common.version>0.0.1-SNAPSHOT</blog-common.version>
-        <blog-article.version>0.0.1-SNAPSHOT</blog-article.version>
-        <blog-categorytag.version>0.0.1-SNAPSHOT</blog-categorytag.version>
-        <blog-user.version>0.0.1-SNAPSHOT</blog-user.version>
-        <blog-comment.version>0.0.1-SNAPSHOT</blog-comment.version>
-        <blog-partnersite.version>0.0.1-SNAPSHOT</blog-partnersite.version>
-        <blog-visitor.version>0.0.1-SNAPSHOT</blog-visitor.version>
-        <blog-siteinfo.version>0.0.1-SNAPSHOT</blog-siteinfo.version>
-        <blog-extension.version>0.0.1-SNAPSHOT</blog-extension.version>
-        <blog-resource.version>0.0.1-SNAPSHOT</blog-resource.version>
+        <blog-common.version>1.0.0</blog-common.version>
+        <blog-article.version>1.0.0</blog-article.version>
+        <blog-categorytag.version>1.0.0</blog-categorytag.version>
+        <blog-user.version>1.0.0</blog-user.version>
+        <blog-comment.version>1.0.0</blog-comment.version>
+        <blog-partnersite.version>1.0.0</blog-partnersite.version>
+        <blog-visitor.version>1.0.0</blog-visitor.version>
+        <blog-siteinfo.version>1.0.0</blog-siteinfo.version>
+        <blog-extension.version>1.0.0</blog-extension.version>
+        <blog-resource.version>1.0.0</blog-resource.version>
     </properties>
 
     <dependencies>

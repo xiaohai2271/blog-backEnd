@@ -15,12 +15,12 @@ git clone git@github.com:xiaohai2271/blog-backEnd.git
  
 ### 3. maven构建
 ```shell script
-mvn package
+mvn clean package -pl blog-deploy -am
 ```
 
 ### 4. 运行
 ```shell script
-java -jar target/blog-0.0.1-SNAPSHOT.jar
+java -jar blog-deploy/target/blog-*.jar
 ```
 
 ### 5. 其他命令
