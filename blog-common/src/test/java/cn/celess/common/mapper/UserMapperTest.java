@@ -1,8 +1,8 @@
 package cn.celess.common.mapper;
 
 import cn.celess.common.CommonBaseTest;
-import cn.celess.common.enmu.RoleEnum;
-import cn.celess.common.enmu.UserAccountStatusEnum;
+import cn.celess.common.constant.RoleEnum;
+import cn.celess.common.constant.UserAccountStatusEnum;
 import cn.celess.common.entity.User;
 import cn.celess.common.util.StringUtil;
 import org.junit.Test;

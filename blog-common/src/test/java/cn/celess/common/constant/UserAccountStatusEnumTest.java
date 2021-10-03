@@ -1,4 +1,4 @@
-package cn.celess.common.enmu;
+package cn.celess.common.constant;
 
 import cn.celess.common.CommonBaseTest;
 import com.fasterxml.jackson.core.JsonProcessingException;

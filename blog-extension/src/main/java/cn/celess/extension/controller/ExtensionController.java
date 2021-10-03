@@ -1,6 +1,6 @@
 package cn.celess.extension.controller;
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.Response;
 import cn.celess.common.entity.vo.QiniuResponse;
 import cn.celess.common.exception.BlogResponseException;

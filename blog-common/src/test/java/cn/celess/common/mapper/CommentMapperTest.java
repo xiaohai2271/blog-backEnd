@@ -1,7 +1,7 @@
 package cn.celess.common.mapper;
 
 import cn.celess.common.CommonBaseTest;
-import cn.celess.common.enmu.CommentStatusEnum;
+import cn.celess.common.constant.CommentStatusEnum;
 import cn.celess.common.entity.Comment;
 import cn.celess.common.entity.User;
 import org.junit.Test;

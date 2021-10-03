@@ -7,7 +7,7 @@ import cn.celess.visitor.VisitorBaseTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 
-import static cn.celess.common.enmu.ResponseEnum.SUCCESS;
+import static cn.celess.common.constant.ResponseEnum.SUCCESS;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

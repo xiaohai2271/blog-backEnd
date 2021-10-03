@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static cn.celess.common.enmu.ResponseEnum.SUCCESS;
+import static cn.celess.common.constant.ResponseEnum.SUCCESS;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 

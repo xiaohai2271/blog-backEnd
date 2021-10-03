@@ -1,4 +1,4 @@
-package cn.celess.common.enmu;
+package cn.celess.common.constant;
 
 /**
  * @author : xiaohai

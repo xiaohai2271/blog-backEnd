@@ -1,6 +1,6 @@
 package cn.celess.common.entity;
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.SneakyThrows;

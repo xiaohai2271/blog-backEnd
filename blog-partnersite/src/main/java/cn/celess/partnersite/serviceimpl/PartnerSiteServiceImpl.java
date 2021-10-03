@@ -1,6 +1,6 @@
 package cn.celess.partnersite.serviceimpl;
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.PartnerSite;
 import cn.celess.common.entity.dto.LinkApplyReq;
 import cn.celess.common.entity.dto.LinkReq;

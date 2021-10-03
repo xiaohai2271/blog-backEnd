@@ -1,6 +1,6 @@
 package cn.celess.user.util;
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.User;
 import cn.celess.common.exception.BlogResponseException;
 import cn.celess.common.util.RedisUtil;

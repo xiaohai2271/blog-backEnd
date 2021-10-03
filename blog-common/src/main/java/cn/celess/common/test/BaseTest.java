@@ -39,7 +39,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.UUID;
 
-import static cn.celess.common.enmu.ResponseEnum.SUCCESS;
+import static cn.celess.common.constant.ResponseEnum.SUCCESS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

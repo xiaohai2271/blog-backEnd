@@ -1,4 +1,4 @@
-package cn.celess.common.enmu;
+package cn.celess.common.constant;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

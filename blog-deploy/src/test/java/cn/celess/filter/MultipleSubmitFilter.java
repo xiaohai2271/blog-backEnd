@@ -1,7 +1,7 @@
 package cn.celess.filter;
 
 import cn.celess.DeployBaseTest;
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.Response;
 import org.junit.Assert;
 import org.junit.Test;

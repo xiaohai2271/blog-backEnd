@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static cn.celess.common.enmu.ResponseEnum.DATA_IS_DELETED;
-import static cn.celess.common.enmu.ResponseEnum.SUCCESS;
+import static cn.celess.common.constant.ResponseEnum.DATA_IS_DELETED;
+import static cn.celess.common.constant.ResponseEnum.SUCCESS;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 

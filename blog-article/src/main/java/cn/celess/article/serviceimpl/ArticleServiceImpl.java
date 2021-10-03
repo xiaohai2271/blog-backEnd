@@ -1,7 +1,7 @@
 package cn.celess.article.serviceimpl;
 
-import cn.celess.common.enmu.ResponseEnum;
-import cn.celess.common.enmu.RoleEnum;
+import cn.celess.common.constant.ResponseEnum;
+import cn.celess.common.constant.RoleEnum;
 import cn.celess.common.entity.*;
 import cn.celess.common.entity.dto.ArticleReq;
 import cn.celess.common.entity.vo.ArticleModel;

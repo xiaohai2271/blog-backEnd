@@ -4,7 +4,7 @@ import cn.celess.common.entity.Response;
 import cn.celess.user.UserBaseTest;
 import org.junit.Test;
 
-import static cn.celess.common.enmu.ResponseEnum.*;
+import static cn.celess.common.constant.ResponseEnum.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 

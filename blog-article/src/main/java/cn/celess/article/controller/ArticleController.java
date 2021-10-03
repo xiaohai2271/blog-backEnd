@@ -1,7 +1,7 @@
 package cn.celess.article.controller;
 
 import cn.celess.article.util.SitemapGenerateUtil;
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.Response;
 import cn.celess.common.entity.dto.ArticleReq;
 import cn.celess.common.entity.vo.ArticleModel;

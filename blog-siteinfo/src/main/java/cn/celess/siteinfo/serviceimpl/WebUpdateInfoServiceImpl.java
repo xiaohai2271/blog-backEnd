@@ -1,6 +1,6 @@
 package cn.celess.siteinfo.serviceimpl;
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.WebUpdate;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.WebUpdateModel;

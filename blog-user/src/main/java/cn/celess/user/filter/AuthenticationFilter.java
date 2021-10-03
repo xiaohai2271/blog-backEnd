@@ -1,7 +1,7 @@
 package cn.celess.user.filter;
 
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.Response;
 import cn.celess.common.service.UserService;
 import cn.celess.common.util.RedisUtil;

@@ -1,6 +1,6 @@
 package cn.celess.visitor.serviceimpl;
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.Visitor;
 import cn.celess.common.entity.vo.PageData;
 import cn.celess.common.entity.vo.VisitorModel;

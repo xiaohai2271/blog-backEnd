@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static cn.celess.common.enmu.ResponseEnum.*;
+import static cn.celess.common.constant.ResponseEnum.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 

@@ -1,6 +1,6 @@
 package cn.celess.common.entity.vo;
 
-import cn.celess.common.enmu.UserAccountStatusEnum;
+import cn.celess.common.constant.UserAccountStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -30,7 +30,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static cn.celess.common.enmu.ResponseEnum.*;
+import static cn.celess.common.constant.ResponseEnum.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 

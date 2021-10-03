@@ -1,7 +1,7 @@
 package cn.celess.categorytag.serviceimpl;
 
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.ArticleTag;
 import cn.celess.common.entity.Tag;
 import cn.celess.common.entity.vo.PageData;

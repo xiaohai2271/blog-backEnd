@@ -1,7 +1,7 @@
 package cn.celess.comment.serviceimpl;
 
-import cn.celess.common.enmu.CommentStatusEnum;
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.CommentStatusEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.Comment;
 import cn.celess.common.entity.User;
 import cn.celess.common.entity.dto.CommentReq;

@@ -1,6 +1,6 @@
 package cn.celess.configuration.filter;
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import cn.celess.common.entity.Response;
 import cn.celess.common.util.StringUtil;
 import org.springframework.web.servlet.HandlerInterceptor;

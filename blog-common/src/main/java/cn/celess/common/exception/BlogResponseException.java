@@ -1,6 +1,6 @@
 package cn.celess.common.exception;
 
-import cn.celess.common.enmu.ResponseEnum;
+import cn.celess.common.constant.ResponseEnum;
 import lombok.Data;
 
 /**
