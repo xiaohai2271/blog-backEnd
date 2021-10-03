@@ -1,10 +1,12 @@
 package cn.celess.common;
 
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.core.SpringVersion;
 
 
 @SpringBootApplication(
@@ -16,6 +18,9 @@ import org.springframework.context.annotation.FilterType;
 @MapperScan("cn.celess.common.mapper")
 public class CommonApplication {
     public static void main(String[] args) {
-        SpringApplication.run(CommonApplication.class, args);
+        new SpringApplicationBuilder(CommonApplication.class)
+                .main(SpringVersion.class)
+                .bannerMode(Banner.Mode.CONSOLE)
+                .run(args);
     }
 }
