@@ -3,14 +3,7 @@ on:
   push:
   schedule:
     # 每周一0:00
-    - cron:  '0 0 0 ? 1 *'
-
-name: Sync Repository Action
-on:
-  push:
-  schedule:
-    # 每天北京时间0点同步
-    - cron:  '0 16 * * *'
+    - cron:  '0 0 * * 1'
 
 jobs:
   build:
