@@ -229,7 +229,7 @@ public abstract class BaseTest {
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
-            response = mapper.readValue(json, responseType);
+            response = (Response<T>) mapper.readValue(json, responseType);
         } catch (IOException e) {
             logger.error("解析json Response对象错误，json:[{}]", json);
             e.printStackTrace();
