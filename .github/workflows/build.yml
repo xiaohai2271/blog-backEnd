@@ -36,6 +36,14 @@ jobs:
           github-repo: git@github.com:xiaohai2271/blog-backEnd.git
           # Gitee存储库的SSH URL.
           gitee-repo: git@gitee.com:xiaohai2271/blog-backEnd.git
+          
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       - name: Unit Test
         run: mvn package -B -pl blog-deploy -am
