@@ -26,17 +26,6 @@ jobs:
         with:
           java-version: 1.8
 
-      - name: Sync repository
-        uses: x-dr/sync-repo-to-gitee@v1.0
-        env:
-          # 在 Settings->Secrets 配置 GITEE_KEY
-          SSH_KEY: ${{ secrets.GITEE_KEY }}
-        with:
-          # GitHub存储库的SSH URL.
-          github-repo: git@github.com:xiaohai2271/blog-backEnd.git
-          # Gitee存储库的SSH URL.
-          gitee-repo: git@gitee.com:xiaohai2271/blog-backEnd.git
-          
       - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
