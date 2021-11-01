@@ -1,6 +1,7 @@
 name: Sync Repository Action
 on:
   push:
+      branches: [ master ]
   schedule:
     # 每周一0:00
     - cron:  '0 0 * * 1'
