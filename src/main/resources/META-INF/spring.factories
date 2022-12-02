@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=cn.celess.blog.configuration.CommonEnvPostProcessor
+org.springframework.context.ApplicationListener=cn.celess.blog.configuration.CommonEnvPostProcessor
