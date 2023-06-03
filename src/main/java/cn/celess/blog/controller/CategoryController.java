@@ -36,6 +36,17 @@ public class CategoryController {
     public Response deleteOne(@RequestParam("id") long id) {
         return Response.success(categoryService.delete(id));
     }
+    
+    /**
+     * 删除一个分类
+     *
+     * @param id 分类id
+     * @return Response
+     */
+    @DeleteMapping("/admin/category/del/{id}")
+    public Response deleteOne(@PathVariable("id") long id) {
+        return Response.success(categoryService.delete(id));
+    }
 
     /**
      * 更新一个分类
